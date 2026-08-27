@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<!-- saved from url=(0115)https://campusvirtual.frm.utn.edu.ar/pluginfile.php/85532/mod_resource/content/3/Deck_CriteriosFuenteDeDatos_6.html -->
+<html lang="es"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>Criterios de una buena fuente de datos — Ciencia de Datos 2026 · Clase 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com/">
+<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+<link href="./Criterios de una buena fuente de datos_files/css2" rel="stylesheet">
+<style>
+  :root {
+    /* Citable palette — dark ground master */
+    --teal-100: #D9F7F5;
+    --teal-300: #7FE6DF;
+    --teal-500: #00C6BB;
+    --teal-700: #009086;
+    --mint-500: #6FEBA0;
+    --lime-500: #B6DF5E;
+    --gold-500: #EFB251;
+    --coral-500: #EF755F;
+    --rose-500: #ED515C;
+    --ink-900: #000000;
+    --ink-800: #212121;
+    --ink-600: #4A4A4A;
+    --ink-500: #636363;
+    --ink-400: #8F8F8F;
+    --paper-0: #FFFFFF;
+    --paper-50: #FAFAFA;
+    --paper-100: #F0F0F0;
+    --paper-200: #E2E2E2;
+    --paper-300: #C9C9C9;
+
+    --color-bg-canvas: var(--ink-800);
+    --color-bg-elevated: #2C2C2C;
+    --color-bg-subtle: #2C2C2C;
+    --color-border: #3A3A3A;
+    --color-border-strong: var(--paper-300);
+    --color-text-primary: var(--paper-0);
+    --color-text-secondary: var(--ink-500);
+
+    --font-display: 'Jost', 'Century Gothic', 'Segoe UI', system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
+    --font-body: 'Jost', 'Century Gothic', 'Segoe UI', system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
+    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+    --text-display-xl: 700 72px/1.05 var(--font-display);
+    --text-display-lg: 600 56px/1.1 var(--font-display);
+    --text-display-md: 600 40px/1.15 var(--font-display);
+    --text-heading: 600 28px/1.25 var(--font-display);
+    --text-subheading: 500 20px/1.4 var(--font-body);
+    --text-body-lg: 400 18px/1.6 var(--font-body);
+    --text-body: 400 16px/1.6 var(--font-body);
+    --text-label: 600 13px/1.3 var(--font-body);
+    --text-caption: 400 13px/1.5 var(--font-body);
+
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 24px;
+    --radius-pill: 999px;
+
+    --shadow-card: 0 1px 2px rgba(0,0,0,0.35), 0 12px 28px rgba(0,0,0,0.45);
+
+    /* Signature notch panels */
+    --notch-title: polygon(0 0, 100% 0, 100% 71.55%, 23.35% 71.55%, 19.86% 75.88%, 16.37% 71.55%, 0 71.55%);
+    --notch-banner: polygon(0 0, 100% 0, 100% 30.05%, 23.35% 30.05%, 19.86% 31.88%, 16.37% 30.05%, 0 30.05%);
+    --notch-section: polygon(0 0, 100% 0, 100% 71.55%, 83.63% 71.55%, 80.14% 75.88%, 76.65% 71.55%, 0 71.55%);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%;
+    background: #0d0d0d;
+    font-family: var(--font-body);
+    color: var(--color-text-primary);
+    overflow: hidden;
+  }
+
+  .stage { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .deck { width: 1280px; height: 720px; position: relative; transform-origin: center center; }
+  .slide {
+    position: absolute; inset: 0;
+    background: var(--color-bg-canvas);
+    overflow: hidden;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s ease;
+    box-sizing: border-box;
+    color: var(--color-text-primary);
+  }
+  .slide.active { opacity: 1; pointer-events: auto; }
+
+  .panel-title { position: absolute; inset: 0; background: var(--teal-500); clip-path: var(--notch-title); }
+  .panel-banner { position: absolute; inset: 0; background: var(--teal-500); clip-path: var(--notch-banner); }
+  .panel-section { position: absolute; inset: 0; background: var(--teal-500); clip-path: var(--notch-section); }
+
+  .brand {
+    font: 600 15px/1 var(--font-display);
+    color: var(--paper-0);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .pill {
+    display: inline-flex;
+    padding: 6px 16px;
+    border-radius: var(--radius-pill);
+    background: rgba(255,255,255,0.2);
+    color: var(--paper-0);
+    font: var(--text-label);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    width: fit-content;
+  }
+  .caption { font: var(--text-caption); color: var(--ink-500); }
+
+  /* Title slide */
+  .slide.title-slide { padding: 72px; display: flex; flex-direction: column; justify-content: space-between; }
+  .slide.title-slide .content { display: flex; flex-direction: column; gap: 20px; max-width: 950px; position: relative; }
+  .slide.title-slide h1 {
+    font: 700 80px/1.05 var(--font-display);
+    color: var(--paper-0);
+    text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000, 0 3px 8px rgba(0,0,0,0.3);
+  }
+  .slide.title-slide .pill {
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(0,0,0,0.6);
+  }
+  .slide.title-slide .brand {
+    text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000;
+  }
+  .slide.title-slide .caption {
+    color: var(--paper-0);
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  }
+
+  /* Section divider — text anclado al bottom del panel teal */
+  .slide.section-divider { padding: 280px 96px 0; display: flex; align-items: flex-start; }
+  .slide.section-divider .content { display: flex; flex-direction: column; gap: 22px; max-width: 950px; position: relative; }
+  .slide.section-divider .kicker {
+    font: 700 26px/1 var(--font-display);
+    color: var(--paper-0);
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    letter-spacing: 0.02em;
+  }
+  .slide.section-divider h1 {
+    font: 700 84px/1.05 var(--font-display);
+    color: var(--paper-0);
+    text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000, 0 2px 6px rgba(0,0,0,0.25);
+  }
+  .slide.section-divider .subtitle {
+    color: var(--paper-0);
+    font: 500 22px/1.5 var(--font-body);
+    max-width: 850px;
+    margin-top: 10px;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  }
+  .slide.section-divider .footer-note {
+    position: absolute; right: 96px; bottom: 32px;
+    font: var(--text-caption); color: var(--ink-500);
+  }
+
+  /* Content slide with banner */
+  .slide.content-slide { display: flex; flex-direction: column; }
+  .slide.content-slide .header {
+    position: relative;
+    padding: 0;
+    height: 216px;
+  }
+  .slide.content-slide .header .hdr-content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    padding: 95px 72px 14px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .slide.content-slide .header h2 {
+    font: var(--text-display-md);
+    color: var(--paper-0);
+    max-width: 1050px;
+  }
+  .slide.content-slide .header h2 .num {
+    display: inline-block;
+    margin-right: 14px;
+    opacity: 0.75;
+    font-weight: 400;
+  }
+  .slide.content-slide .body {
+    position: relative;
+    padding: 14px 72px 48px;
+    flex: 1;
+    display: flex; flex-direction: column; gap: 18px;
+    overflow: hidden;
+    background: var(--color-bg-canvas);
+  }
+  .slide.content-slide .lead {
+    font: 400 22px/1.5 var(--font-body);
+    color: rgba(255,255,255,0.85);
+    max-width: 1080px;
+  }
+
+  /* Cards grid */
+  .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .cards-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+  .card {
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-md);
+    padding: 20px 22px;
+    box-shadow: var(--shadow-card);
+    display: flex; flex-direction: column; gap: 10px;
+    border-top: 4px solid var(--teal-500);
+  }
+  .card.yes { border-top-color: var(--mint-500); }
+  .card.no { border-top-color: var(--coral-500); }
+  .card.mint { border-top-color: var(--mint-500); }
+  .card.gold { border-top-color: var(--gold-500); }
+  .card.coral { border-top-color: var(--coral-500); }
+  .card .card-label {
+    display: flex; align-items: center; gap: 10px;
+    font: 500 22px/1.35 var(--font-display);
+    color: var(--teal-300);
+  }
+  .card.yes .card-label { color: var(--mint-500); }
+  .card.no .card-label { color: var(--coral-500); }
+  .card.mint .card-label { color: var(--mint-500); }
+  .card.gold .card-label { color: var(--gold-500); }
+  .card.coral .card-label { color: var(--coral-500); }
+  .card .card-label .glyph { font-size: 22px; line-height: 1; }
+  .card .card-tag {
+    font: 600 14px/1.3 var(--font-body);
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .card .card-text { font: 400 19px/1.55 var(--font-body); color: var(--paper-0); }
+  .card .card-text strong { color: var(--paper-0); font-weight: 600; }
+  .card .card-text em { font-style: italic; color: rgba(255,255,255,0.75); }
+
+  /* Two-box */
+  .two-box { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .box {
+    padding: 28px;
+    border-radius: var(--radius-lg);
+    display: flex; flex-direction: column; gap: 12px;
+    background: var(--color-bg-elevated);
+    box-shadow: var(--shadow-card);
+    border-top: 4px solid var(--teal-500);
+  }
+  .box.b { border-top-color: var(--gold-500); }
+  .box .box-num { font: 700 56px/1 var(--font-display); }
+  .box.a .box-num { color: var(--teal-300); }
+  .box.a h3 { color: var(--teal-300); }
+  .box.b .box-num { color: var(--gold-500); }
+  .box.b h3 { color: var(--gold-500); }
+  .box h3 { font: 600 30px/1.25 var(--font-display); }
+  .box p { font: 400 22px/1.5 var(--font-body); color: var(--paper-0); }
+
+  /* Tables (wide vs tidy) */
+  .tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .tables-grid .tbl-wrap { display: flex; flex-direction: column; gap: 8px; }
+  .tables-grid .tbl-title {
+    font: 600 17px/1.3 var(--font-body);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .tables-grid .tbl-title.wide { color: var(--coral-500); }
+  .tables-grid .tbl-title.tidy { color: var(--mint-500); }
+  table.mini {
+    width: 100%;
+    border-collapse: collapse;
+    font: 400 19px/1.4 var(--font-body);
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+    color: var(--paper-0);
+  }
+  table.mini th, table.mini td {
+    padding: 11px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-border);
+    font: 400 19px/1.4 var(--font-body);
+  }
+  table.mini th {
+    background: #232323;
+    font: 600 15px/1.3 var(--font-body);
+    color: var(--paper-0);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  table.mini tr:last-child td { border-bottom: 0; }
+  .tables-grid .caption { font-style: italic; color: rgba(255,255,255,0.55); }
+
+  /* Big bullet list — término subrayado teal + explicación */
+  ul.bul-big { list-style: none; display: flex; flex-direction: column; gap: 16px; }
+  ul.bul-big li {
+    padding-left: 32px;
+    position: relative;
+    font: 400 22px/1.5 var(--font-body);
+    color: rgba(255,255,255,0.92);
+  }
+  ul.bul-big li::before {
+    content: '•';
+    position: absolute; left: 4px; top: 0;
+    color: var(--teal-500);
+    font: 700 26px/1.4 var(--font-display);
+  }
+  ul.bul-big li .term {
+    color: var(--paper-0);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--teal-500);
+    text-underline-offset: 3px;
+  }
+  ul.bul-big li em { color: var(--teal-300); font-style: italic; }
+
+  /* Modelable — dos opciones (supervisado / no supervisado) */
+  .modelable-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .modelable-card {
+    padding: 22px 26px;
+    border-radius: var(--radius-md);
+    display: flex; flex-direction: column; gap: 10px;
+    background: var(--color-bg-elevated);
+    border-top: 4px solid var(--teal-500);
+    box-shadow: var(--shadow-card);
+  }
+  .modelable-card.gold { border-top-color: var(--gold-500); }
+  .modelable-card .m-tag {
+    font: 600 15px/1.3 var(--font-body);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--teal-300);
+  }
+  .modelable-card.gold .m-tag { color: var(--gold-500); }
+  .modelable-card .m-title { font: 500 22px/1.4 var(--font-body); color: var(--paper-0); }
+  .modelable-card .m-example { font: 400 17px/1.5 var(--font-body); color: rgba(255,255,255,0.72); font-style: italic; }
+
+  /* Volume scale — 3 rangos */
+  .volume-scale { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .volume-cell {
+    padding: 22px;
+    border-radius: var(--radius-md);
+    text-align: center;
+    display: flex; flex-direction: column; gap: 8px;
+    background: var(--color-bg-elevated);
+    border-top: 4px solid var(--color-border);
+    box-shadow: var(--shadow-card);
+  }
+  .volume-cell.low { border-top-color: var(--coral-500); }
+  .volume-cell.mid { border-top-color: var(--gold-500); }
+  .volume-cell.high { border-top-color: var(--mint-500); }
+  .volume-cell .v-num { font: 700 34px/1.1 var(--font-display); }
+  .volume-cell.low .v-num { color: var(--coral-500); }
+  .volume-cell.mid .v-num { color: var(--gold-500); }
+  .volume-cell.high .v-num { color: var(--mint-500); }
+  .volume-cell .v-tag {
+    font: 600 15px/1.3 var(--font-body);
+    color: rgba(255,255,255,0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* Checklist final */
+  .check-list { display: flex; flex-direction: column; gap: 10px; max-width: 1100px; }
+  .check-list .item {
+    display: flex;
+    gap: 24px;
+    align-items: baseline;
+  }
+  .check-list .item .n {
+    font: 700 24px/1 var(--font-display);
+    color: var(--teal-300);
+    width: 40px;
+    flex-shrink: 0;
+  }
+  .check-list .item.fac .n { color: var(--gold-500); }
+  .check-list .item .txt {
+    font: 500 21px/1.35 var(--font-body);
+    color: var(--paper-0);
+  }
+  .check-list .item .txt .hint {
+    color: rgba(255,255,255,0.58);
+    font-size: 15px;
+    display: block;
+    margin-top: 2px;
+  }
+  .check-list .footer-line {
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px solid var(--color-border);
+    font: 400 15px/1.5 var(--font-body);
+    color: rgba(255,255,255,0.6);
+  }
+
+  /* Bridge — puente al proyecto integrador */
+  .bridge {
+    margin-top: auto;
+    padding: 14px 18px;
+    background: rgba(239,178,81,0.10);
+    border-left: 4px solid var(--gold-500);
+    border-radius: 8px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .bridge .b-tag {
+    font: var(--text-label); font-family: 'Jost', 'Noto Color Emoji', sans-serif;
+    color: var(--gold-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .bridge .b-text {
+    font: 400 18px/1.5 var(--font-body);
+    color: var(--paper-0);
+  }
+
+  /* Callout con número/frase grande destacado */
+  .callout-key {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px;
+    align-items: center;
+    padding: 16px 24px;
+    background: rgba(0,198,187,0.09);
+    border-left: 4px solid var(--teal-500);
+    border-radius: 8px;
+  }
+  .callout-key .ck-big {
+    font: 700 48px/1 var(--font-display);
+    color: var(--teal-300);
+    white-space: nowrap;
+  }
+  .callout-key p {
+    font: 400 19px/1.5 var(--font-body);
+    color: rgba(255,255,255,0.92);
+  }
+
+  /* Close slide */
+  .slide.close-slide {
+    padding: 72px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .slide.close-slide h1 {
+    font: 700 84px/1.05 var(--font-display);
+    color: var(--paper-0);
+    text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000, 0 3px 8px rgba(0,0,0,0.3);
+  }
+  .slide.close-slide .pill {
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(0,0,0,0.6);
+  }
+  .slide.close-slide .brand {
+    text-shadow: -1.5px -1.5px 0 #000, 1.5px -1.5px 0 #000, -1.5px 1.5px 0 #000, 1.5px 1.5px 0 #000;
+  }
+  .slide.close-slide .subtitle {
+    font: var(--text-heading);
+    color: var(--paper-0);
+    opacity: 0.95;
+    margin-top: 20px;
+    max-width: 820px;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+  }
+  .slide.close-slide .task {
+    max-width: 820px;
+    background: var(--color-bg-elevated);
+    border-radius: var(--radius-md);
+    padding: 24px 28px;
+    box-shadow: var(--shadow-card);
+    border-top: 4px solid var(--gold-500);
+  }
+  .slide.close-slide .task .t-tag {
+    font: var(--text-label);
+    color: var(--gold-500);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .slide.close-slide .task .t-text { font: 400 22px/1.55 var(--font-body); color: var(--paper-0); }
+
+  /* Footer / navigation */
+  .nav {
+    position: fixed;
+    bottom: 20px; right: 24px;
+    display: flex; align-items: center; gap: 12px;
+    z-index: 10;
+    color: rgba(255,255,255,0.75);
+    font: var(--text-label);
+  }
+  .nav button {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.25);
+    color: white;
+    width: 36px; height: 36px;
+    border-radius: 50%; cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  .nav button:hover { background: var(--teal-500); border-color: var(--teal-500); }
+  .nav .counter { min-width: 60px; text-align: center; letter-spacing: 0.04em; cursor: pointer; user-select: none; padding: 6px 8px; border-radius: 6px; transition: background 0.15s; }
+  .nav .counter:hover { background: rgba(255,255,255,0.12); }
+
+  .brand-footer {
+    position: fixed;
+    bottom: 24px; left: 24px;
+    font: var(--text-label);
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    z-index: 10;
+  }
+  .page-brand {
+    position: absolute;
+    right: 32px; bottom: 20px;
+    font: var(--text-caption);
+    color: rgba(255,255,255,0.4);
+  }
+
+  /* Overview panel — jump to any slide (G) */
+  .overview {
+    position: fixed;
+    inset: 0;
+    background: rgba(10,10,10,0.94);
+    z-index: 100;
+    overflow: auto;
+    padding: 48px 56px;
+    display: none;
+    backdrop-filter: blur(6px);
+  }
+  .overview.open { display: block; }
+  .overview .ov-header {
+    max-width: 1400px;
+    margin: 0 auto 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+  }
+  .overview .ov-header h3 { font: 600 20px/1 var(--font-display); color: white; }
+  .overview .ov-header .hint {
+    font: 400 12px/1.4 var(--font-body);
+    color: rgba(255,255,255,0.6);
+  }
+  .overview .ov-header .hint kbd {
+    background: rgba(255,255,255,0.12);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font: 500 11px var(--font-mono);
+    margin: 0 2px;
+  }
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .overview-tile {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 16px 18px;
+    cursor: pointer;
+    text-align: left;
+    color: white;
+    font-family: var(--font-body);
+    transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  }
+  .overview-tile:hover {
+    background: var(--teal-500);
+    border-color: var(--teal-500);
+    transform: translateY(-2px);
+  }
+  .overview-tile.current {
+    border-color: var(--teal-500);
+    background: rgba(0,198,187,0.14);
+  }
+  .overview-tile .ot-num {
+    font: 700 22px/1 var(--font-display);
+    color: var(--teal-300);
+    margin-bottom: 6px;
+  }
+  .overview-tile:hover .ot-num { color: white; }
+  .overview-tile .ot-kicker {
+    font: 500 10px/1 var(--font-body);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    opacity: 0.55;
+    margin-bottom: 4px;
+    min-height: 10px;
+  }
+  .overview-tile .ot-title {
+    font: 500 14px/1.35 var(--font-body);
+    color: rgba(255,255,255,0.92);
+  }
+
+  /* Number-jump pill */
+  .jump-hint {
+    position: fixed;
+    bottom: 76px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 18px;
+    background: rgba(0,198,187,0.95);
+    color: white;
+    font: 600 14px/1 var(--font-mono);
+    border-radius: 999px;
+    z-index: 20;
+    display: none;
+  }
+  .jump-hint.visible { display: block; }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="deck" id="deck" style="transform: scale(1.91806);">
+
+    <!-- 1. Portada -->
+    <section class="slide title-slide active">
+      <div class="panel-title"></div>
+      <div style="position:relative; z-index:1; display:flex; flex-direction:column; justify-content:space-between; height:100%;">
+        <div class="brand">UTN FRM</div>
+        <div class="content">
+          <span class="pill">Ciencia de Datos · Clase 1 · Bloque 2</span>
+          <h1>Criterios de una<br>buena fuente<br>de datos</h1>
+        </div>
+        <div class="caption">Universidad Tecnológica Nacional — Facultad Regional Mendoza</div>
+      </div>
+    </section>
+
+    <!-- 2. Antes de elegir (Two-box) -->
+    <section class="slide content-slide">
+      <div class="header">
+        <div class="panel-banner"></div>
+        <div class="hdr-content">
+          <span class="pill">Punto de partida</span>
+          <h2>Antes de elegir la fuente</h2>
+        </div>
+      </div>
+      <div class="body">
+        <p class="lead">Dos preguntas que se responden en este orden. No al revés.</p>
+        <div class="two-box">
+          <div class="box a">
+            <div class="box-num">1</div>
+            <h3>¿Qué querés investigar?</h3>
+            <p>Una pregunta acotada. Sobre qué unidad — un jugador, una transacción, un país-año, un tweet.</p>
+          </div>
+          <div class="box b">
+            <div class="box-num">2</div>
+            <h3>¿Qué fuente responde esa pregunta?</h3>
+            <p>Elegir dataset primero e inventar la pregunta después lleva a proyectos mecánicos y desmotivadores.</p>
+          </div>
+        </div>
+        <p class="caption" style="text-align:center; font-style:italic;">Los 7 criterios que siguen son la lupa con la que se evalúa el punto 2.</p>
+      </div>
+      <div class="page-brand">Ciencia de Datos · Clase 1</div>
+    </section>
+
+    <!-- 3. Divisor Bloque A -->
+    <section class="slide section-divider">
+      <div class="panel-section"></div>
+      <div class="content" style="z-index:1;">
+        <div class="kicker">Bloque A · 4 eliminatorios</div>
+        <h1>Sin esto no hay<br>proyecto</h1>
+        <p class="subtitle">Si tu fuente no cumple alguno de estos, no importa cuánto insistas — el proyecto no va a llegar a buen puerto. Buscá otra o ajustá tu pregunta.</p>
+      </div>
+      <div class="footer-note">Ciencia de Datos · Clase 1</div>
+    </section>
+
+    <!-- 4. Criterio 1: Tidy -->
+    <section class="slide content-slide">
+      <div class="header">
+        <div class="panel-banner"></div>
+        <div class="hdr-content">
+          <span class="pill">Criterio 1 · Eliminatorio</span>
+          <h2><span class="num">01</span>Datos tidy</h2>
+        </div>
+      </div>
+      <div class="body">
+        <p class="lead">Cada fila es una observación. Cada columna es una variable. El nombre técnico es <em>tidy</em> — "ordenado".</p>
+        <div class="tables-grid">
+          <div class="tbl-wrap">
+            <div class="tbl-title wide">✗ Formato no tidy (wide)</div>
+            <table class="mini">
+              <tbody><tr><th>Persona</th><th>Enero</th><th>Febrero</th><th>Marzo</th></tr>
+              <tr><td>Ana</td><td>1500</td><td>1700</td><td>1600</td></tr>
+              <tr><td>Bruno</td><td>1300</td><td>1400</td><td>1450</td></tr>
+            </tbody></table>
+            <p class="caption">"Mes" es una variable, pero está escondida como nombre de columna.</p>
+          </div>
+          <div class="tbl-wrap">
+            <div class="tbl-title tidy">✓ Formato tidy (long)</div>
+            <table class="mini">
+              <tbody><tr><th>Persona</th><th>Mes</th><th>Valor</th></tr>
+              <tr><td>Ana</td><td>Enero</td><td>1500</td></tr>
+              <tr><td>Ana</td><td>Febrero</td><td>1700</td></tr>
+              <tr><td>Ana</td><td>Marzo</td><td>1600</td></tr>
+              <tr><td>Bruno</td><td>Enero</td><td>1300</td></tr>
+            </tbody></table>
+            <p class="caption">Cada fila es una observación (persona-mes). Cada columna, una variable.</p>
+          </div>
+        </div>
+      </div>
+      <div class="page-brand">Ciencia de Datos · Clase 1</div>
+    </section>
+
+    <!-- 5. Criterio 2: Unidad de análisis -->
+    <section class="slide content-slide">
+      <div class="header">
+        <div class="panel-banner"></div>
+        <div class="hdr-content">
+          <span class="pill">Criterio 2 · Eliminatorio</span>
+          <h2><span class="num">02</span>Unidad de análisis alineada con la pregunta</h2>
+        </div>
+      </div>
+      <div class="body">
+        <p class="lead">La unidad que representa cada fila del dataset tiene que coincidir con la unidad sobre la que querés sacar conclusiones. La granularidad se decide desde la pregunta, no desde el dataset.</p>
+        <div class="cards-grid">
+          <div class="card yes">
+            <div class="card-tag">Pregunta y unidad alineadas</div>
+            <div class="card-label"><span class="glyph">✓</span> FIFA</div>
+            <p class="card-text"><strong>Pregunta:</strong> ¿Qué distingue los perfiles físicos de cada posición en el fútbol?<br><strong>Unidad:</strong> jugador. <strong>Dataset:</strong> FIFA, un jugador por fila. <em>Match.</em></p>
+          </div>
+          <div class="card no">
+            <div class="card-tag">Pregunta y unidad desalineadas</div>
+            <div class="card-label"><span class="glyph">✗</span> Banco Mundial para preguntas sobre personas</div>
+            <p class="card-text"><strong>Pregunta:</strong> ¿Qué distingue a las personas que emigran?<br><strong>Dataset:</strong> Banco Mundial, país-año por fila. La unidad país no captura decisiones individuales.</p>
+          </div>
+        </div>
+      </div>
+      <div class="page-brand">Ciencia de Datos · Clase 1</div>
+    </section>
+
+    <!-- 6. Criterio 3: Modelable — modelable-grid + callout FIFA -->
+    <section class="slide content-slide">
+      <div class="header">
+        <div class="panel-banner"></div>
+        <div class="hdr-content">
+          <span class="pill">Criterio 3 · Eliminatorio</span>
+          <h2><span class="num">03</span>Algo modelable</h2>
+        </div>
+      </div>
+      <div class="body">
+        <p class="lead">En la Unidad 3 vas a construir un modelo. La fuente tiene que dar el material. Basta con que se cumpla una de estas dos condiciones.</p>
+        <div class="modelable-grid">
+          <div class="modelable-card">
+            <div class="m-tag">Aprendizaje supervisado</div>
+            <div class="m-title">Hay una variable que querés predecir a partir de las otras.</div>
+            <p class="m-example">Ej: predecir la posición del jugador desde sus atributos técnicos.</p>
+          </div>
+          <div class="modelable-card gold">
+            <div class="m-tag">Aprendizaje no supervisado</div>
+            <div class="m-title">Sospechás que hay grupos naturales escondidos en los datos.</div>
+            <p class="m-example">Ej: agrupar jugadores en arquetipos — "delantero potente", "extremo veloz".</p>
+          </div>
+        </div>
+        <div class="callout-key">
+          <div class="ck-big">FIFA ✓</div>
+          <p>Posición del jugador como variable objetivo, arquetipos como estructura latente. <strong>Cumple las dos.</strong> Un listado de museos con dirección, en cambio, no tiene qué predecir ni grupos que descubrir — en U3 el proyecto se rompe.</p>
+        </div>
+      </div>
+      <div class="page-brand">Ciencia de Datos · Clase 1</div>
+    </section>
+
+    <!-- 7. Criterio 4: Descargable — bul-big variety -->
+    <section class="slide content-slide">
+      <div class="header">
+        <div class="panel-banner"></div>
+        <div class="hdr-content">
+          <span class="pill">Criterio 4 · Eliminatorio</span>
+          <h2><span class="num">04</span>Descargable de forma automatizada</h2>
+        </div>
+      </div>
+      <div class="body">
+        <p class="lead">En la Unidad 1 vas a construir un pipeline que baje los datos sin intervención humana.</p>
+        <ul class="bul-big">
+          <li><span class="term">Archivos por URL directa</span> — un CSV o JSON servido en un endpoint público. El caso más simple: <em>requests.get</em> y listo.</li>
+          <li><span class="term">APIs REST públicas</span> — con o sin API key, siempre que se pueda automatizar. Ej: Banco Mundial, GitHub, OpenWeather.</li>
+          <li><span class="term">Páginas scrapeables</span> — HTML navegable con estructura estable. Aun con Cloudflare o JS pesado se puede, con <em>Playwright</em>. Es más trabajo, pero es válido.</li>
+        </ul>
+        <div class="callout-key" style="background: rgba(239,117,95,0.10); border-left-color: var(--coral-500);">
+          <div class="ck-big" style="color: var(--coral-500);">NO</div>
+          <p>Foto de una tabla en un PDF. Sitios con captcha manual. Bases privadas o pagas. Apuntes propios.</p>
+        </div>
+      </div>
+      <div class="page-brand">Ciencia de Datos · Clase 1</div>
+    </section>
+
+    <!-- 8. Divisor Bloque B -->
+    <section class="slide section-divider">
+      <div class="panel-section"></div>
+      <div class="content" style="z-index:1;">
+        <div class="kicker">Bloque B · 3 facilitadores</div>
+        <h1>Estos te hacen<br>la vida más fácil</h1>
+        <p class="subtitle">No rompen el proyecto si fallan, pero lo complican. Cada uno tiene una salida de emergencia si estás dispuesto a poner más trabajo.</p>
+      </div>
+      <div class="footer-note">Ciencia de Datos · Clase 1</div>
+    </section>
+
+    <!-- 9. Criterio 5: Volumen -->
+    <section class="slide content-slide">
+      <div class="header">
+        <div class="panel-banner"></div>
+        <div class="hdr-content">
+          <span class="pill">Criterio 5 · Facilitador</span>
+          <h2><span class="num">05</span>Volumen suficiente</h2>
+        </div>
+      </div>
+      <div class="body">
+        <p class="lead">Con pocas filas los modelos no aprenden y las visualizaciones cuentan anécdotas.</p>
+        <div class="volume-scale">
+          <div class="volume-cell low">
+            <div class="v-num">&lt; 1.000</div>
+            <div class="v-tag">Insuficiente</div>
+          </div>
+          <div class="volume-cell mid">
+            <div class="v-num">1.000 – 10.000</div>
+            <div class="v-tag">Suficiente para arrancar</div>
+          </div>
+          <div class="volume-cell high">
+            <div class="v-num">&gt; 10.000</div>
+            <div class="v-tag">Cómodo</div>
+          </div>
+        </div>
+        <div class="callout-key">
+          <div class="ck-big">~18.000</div>
+          <p><strong>FIFA:</strong> ~18.000 jugadores. Cómodo. <em>Salida si te queda corto:</em> combinar con otra fuente relacionada por una clave común, o acotar el alcance del modelo.</p>
+        </div>
+      </div>
+      <div class="page-brand">Ciencia de Datos · Clase 1</div>
+    </section>
+
+    <!-- 10. Criterio 6: Columnas — bul-big con categorías FIFA -->
+    <section class="slide content-slide">
+      <div class="header">
+        <div class="panel-banner"></div>
+        <div class="hdr-content">
+          <span class="pill">Criterio 6 · Facilitador</span>
+          <h2><span class="num">06</span>Varias columnas informativas</h2>
+        </div>
+      </div>
+      <div class="body">
+        <p class="lead">Al menos <strong>5 columnas útiles</strong>, con mezcla de tipos: numéricas, categóricas, fechas.</p>
+        <ul class="bul-big">
+          <li><span class="term">FIFA</span> — 100+ atributos por jugador. <em>Físicos</em> (altura, peso), <em>técnicos</em> (regate, pase, tiro), <em>financieros</em> (valor, salario), <em>contextuales</em> (club, liga, país).</li>
+          <li><span class="term">Contraejemplo: habitantes por localidad</span> — una única columna útil. No hay features para modelar ni dimensiones para cruzar en visualizaciones.</li>
+        </ul>
+        <div class="callout-key">
+          <div class="ck-big">Salida</div>
+          <p>Si te faltan columnas: <strong>derivar nuevas variables</strong> desde las existentes (feature engineering) o <strong>combinar con otra fuente</strong> por una clave común (ej. país, año, ID de jugador).</p>
+        </div>
+      </div>
+      <div class="page-brand">Ciencia de Datos · Clase 1</div>
+    </section>
+
+    <!-- 11. Criterio 7: Documentación -->
+    <section class="slide content-slide">
+      <div class="header">
+        <div class="panel-banner"></div>
+        <div class="hdr-content">
+          <span class="pill">Criterio 7 · Facilitador</span>
+          <h2><span class="num">07</span>Documentación entendible</h2>
+        </div>
+      </div>
+      <div class="body">
+        <p class="lead">Tenés que saber qué significa cada columna, sus unidades, su origen, qué representa un valor faltante.</p>
+        <div class="cards-grid">
+          <div class="card yes">
+            <div class="card-label"><span class="glyph">✓</span> FIFA / sofifa</div>
+            <p class="card-text">Los atributos son estándar del videojuego y están ampliamente documentados. Un "85 en <em>dribbling</em>" significa lo mismo en todos los jugadores.</p>
+          </div>
+          <div class="card no">
+            <div class="card-label"><span class="glyph">✗</span> CSV con columnas <em>col_1, col_2, col_3</em></div>
+            <p class="card-text">Sin diccionario ni nombres claros. Vas a pasar más tiempo adivinando que analizando.</p>
+          </div>
+        </div>
+        <div class="bridge">
+          <div class="b-tag">🔗 Salida de emergencia</div>
+          <p class="b-text">Si no hay documentación, se puede reconstruir leyendo los datos y consultando la fuente original. Cuesta tiempo, pero se puede — no descarta la fuente por sí solo.</p>
+        </div>
+      </div>
+      <div class="page-brand">Ciencia de Datos · Clase 1</div>
+    </section>
+
+    <!-- 12. Checklist final -->
+    <section class="slide content-slide">
+      <div class="header">
+        <div class="panel-banner"></div>
+        <div class="hdr-content">
+          <span class="pill">Cierre del bloque</span>
+          <h2>Checklist antes de aceptar tu fuente</h2>
+        </div>
+      </div>
+      <div class="body">
+        <p class="lead">Si a alguna de las 4 primeras respondés "no" o "no sé", buscá otra fuente o ajustá tu pregunta.</p>
+        <div class="check-list">
+          <div class="item"><div class="n">01</div><div class="txt">¿Cada fila representa una unidad concreta que podés nombrar en una frase?</div></div>
+          <div class="item"><div class="n">02</div><div class="txt">¿Esa unidad coincide con la unidad sobre la que querés sacar conclusiones?</div></div>
+          <div class="item"><div class="n">03</div><div class="txt">¿Hay algo que quieras predecir, o grupos que sospeches encontrar?</div></div>
+          <div class="item"><div class="n">04</div><div class="txt">¿La podés descargar sin intervención humana? <span class="hint">URL, API, scraping.</span></div></div>
+          <div class="item fac"><div class="n">05</div><div class="txt">¿Cuántas filas hay? <span class="hint">Objetivo: &gt;1.000. Ideal: &gt;10.000.</span></div></div>
+          <div class="item fac"><div class="n">06</div><div class="txt">¿Cuántas columnas útiles hay? <span class="hint">Objetivo: &gt;5, con mezcla de tipos.</span></div></div>
+          <div class="item fac"><div class="n">07</div><div class="txt">¿Sabés qué significa cada columna?</div></div>
+          <div class="footer-line">Los 4 primeros son eliminatorios (teal). Los 3 últimos son facilitadores solucionables con trabajo extra (dorado).</div>
+        </div>
+      </div>
+      <div class="page-brand">Ciencia de Datos · Clase 1</div>
+    </section>
+
+    <!-- 13. Cierre -->
+    <section class="slide close-slide">
+      <div class="panel-title"></div>
+      <div style="position:relative; z-index:1; display:flex; flex-direction:column; justify-content:space-between; height:100%;">
+        <div class="brand">UTN FRM</div>
+        <div>
+          <span class="pill" style="margin-bottom:16px;">Ahora te toca a vos</span>
+          <h1>Elegí tema,<br>pregunta y fuente.</h1>
+          <p class="subtitle">Reunite con tu grupo, formulá una pregunta acotada y buscá la fuente que la responde — pasándola por los 7 criterios.</p>
+        </div>
+        <div class="task">
+          <div class="t-tag">🔗 Antes de irte de la clase</div>
+          <p class="t-text">Completá el formulario con: <strong>integrantes del grupo</strong>, <strong>pregunta tentativa</strong>, <strong>link a la fuente</strong> y <strong>checklist tildado</strong>. Sin eso el TP Integrador no arranca.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="overview" id="overview">
+  <div class="ov-header">
+    <h3>Ir a slide</h3>
+    <div class="hint">Enter <kbd>G</kbd> para abrir · <kbd>Esc</kbd> para cerrar · Tipeá un número + <kbd>Enter</kbd> desde cualquier lado</div>
+  </div>
+  <div class="overview-grid" id="overviewGrid"><button class="overview-tile current"><div class="ot-num">01</div><div class="ot-kicker">CIENCIA DE DATOS · CLASE 1 · BLOQUE 2</div><div class="ot-title">Criterios de una
+buena fuente
+de datos</div></button><button class="overview-tile"><div class="ot-num">02</div><div class="ot-kicker">PUNTO DE PARTIDA</div><div class="ot-title">Antes de elegir la fuente</div></button><button class="overview-tile"><div class="ot-num">03</div><div class="ot-kicker">Bloque A · 4 eliminatorios</div><div class="ot-title">Sin esto no hay
+proyecto</div></button><button class="overview-tile"><div class="ot-num">04</div><div class="ot-kicker">CRITERIO 1 · ELIMINATORIO</div><div class="ot-title">01Datos tidy</div></button><button class="overview-tile"><div class="ot-num">05</div><div class="ot-kicker">CRITERIO 2 · ELIMINATORIO</div><div class="ot-title">02Unidad de análisis alineada con la pregunta</div></button><button class="overview-tile"><div class="ot-num">06</div><div class="ot-kicker">CRITERIO 3 · ELIMINATORIO</div><div class="ot-title">03Algo modelable</div></button><button class="overview-tile"><div class="ot-num">07</div><div class="ot-kicker">CRITERIO 4 · ELIMINATORIO</div><div class="ot-title">04Descargable de forma automatizada</div></button><button class="overview-tile"><div class="ot-num">08</div><div class="ot-kicker">Bloque B · 3 facilitadores</div><div class="ot-title">Estos te hacen
+la vida más fácil</div></button><button class="overview-tile"><div class="ot-num">09</div><div class="ot-kicker">CRITERIO 5 · FACILITADOR</div><div class="ot-title">05Volumen suficiente</div></button><button class="overview-tile"><div class="ot-num">10</div><div class="ot-kicker">CRITERIO 6 · FACILITADOR</div><div class="ot-title">06Varias columnas informativas</div></button><button class="overview-tile"><div class="ot-num">11</div><div class="ot-kicker">CRITERIO 7 · FACILITADOR</div><div class="ot-title">07Documentación entendible</div></button><button class="overview-tile"><div class="ot-num">12</div><div class="ot-kicker">CIERRE DEL BLOQUE</div><div class="ot-title">Checklist antes de aceptar tu fuente</div></button><button class="overview-tile"><div class="ot-num">13</div><div class="ot-kicker">AHORA TE TOCA A VOS</div><div class="ot-title">Elegí tema,
+pregunta y fuente.</div></button></div>
+</div>
+<div class="jump-hint" id="jumpHint">Ir a slide <span id="jumpNum"></span></div>
+
+<div class="brand-footer">Ciencia de Datos · UTN FRM · 2026</div>
+<div class="nav">
+  <button id="prev" aria-label="Anterior">‹</button>
+  <span class="counter" id="counter">1 / 13</span>
+  <button id="next" aria-label="Siguiente">›</button>
+</div>
+
+<script>
+  // Scale the 1280×720 deck to fit the viewport while preserving aspect ratio
+  const deck = document.getElementById('deck');
+  function resize() {
+    const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    deck.style.transform = `scale(${scale})`;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  const slides = document.querySelectorAll('.slide');
+  const counter = document.getElementById('counter');
+  const overview = document.getElementById('overview');
+  const overviewGrid = document.getElementById('overviewGrid');
+  const jumpHint = document.getElementById('jumpHint');
+  const jumpNum = document.getElementById('jumpNum');
+  let current = 0;
+  const total = slides.length;
+
+  function show(i) {
+    i = Math.max(0, Math.min(total - 1, i));
+    slides[current].classList.remove('active');
+    slides[i].classList.add('active');
+    current = i;
+    counter.textContent = (i + 1) + ' / ' + total;
+    document.querySelectorAll('.overview-tile').forEach((t, idx) => {
+      t.classList.toggle('current', idx === i);
+    });
+  }
+
+  function buildOverview() {
+    slides.forEach((slide, i) => {
+      const titleEl = slide.querySelector('h1, h2');
+      let title = titleEl ? titleEl.innerText.replace(/^\d+\s+/, '').trim() : 'Slide ' + (i+1);
+      const kickerEl = slide.querySelector('.pill, .kicker');
+      const kicker = kickerEl ? kickerEl.innerText.trim() : '';
+      const tile = document.createElement('button');
+      tile.className = 'overview-tile';
+      if (i === current) tile.classList.add('current');
+      tile.innerHTML = `<div class="ot-num">${(i+1).toString().padStart(2,'0')}</div><div class="ot-kicker">${kicker}</div><div class="ot-title">${title}</div>`;
+      tile.addEventListener('click', () => { show(i); closeOverview(); });
+      overviewGrid.appendChild(tile);
+    });
+  }
+  buildOverview();
+
+  function openOverview() { overview.classList.add('open'); }
+  function closeOverview() { overview.classList.remove('open'); }
+  function toggleOverview() { overview.classList.toggle('open'); }
+
+  let numberBuffer = '';
+  let bufferTimeout = null;
+  function showBuffer() {
+    jumpNum.textContent = numberBuffer;
+    jumpHint.classList.add('visible');
+    clearTimeout(bufferTimeout);
+    bufferTimeout = setTimeout(clearBuffer, 2500);
+  }
+  function clearBuffer() {
+    numberBuffer = '';
+    jumpHint.classList.remove('visible');
+  }
+  function jumpToBuffer() {
+    if (!numberBuffer) return;
+    const n = parseInt(numberBuffer);
+    if (n >= 1 && n <= total) show(n - 1);
+    clearBuffer();
+  }
+
+  document.getElementById('next').addEventListener('click', () => show(current + 1));
+  document.getElementById('prev').addEventListener('click', () => show(current - 1));
+  counter.addEventListener('click', openOverview);
+
+  document.addEventListener('keydown', e => {
+    if (e.key >= '0' && e.key <= '9') {
+      numberBuffer += e.key;
+      showBuffer();
+      e.preventDefault();
+      return;
+    }
+    if (e.key === 'Enter') {
+      if (overview.classList.contains('open')) return;
+      jumpToBuffer();
+      e.preventDefault();
+      return;
+    }
+    if (e.key === 'Escape') {
+      if (overview.classList.contains('open')) closeOverview();
+      clearBuffer();
+      return;
+    }
+    if (e.key === 'g' || e.key === 'G') {
+      toggleOverview();
+      e.preventDefault();
+      return;
+    }
+    if (overview.classList.contains('open')) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { show(current + 1); e.preventDefault(); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') { show(current - 1); e.preventDefault(); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(total - 1);
+  });
+
+  overview.addEventListener('click', e => {
+    if (e.target === overview) closeOverview();
+  });
+</script>
+
+
+</body></html>

@@ -1,0 +1,31 @@
+# Plantilla de la configuración local. Copiar a `airflow_settings.yaml`
+# (que está gitignoreado) y completar la key. Astro CLI la carga sola al
+# hacer `astro dev start`, así que no hay que dar de alta nada a mano.
+#
+# La key de Riot va ACÁ y en ningún otro lado. Nunca en un .py.
+#
+# conn_password acepta UNA key o VARIAS separadas por coma, una por
+# integrante del grupo. El cliente arma un pool y reparte las requests
+# respetando el límite por (key, host), que Riot aplica por separado en
+# cada región. Con más keys, más rápido se junta el volumen.
+#
+# Las Development keys VENCEN CADA 24 HS: hay que regenerarlas en
+# https://developer.riotgames.com y volver a hacer `astro dev restart`.
+
+airflow:
+  connections:
+    - conn_id: riot_api
+      conn_type: http
+      conn_host: api.riotgames.com
+      conn_schema: https
+      conn_login:
+      conn_password: RGAPI-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+      conn_port:
+      conn_extra:
+  pools:
+    - pool_name:
+      pool_slot:
+      pool_description:
+  variables:
+    - variable_name:
+      variable_value:

@@ -1,0 +1,3 @@
+pandas>=2.2
+requests>=2.31
+apache-airflow-providers-http>=6.0

@@ -1,0 +1,32 @@
+# Configuración de herramientas del proyecto.
+#
+# El proyecto de la cátedra (airflow-fifa) no trae linter: el estilo se
+# sostiene sólo por convención. Con un grupo de varias personas tocando los
+# mismos DAGs eso se degrada rápido, así que acá se fija por escrito.
+#
+#   ruff check .          # revisar
+#   ruff check --fix .    # arreglar lo automático
+#   ruff format .         # formatear
+
+[tool.ruff]
+line-length = 79
+target-version = "py312"
+# .astro/ lo genera Astro CLI, no lo escribimos nosotros.
+extend-exclude = ["Documentacion", ".astro"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+ignore = [
+    # Los docstrings y los mensajes de log son prosa en castellano y a veces
+    # pasan las 79 columnas por poco. El límite guía el código, no el texto.
+    "E501",
+]
+
+[tool.ruff.lint.isort]
+# `lol` vive en include/ y entra por PYTHONPATH, así que ruff no lo
+# reconoce solo como propio. Declararlo mantiene el orden de imports que
+# usa la cátedra: stdlib, terceros, propio.
+known-first-party = ["lol"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
