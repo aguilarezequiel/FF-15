@@ -40,6 +40,7 @@ FF-15/
 ├── dags/lol_ingest.py     · la definición del flujo, y nada más
 ├── include/lol/           · toda la lógica pesada, SIN un solo import de Airflow
 ├── include/output/        · bronce, plata y entregables — gitignoreado
+├── docs/                  · documentación integral del proyecto (HTML fuente + PDF)
 ├── tests/                 · astro dev pytest
 └── Documentacion/         · material de la cátedra (fuente de verdad de las consignas)
 ```
@@ -122,4 +123,18 @@ Leerlas cuando la tarea lo pida — no hace falta cargarlas todas de entrada.
 
 ## Mantener esto vivo
 
-Cuando cambie algo del proyecto — una columna, una tarea, una decisión de diseño, una fecha — actualizar en el mismo movimiento el `CLAUDE.md` y la referencia que corresponda. Una skill que describe un proyecto que ya no existe es peor que no tener skill: da respuestas con confianza y están mal.
+Cuando cambie algo del proyecto — una columna, una tarea, una decisión de diseño, una fecha — actualizar **en el mismo movimiento** los tres lugares donde vive el conocimiento del proyecto:
+
+| Dónde | Qué se actualiza |
+|---|---|
+| **`docs/documentacion-proyecto.html`** | El documento integral que lee todo el grupo. Es el más importante. Después: `python docs/generar_pdf.py`. |
+| `CLAUDE.md` | El contexto y las reglas de trabajo. |
+| Esta skill y sus `references/` | El conocimiento reusable. |
+
+La regla del documento integral es que es **incremental, no acumulativo**: se agrega lo nuevo y se **borra lo que dejó de ser cierto**. Borrar pesa tanto como agregar — un documento que sólo crece termina afirmando cosas contradictorias, y como está escrito con seguridad, se le cree.
+
+Un cambio suele tocar varias partes a la vez: una columna nueva aparece en la parte IV (el módulo), en la V (el esquema) y probablemente en la VII (la defensa). Buscar todas las menciones antes de dar el cambio por hecho, y actualizar el bloque «Estado a la fecha de esta versión» del principio.
+
+Y verificar los números: cantidad de columnas, líneas por archivo, partidas en bronce, filas del CSV, mediciones de rendimiento. No arrastrar un número viejo — medirlo de nuevo.
+
+Una documentación que describe un proyecto que ya no existe es peor que no tenerla: da respuestas con confianza y están mal.

@@ -33,10 +33,30 @@ Esto no es formalismo: el proyecto se defiende oralmente, con preguntas dirigida
 
 Después de todo cambio aceptado, evaluar en el mismo movimiento si quedó desactualizado o incompleto:
 
+- **`docs/documentacion-proyecto.html`** → el documento integral que lee todo el grupo. **Es el más importante de los tres.** Ver la regla detallada abajo.
 - **este `CLAUDE.md`** → actualizarlo;
 - **la skill `.claude/skills/proyecto-integrador-ff15/`** → corregir la referencia que corresponda, o ampliarla si el cambio introdujo conocimiento nuevo que valga la pena conservar.
 
-Si el cambio no afecta a ninguno de los dos, decirlo explícitamente en vez de saltearlo en silencio. Una skill que describe un proyecto que ya no existe da respuestas con confianza y están mal.
+Si el cambio no afecta a ninguno de los tres, decirlo explícitamente en vez de saltearlo en silencio. Una documentación que describe un proyecto que ya no existe da respuestas con confianza y están mal.
+
+### 4. La documentación integral es incremental, no acumulativa
+
+`docs/documentacion-proyecto.html` es la memoria completa del proyecto: qué hace, por qué está hecho así, cómo se ejecuta y cómo se defiende. El grupo lo lee para entender todo el proyecto, y de ahí salen las respuestas de la defensa oral.
+
+**Ante cada avance relevante — una tarea nueva, una columna que se agrega o se quita, una decisión de diseño que cambia, un bug corregido, un número que se vuelve a medir — hay que actualizarlo en el mismo movimiento:**
+
+- **Agregar** lo nuevo, en la parte que corresponda.
+- **Borrar** lo que dejó de ser cierto. Esto es tan importante como agregar: un documento que sólo crece termina afirmando cosas contradictorias, y como está escrito con seguridad, se le cree.
+- **Reflejar el cambio en todas las partes afectadas.** Una columna nueva toca la parte IV (el módulo), la parte V (el esquema) y probablemente la VII (la defensa). Buscar todas las menciones antes de dar el cambio por hecho.
+- **Actualizar el bloque «Estado a la fecha de esta versión»** del principio, que es lo primero que lee alguien que vuelve al documento.
+
+Después de editar el HTML, regenerar el PDF:
+
+```bash
+python docs/generar_pdf.py
+```
+
+**Verificar antes de dar por cerrado un cambio:** los números que aparecen en el documento (cantidad de columnas, líneas por archivo, partidas en bronce, filas del CSV, mediciones de rendimiento) tienen que coincidir con la realidad del repo. No arrastrar un número viejo: medirlo de nuevo.
 
 ---
 
@@ -62,6 +82,7 @@ dags/lol_ingest.py    · el flujo, y nada más
 include/lol/          · toda la lógica pesada, testeable sin Airflow
 include/output/       · bronce, plata y entregables (gitignoreado)
 tests/                · astro dev pytest
+docs/                 · la documentación integral del proyecto (HTML + PDF)
 Documentacion/        · material de la cátedra — fuente de verdad de las consignas
 .claude/skills/       · la skill del proyecto, versionada para todo el grupo
 ```

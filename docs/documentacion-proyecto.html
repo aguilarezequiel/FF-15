@@ -1,0 +1,2561 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FF-15 · Documentación del Proyecto Integrador</title>
+<style>
+@page { size: A4; margin: 20mm 18mm 18mm 18mm; }
+:root{
+  --tinta:#16191d; --suave:#4a5158; --linea:#d8dde2; --fondo:#f6f8fa;
+  --acento:#0b5fa5; --alerta:#a3341f;
+}
+*{box-sizing:border-box}
+body{font-family:"Charter","Georgia","Times New Roman",serif;color:var(--tinta);
+  font-size:10.5pt; line-height:1.55; margin:0;}
+h1,h2,h3,h4{font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;line-height:1.25;
+  color:var(--tinta); page-break-after:avoid;}
+h1{font-size:23pt;margin:0 0 6pt;letter-spacing:-.4pt}
+h2{font-size:16pt;margin:22pt 0 8pt;padding-bottom:4pt;border-bottom:2px solid var(--acento)}
+h3{font-size:12.5pt;margin:16pt 0 5pt;color:var(--acento)}
+h4{font-size:10.5pt;margin:12pt 0 4pt;text-transform:uppercase;letter-spacing:.6pt;color:var(--suave)}
+p{margin:0 0 8pt;text-align:justify}
+ul,ol{margin:0 0 9pt;padding-left:18pt}
+li{margin-bottom:4pt}
+code{font-family:"Cascadia Mono","Consolas","DejaVu Sans Mono",monospace;font-size:9pt;
+  background:var(--fondo);padding:1px 3px;border-radius:3px;border:1px solid var(--linea)}
+pre{font-family:"Cascadia Mono","Consolas","DejaVu Sans Mono",monospace;font-size:8.2pt;
+  line-height:1.45;background:var(--fondo);border:1px solid var(--linea);border-left:3px solid var(--acento);
+  padding:8pt 10pt;white-space:pre-wrap;word-wrap:break-word;
+  border-radius:3px;margin:0 0 10pt;page-break-inside:avoid}
+pre code{background:none;border:none;padding:0;font-size:inherit}
+table{width:100%;border-collapse:collapse;margin:0 0 11pt;font-size:9.2pt;page-break-inside:avoid}
+th{background:var(--fondo);text-align:left;font-family:"Segoe UI",Arial,sans-serif;
+  font-size:8.8pt;text-transform:uppercase;letter-spacing:.4pt;color:var(--suave);
+  padding:5pt 6pt;border-bottom:1.5px solid var(--acento)}
+td{padding:5pt 6pt;border-bottom:1px solid var(--linea);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.portada{height:245mm;display:flex;flex-direction:column;justify-content:center;
+  page-break-after:always;text-align:center}
+.portada .materia{font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;letter-spacing:2.5pt;
+  text-transform:uppercase;color:var(--suave);margin-bottom:14pt}
+.portada h1{font-size:30pt;margin-bottom:10pt}
+.portada .sub{font-size:13pt;color:var(--suave);font-style:italic;margin-bottom:26pt;
+  max-width:135mm;margin-left:auto;margin-right:auto;text-align:center}
+.portada .meta{font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;color:var(--suave);line-height:1.9}
+.parte{page-break-before:always;border-top:4px solid var(--acento);padding-top:10pt;margin-top:0}
+.parte .n{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;letter-spacing:2pt;
+  text-transform:uppercase;color:var(--acento);display:block;margin-bottom:2pt}
+.nota,.aviso,.clave{padding:8pt 11pt;margin:0 0 11pt;border-radius:4px;font-size:9.6pt;page-break-inside:avoid}
+.nota{background:#eef4fa;border-left:3px solid var(--acento)}
+.aviso{background:#fdf2ee;border-left:3px solid var(--alerta)}
+.clave{background:#f2f7ee;border-left:3px solid #4a7c2f}
+.nota p:last-child,.aviso p:last-child,.clave p:last-child{margin-bottom:0}
+.etiqueta{font-family:"Segoe UI",Arial,sans-serif;font-size:8.5pt;font-weight:600;
+  text-transform:uppercase;letter-spacing:.7pt;display:block;margin-bottom:3pt}
+.nota .etiqueta{color:var(--acento)} .aviso .etiqueta{color:var(--alerta)} .clave .etiqueta{color:#4a7c2f}
+.toc{font-family:"Segoe UI",Arial,sans-serif;font-size:9.5pt}
+.toc ol{list-style:none;padding-left:0}
+.toc>ol>li{margin:9pt 0 3pt;font-weight:600;border-bottom:1px solid var(--linea);padding-bottom:3pt}
+.toc ol ol{padding-left:14pt;margin-top:3pt}
+.toc ol ol li{font-weight:400;margin:2pt 0;color:var(--suave)}
+.arbol{font-family:"Cascadia Mono","Consolas",monospace;font-size:8.4pt;line-height:1.6;
+  background:var(--fondo);border:1px solid var(--linea);padding:9pt 11pt;border-radius:3px;
+  margin-bottom:11pt;white-space:pre-wrap}
+.grafo{font-family:"Cascadia Mono","Consolas",monospace;font-size:8pt;line-height:1.5;
+  background:#fff;border:1.5px solid var(--acento);padding:10pt;border-radius:4px;
+  margin-bottom:11pt;white-space:pre-wrap}
+.pregunta{background:var(--fondo);border:1px solid var(--linea);border-radius:4px;
+  padding:9pt 11pt;margin:0 0 11pt;page-break-inside:avoid}
+.pregunta .q{font-family:"Segoe UI",Arial,sans-serif;font-weight:600;font-size:10pt;
+  color:var(--acento);margin-bottom:5pt;display:block}
+.pregunta p:last-child{margin-bottom:0}
+.ok{color:#2d6a1f;font-weight:600} .no{color:var(--alerta);font-weight:600}
+.pie{margin-top:20pt;padding-top:8pt;border-top:1px solid var(--linea);
+  font-size:8.5pt;color:var(--suave);font-family:"Segoe UI",Arial,sans-serif}
+</style>
+</head>
+<body>
+
+<div class="portada">
+  <div class="materia">UTN FRM · Ingeniería en Sistemas de Información · Ciencia de Datos 2026</div>
+  <h1>FF-15</h1>
+  <div class="sub">¿Es posible predecir la duración de una partida de League&nbsp;of&nbsp;Legends a partir de las características de los jugadores, de los campeones de los equipos y las condiciones iniciales de la partida?</div>
+  <div class="meta">
+    <strong>Documentación integral del Proyecto Integrador</strong><br>
+    Entrega 1 · Ingeniería de datos<br><br>
+    Comisión 5K09 · Grupo 5K09-02<br>
+    Exposición: miércoles 9 de septiembre, 14:55 – 15:15<br><br>
+    <code>github.com/aguilarezequiel/FF-15</code>
+  </div>
+</div>
+
+<h2 style="margin-top:0">Cómo usar este documento</h2>
+
+<p>Este documento es la memoria completa del proyecto. Está escrito para que
+<strong>cualquier integrante del grupo pueda leerlo de punta a punta sin saber nada previo</strong>
+y termine entendiendo qué hace el proyecto, por qué está hecho así, cómo ejecutarlo
+y cómo defenderlo frente al docente.</p>
+
+<p>No hace falta leerlo en orden, pero conviene. Las partes I y II dan el contexto
+—qué pide la materia y qué teoría hay detrás—; la parte III explica la fuente de datos;
+la IV recorre el repositorio archivo por archivo; la V describe el dataset que se produce;
+la VI es la guía práctica para ejecutarlo; y la VII prepara la defensa oral.</p>
+
+<div class="aviso">
+  <span class="etiqueta">Regla de mantenimiento de este documento</span>
+  <p>Este documento es <strong>vivo</strong>. Cada avance relevante del proyecto —una tarea nueva,
+  una columna que se agrega o se quita, una decisión de diseño que cambia, un bug corregido—
+  tiene que reflejarse acá <strong>en el mismo movimiento</strong>: se agrega lo nuevo y se
+  <strong>borra lo que dejó de ser cierto</strong>. Una documentación que sólo acumula es peor
+  que no tenerla, porque afirma con confianza cosas que ya no pasan.</p>
+  <p>La regla está registrada en <code>CLAUDE.md</code> y en la skill del proyecto, así que
+  cualquiera que trabaje sobre este repo con asistencia de IA la va a ver antes de tocar nada.
+  El documento se edita en <code>docs/documentacion-proyecto.html</code> y el PDF se regenera
+  con <code>python docs/generar_pdf.py</code>.</p>
+</div>
+
+<h3>Estado a la fecha de esta versión</h3>
+<table>
+<tr><th>Aspecto</th><th>Estado</th></tr>
+<tr><td>Pipeline</td><td>Completo y funcionando. Nueve tareas, todas verificadas en verde con datos reales de la API.</td></tr>
+<tr><td>Corridas exitosas</td><td>Cinco, visibles en el historial de la interfaz de Airflow.</td></tr>
+<tr><td>Bronce acumulado</td><td>204 partidas crudas, 3.620 perfiles de jugador, 22 partidas descartadas. 14&nbsp;MB en disco.</td></tr>
+<tr><td>Dataset (capa plata)</td><td>70 filas × 139 columnas. <strong>Falta volumen:</strong> la consigna pide más de 1.000 filas.</td></tr>
+<tr><td>Calidad de código</td><td>10/10 tests en verde · <code>ruff</code> sin hallazgos · <code>astro dev parse</code> limpio.</td></tr>
+<tr><td>Lo único que falta</td><td>Correr las tandas de recolección hasta el objetivo de 20.000 partidas. Está explicado paso a paso en la parte VI.</td></tr>
+</table>
+
+<div class="toc">
+<h2>Contenido</h2>
+<ol>
+  <li>Parte I · El proyecto dentro de la materia
+    <ol>
+      <li>Qué es el Proyecto Integrador y cuánto pesa</li>
+      <li>Las cuatro entregas y el calendario</li>
+      <li>La pregunta de investigación</li>
+      <li>Los siete criterios de una buena fuente, aplicados a nuestro caso</li>
+      <li>Qué pide exactamente la Entrega 1</li>
+    </ol>
+  </li>
+  <li>Parte II · La teoría de la Unidad 1, explicada desde cero
+    <ol>
+      <li>Qué es la ingeniería de datos y dónde encaja</li>
+      <li>Pipelines, ETL y ELT</li>
+      <li>Qué problema resuelve un orquestador</li>
+      <li>Apache Airflow: DAG, tarea, operador, hook, provider</li>
+      <li>Las piezas de Airflow 3 y qué hace cada una</li>
+      <li>Astro Runtime y Astro CLI: qué es cada cosa</li>
+      <li>El modelo medallón: bronce, plata y oro</li>
+      <li>Idempotencia, y por qué importa tanto acá</li>
+      <li>Datos tidy</li>
+    </ol>
+  </li>
+  <li>Parte III · La fuente de datos: la API de Riot Games
+    <ol>
+      <li>Qué publica Riot y cómo se accede</li>
+      <li>La API key: tipos, límites y vencimiento</li>
+      <li>Las dos familias de hosts, el detalle que más confunde</li>
+      <li>Los siete endpoints que usa el pipeline</li>
+      <li>Data Dragon: el catálogo público sin key</li>
+      <li>El recorrido de semilla a dataset</li>
+    </ol>
+  </li>
+  <li>Parte IV · El repositorio, archivo por archivo
+    <ol>
+      <li>Árbol completo y criterio de organización</li>
+      <li>Configuración del entorno</li>
+      <li>Credenciales y seguridad</li>
+      <li>include/lol/ — la lógica del dominio</li>
+      <li>dags/lol_ingest.py — la orquestación</li>
+      <li>Tests, calidad de código y documentación</li>
+    </ol>
+  </li>
+  <li>Parte V · El dataset producido
+    <ol>
+      <li>Unidad de análisis, clave y objetivo</li>
+      <li>Las 139 columnas por bloques</li>
+      <li>Reglas de admisión de una partida</li>
+      <li>Variables derivadas y su justificación</li>
+      <li>Los nulos: dónde, por qué y qué se hizo</li>
+      <li>Las capas en disco</li>
+    </ol>
+  </li>
+  <li>Parte VI · Guía de ejecución
+    <ol>
+      <li>Requisitos previos</li>
+      <li>Puesta en marcha desde cero</li>
+      <li>Obtener y renovar la API key</li>
+      <li>Cómo llegar a 20.000 filas</li>
+      <li>Qué mirar mientras corre</li>
+      <li>Problemas frecuentes y cómo resolverlos</li>
+    </ol>
+  </li>
+  <li>Parte VII · La defensa de la Entrega 1
+    <ol>
+      <li>Cómo se estructuran los 20 minutos</li>
+      <li>Las seis verificaciones numéricas</li>
+      <li>Las cinco preguntas que se explican</li>
+      <li>La confesión sobre tidy</li>
+      <li>Limitaciones que declaramos</li>
+      <li>Reparto de conocimiento en el grupo</li>
+      <li>Banco de preguntas probables</li>
+    </ol>
+  </li>
+  <li>Anexo · Glosario</li>
+</ol>
+</div>
+
+<h2 class="parte"><span class="n">Parte I</span>El proyecto dentro de la materia</h2>
+
+<h3>1. Qué es el Proyecto Integrador y cuánto pesa</h3>
+
+<p>El Proyecto Integrador es un proyecto de ciencia de datos <em>de punta a punta</em>, sobre un
+problema que elige el grupo y datos que consigue el grupo. Empieza el 12 de agosto y termina
+el 18 de noviembre. En ese recorrido hay que conseguir los datos y automatizar su descarga,
+explorarlos, modelarlos, visualizarlos y comunicar los hallazgos en una aplicación funcionando.</p>
+
+<p>No es un anexo de la materia: es el eje. Tres números que lo dimensionan, tomados del
+<em>Kit de arranque</em>:</p>
+
+<ul>
+  <li>Vale el <strong>50 % de la nota final</strong> — el doble que los cuatro trabajos prácticos
+  juntos, y el doble que los dos parciales.</li>
+  <li>Ocupa <strong>cuatro clases completas</strong> del cuatrimestre, dedicadas exclusivamente
+  a las entregas.</li>
+  <li>Cada TP práctico está diseñado para preparar la entrega del integrador que viene después.</li>
+</ul>
+
+<p>Se aprueba con el 60 %. Hay una instancia de recuperación al final del cursado.</p>
+
+<div class="nota">
+  <span class="etiqueta">Los TP y el Integrador no son lo mismo</span>
+  <p>Los cuatro TP prácticos se hacen sobre el dataset <strong>FIFA</strong>, que provee la cátedra:
+  es un caso controlado donde se aprende la técnica. El Integrador aplica esa misma técnica al
+  dataset propio, que va a ser más sucio, más ambiguo y más difícil. Por eso conviene hacer el TP
+  <em>antes</em> de encarar la entrega correspondiente del integrador. El orden importa.</p>
+</div>
+
+<h3>2. Las cuatro entregas y el calendario</h3>
+
+<table>
+<tr><th>Entrega</th><th>Fecha</th><th>Qué se presenta</th></tr>
+<tr><td>Definición</td><td>12/08</td><td>Grupo, pregunta y fuente de datos</td></tr>
+<tr><td><strong>1 · Ingeniería de datos</strong></td><td><strong>miércoles 9/9</strong></td><td>Pipeline automatizado que produce tu dataset</td></tr>
+<tr><td>2 · Análisis exploratorio</td><td>16/09</td><td>Exploración, hipótesis y hallazgos</td></tr>
+<tr><td>3 · Modelado</td><td>14/10</td><td>Objetivo predictivo, modelos comparados y métricas</td></tr>
+<tr><td>4 · Visualización e integración</td><td>04/11</td><td>Visualizaciones y aplicación funcionando</td></tr>
+<tr><td>Exposición final</td><td>18/11</td><td>Proyecto completo y demo en vivo</td></tr>
+<tr><td>Recuperación</td><td>25/11</td><td>Para los grupos que la necesiten</td></tr>
+</table>
+
+<div class="aviso">
+  <span class="etiqueta">Ojo con la fecha de la Entrega 1</span>
+  <p>El PDF del <em>Kit de arranque</em> dice que la Entrega 1 es el <strong>02/09</strong>. La página
+  del campus, que es más reciente, dice <strong>miércoles 9 de septiembre</strong> y publica las franjas
+  horarias por grupo. <strong>Vale la del campus.</strong> Al grupo 5K09-02 le toca de
+  <strong>14:55 a 15:15</strong>. Hay que llegar cinco minutos antes con el entorno ya levantado:
+  la franja empieza y termina a la hora que dice, y lo que no se llega a mostrar no se recupera.</p>
+</div>
+
+<p>Cada entrega parcial es una reunión privada con el docente, sin audiencia de otros grupos.
+La exposición final del 18/11 sí es pública, frente al curso.</p>
+
+<h4>El error de gestión más común</h4>
+<p>Trabajar el integrador la semana previa a cada entrega. Las entregas están separadas por tres
+o cuatro semanas y esa distancia genera la ilusión de que sobra tiempo. No sobra: cada entrega se
+apoya en la anterior, y llegar con lo mínimo a la Entrega 1 significa arrastrar un pipeline frágil
+hasta noviembre.</p>
+
+<h3>3. La pregunta de investigación</h3>
+
+<div class="clave">
+  <span class="etiqueta">Nuestra pregunta</span>
+  <p><strong>¿Es posible predecir la duración de una partida de League of Legends a partir de las
+  características de los jugadores, de los campeones de los equipos y las condiciones iniciales
+  de la partida?</strong></p>
+</div>
+
+<p>La materia insiste en un orden que no es obvio: <strong>primero la pregunta, después la fuente</strong>.
+Elegir un dataset primero e inventar la pregunta después lleva a proyectos mecánicos que se hacen
+cuesta arriba a partir de septiembre.</p>
+
+<p>Vale la pena desarmar nuestra pregunta, porque cada parte tiene consecuencias técnicas concretas:</p>
+
+<table>
+<tr><th>Parte de la pregunta</th><th>Consecuencia en el proyecto</th></tr>
+<tr><td><em>&laquo;la duración de una partida&raquo;</em></td><td>Define la <strong>unidad de análisis</strong>: una fila es una partida. Y define la <strong>variable objetivo</strong>: <code>game_duration_s</code>, en segundos.</td></tr>
+<tr><td><em>&laquo;predecir&raquo;</em></td><td>Como el objetivo es un número continuo, es un problema de <strong>regresión</strong> (no de clasificación). Eso ya define qué modelos se comparan en la Unidad 3.</td></tr>
+<tr><td><em>&laquo;características de los jugadores&raquo;</em></td><td>Hay que traer datos de los 10 jugadores: su rango, su winrate, su experiencia con el campeón que eligieron.</td></tr>
+<tr><td><em>&laquo;campeones de los equipos&raquo;</em></td><td>Hay que traer el catálogo de campeones y derivar métricas de composición de equipo.</td></tr>
+<tr><td><em>&laquo;condiciones iniciales&raquo;</em></td><td>Es la restricción más importante: <strong>sólo entra lo que se conoce antes de que la partida empiece</strong>. Nada de kills, oro, torres ni ningún evento del juego.</td></tr>
+</table>
+
+<div class="aviso">
+  <span class="etiqueta">Por qué la restricción de &laquo;condiciones iniciales&raquo; no es negociable</span>
+  <p>Si el dataset incluyera, por ejemplo, la cantidad de torres destruidas, el modelo predeciría
+  la duración con una precisión altísima… y sería inútil, porque para saber cuántas torres cayeron
+  hay que esperar a que la partida termine. Predecir el pasado no sirve. En la jerga de ciencia de
+  datos esto se llama <strong>fuga de información</strong> (<em>data leakage</em>), y es uno de los
+  errores más caros y más difíciles de detectar, porque el modelo &laquo;funciona&raquo; espectacularmente
+  bien en las pruebas y falla por completo en la realidad.</p>
+</div>
+
+<h3>4. Los siete criterios de una buena fuente, aplicados a nuestro caso</h3>
+
+<p>En la primera clase la cátedra dio siete criterios para <em>elegir</em> una fuente de datos.
+Para la Entrega 1 esos mismos siete criterios se usan para <em>juzgar lo que produjo el pipeline</em>.
+Cambió una sola cosa, y no es menor: en agosto la calidad del dato era responsabilidad de quien
+publicó la fuente; ahora es nuestra.</p>
+
+<p>Los cuatro primeros son <strong>eliminatorios</strong> — si la fuente falla uno solo, no hay proyecto.
+Los tres últimos son <strong>facilitadores</strong>: no lo rompen, pero lo complican, y cada uno tiene
+una salida de emergencia si se pone más trabajo.</p>
+
+<h4>Los cuatro eliminatorios</h4>
+
+<table>
+<tr><th>#</th><th>Criterio</th><th>Qué significa</th><th>Nuestro caso</th></tr>
+<tr>
+  <td>1</td><td><strong>Datos tidy</strong></td>
+  <td>Cada fila es una observación, cada columna una variable.</td>
+  <td><span class="ok">Cumple, con una concesión declarada.</span> Una fila es una partida, que es la unidad de la pregunta. Pero los 10 jugadores están aplanados en 100 columnas en vez de estar en formato largo. Está explicado y justificado en la parte VII.4.</td>
+</tr>
+<tr>
+  <td>2</td><td><strong>Unidad alineada con la pregunta</strong></td>
+  <td>La unidad de cada fila coincide con aquello sobre lo que se quiere concluir.</td>
+  <td><span class="ok">Cumple.</span> La pregunta es sobre la duración de <em>una partida</em>, y una fila es exactamente una partida, identificada por <code>match_id</code>.</td>
+</tr>
+<tr>
+  <td>3</td><td><strong>Algo modelable</strong></td>
+  <td>Hay una variable a predecir, o grupos naturales que se sospecha encontrar.</td>
+  <td><span class="ok">Cumple por partida doble.</span> Supervisado: regresión sobre <code>game_duration_s</code>. No supervisado: arquetipos de composición de equipo a partir de las columnas de agregados.</td>
+</tr>
+<tr>
+  <td>4</td><td><strong>Descargable de forma automatizada</strong></td>
+  <td>URL, API o página scrapeable. Sin intervención humana.</td>
+  <td><span class="ok">Cumple.</span> API REST oficial de Riot Games, con key, orquestada en Airflow. Cero pasos manuales dentro del pipeline.</td>
+</tr>
+</table>
+
+<h4>Los tres facilitadores</h4>
+
+<table>
+<tr><th>#</th><th>Criterio</th><th>Objetivo</th><th>Nuestro caso</th></tr>
+<tr>
+  <td>5</td><td><strong>Volumen suficiente</strong></td>
+  <td>Más de 1.000 filas; ideal más de 10.000.</td>
+  <td><span class="ok">Alcanzable.</span> El objetivo del pipeline es parametrizable. Con 20.000 partidas el dataset queda en zona &laquo;cómodo&raquo; según la escala de la cátedra. Es lo único que falta ejecutar.</td>
+</tr>
+<tr>
+  <td>6</td><td><strong>Varias columnas informativas</strong></td>
+  <td>Cinco o más útiles, mezclando tipos.</td>
+  <td><span class="ok">Cumple holgado.</span> 139 columnas: 108 enteras, 20 flotantes y 11 de texto categórico.</td>
+</tr>
+<tr>
+  <td>7</td><td><strong>Documentación entendible</strong></td>
+  <td>Saber qué significa cada columna y sus unidades.</td>
+  <td><span class="ok">Cumple.</span> Documentación oficial del Riot Developer Portal, más el catálogo Data Dragon. La parte V de este documento traduce cada columna.</td>
+</tr>
+</table>
+
+<p>La escala de volumen que usa la cátedra: menos de 1.000 filas es <em>insuficiente</em>; entre 1.000 y
+10.000 es <em>suficiente para arrancar</em>; más de 10.000 es <em>cómodo</em>.</p>
+
+<h4>Errores de años anteriores que este proyecto evita</h4>
+<table>
+<tr><th>Error típico</th><th>Por qué no nos pasa</th></tr>
+<tr><td>Datos ya agregados (promedios por provincia, totales por año)</td><td>Trabajamos con la observación individual: una partida concreta, con sus 10 jugadores identificados.</td></tr>
+<tr><td>Sin variable objetivo ni estructura latente</td><td><code>game_duration_s</code> es un objetivo explícito y continuo.</td></tr>
+<tr><td>Muy pocas filas</td><td>La fuente es prácticamente inagotable: se juegan millones de partidas por día.</td></tr>
+<tr><td>Una sola columna útil</td><td>139 columnas, de cuatro naturalezas distintas (jugador, campeón, composición, contexto).</td></tr>
+<tr><td>Bajable sólo a mano</td><td>API REST pública y documentada.</td></tr>
+<tr><td>Fuente elegida por descarte, sin interés real</td><td>Es un tema que el grupo eligió y conoce, lo cual pesa: son cuatro meses de convivencia con esta decisión.</td></tr>
+</table>
+
+<h3>5. Qué pide exactamente la Entrega 1</h3>
+
+<p>La consigna del campus lo resume en una sola pregunta de fondo:</p>
+
+<div class="clave">
+  <p><strong>&laquo;¿Tenés un pipeline que produce tu dataset sin que nadie lo toque a mano?&raquo;</strong>
+  Todo lo demás son formas de responderla.</p>
+</div>
+
+<h4>Lo que hay que llevar el día de la entrega</h4>
+<table>
+<tr><th>Qué</th><th>Detalle</th></tr>
+<tr><td><strong>El entorno levantado</strong></td><td>Airflow corriendo en la notebook de alguien del grupo, con la interfaz abierta en el navegador. Prendido <em>antes</em> de entrar.</td></tr>
+<tr><td><strong>Una corrida en verde</strong></td><td>Una ejecución completa y exitosa, <strong>ya hecha</strong>, visible en el historial. No se corre en el momento.</td></tr>
+<tr><td><strong>El CSV producido</strong></td><td>El archivo que generó esa corrida, abierto o listo para abrir.</td></tr>
+<tr><td><strong>El chequeo de calidad</strong></td><td>Los criterios verificados sobre la salida, con los números a mano.</td></tr>
+</table>
+
+<h4>Cómo se reparten los 20 minutos</h4>
+<table>
+<tr><th>Minutos</th><th>Momento</th><th>Qué pasa</th></tr>
+<tr><td>0–2</td><td>De qué se trata</td><td>La pregunta del proyecto en una frase, la fuente, y qué es una fila. Tres oraciones, sin filminas.</td></tr>
+<tr><td>2–7</td><td>La corrida</td><td>Se muestra la ejecución en verde y se recorre el grafo explicando qué hace cada tarea y por qué está donde está.</td></tr>
+<tr><td>7–12</td><td>El dataset</td><td>Se abre el CSV y se lo defiende contra los siete criterios: cuántas filas, cuál es la clave, dónde hay nulos, cuál es la columna objetivo.</td></tr>
+<tr><td>12–18</td><td>Preguntas dirigidas</td><td>El docente pregunta <strong>a integrantes puntuales</strong> sobre cualquier parte de lo anterior.</td></tr>
+<tr><td>18–20</td><td>Devolución</td><td>Qué está bien y qué corregir antes de la Entrega 2.</td></tr>
+</table>
+
+<div class="aviso">
+  <span class="etiqueta">La evaluación es individual</span>
+  <p>Repartirse el trabajo está bien; desentenderse de la parte del otro, no. La pregunta sobre la
+  extracción puede caerle a quien escribió la transformación. Con grupos de cuatro a siete personas
+  esto pesa: <strong>no alcanza con que uno solo sepa todo</strong>. Por eso la parte VII de este
+  documento incluye un reparto sugerido y un banco de preguntas.</p>
+</div>
+
+<h4>Los cinco puntos con los que se aprueba</h4>
+<ol>
+  <li>Hay una corrida completa en verde, hecha por ustedes, visible en la interfaz.</li>
+  <li>El grupo sabe explicar qué hace cada tarea del pipeline y por qué está ahí.</li>
+  <li>El pipeline produce un CSV que cumple los criterios medibles.</li>
+  <li>El grupo sabe defender las decisiones de diseño.</li>
+  <li>Las respuestas no vienen de una sola persona.</li>
+</ol>
+
+<h4>Lo que la consigna dice explícitamente que NO hay que hacer</h4>
+<ul>
+  <li><strong>Llegar sin el entorno levantado.</strong> Arrancar Airflow delante del docente se lleva
+  la mitad del tiempo, y es tiempo que no se recupera.</li>
+  <li><strong>Correr el pipeline en vivo.</strong> Hay que llevar la corrida hecha. Si se quiere mostrar
+  una ejecución en el momento, que sea sobre una muestra chica y <em>además</em> de la que ya está.</li>
+  <li><strong>Que hable uno solo.</strong> Es el error más caro, porque las preguntas van dirigidas y la
+  nota es individual.</li>
+</ul>
+
+<p>Y una nota final de la consigna que conviene tener presente: si algo del pipeline no llegó a
+funcionar, hay que ir igual y decirlo. Un grupo que muestra un pipeline a medias y entiende dónde
+está trabado se lleva una devolución útil. Uno que no se presenta, no.</p>
+
+<h2 class="parte"><span class="n">Parte II</span>La teoría de la Unidad 1, explicada desde cero</h2>
+
+<p>Esta parte no da nada por sabido. Si ya conocés Airflow, se puede saltear hasta la parte III.
+Si no, acá está todo lo que hace falta para entender por qué el proyecto está construido como está.</p>
+
+<h3>1. Qué es la ingeniería de datos y dónde encaja</h3>
+
+<p>La materia arranca con una idea que suena obvia pero cambia todo: <strong>la ciencia de datos no
+empieza con el análisis, sino mucho antes, con los datos mismos</strong>. Antes de que alguien pueda
+hacer un gráfico o entrenar un modelo, alguien tuvo que conseguir los datos, limpiarlos, guardarlos
+en algún lado y dejarlos disponibles de forma confiable y repetible.</p>
+
+<p>Ese &laquo;alguien&raquo; es el rol de <strong>ingeniería de datos</strong>, y su producto no es un
+informe: es un <em>sistema</em> que produce datos. La diferencia importa. Un análisis se hace una vez;
+un sistema tiene que funcionar mañana, y pasado, y cuando la fuente cambie de formato.</p>
+
+<p>La bibliografía de la unidad es <em>Fundamentals of Data Engineering</em> (Reis y Housley), que
+organiza el trabajo alrededor del <strong>ciclo de vida del dato</strong>: generación, almacenamiento,
+ingesta, transformación y disponibilización. Nuestro proyecto cubre las primeras cuatro; la quinta
+—que el dato esté disponible para quien lo consuma— es lo que van a usar las Unidades 2, 3 y 4.</p>
+
+<h3>2. Pipelines, ETL y ELT</h3>
+
+<p>Un <strong>pipeline</strong> (tubería) es una secuencia de pasos por la que pasa el dato desde su
+origen hasta su destino. Cada paso toma algo, lo transforma y se lo pasa al siguiente.</p>
+
+<p>Las dos formas clásicas de armar un pipeline se distinguen por el orden de las letras:</p>
+
+<table>
+<tr><th>Enfoque</th><th>Orden</th><th>Idea</th></tr>
+<tr>
+  <td><strong>ETL</strong></td>
+  <td>Extract → Transform → Load</td>
+  <td>Se extrae el dato, se lo transforma <em>en el camino</em> y recién después se lo guarda. Se guarda sólo el resultado final.</td>
+</tr>
+<tr>
+  <td><strong>ELT</strong></td>
+  <td>Extract → Load → Transform</td>
+  <td>Se extrae el dato y se lo guarda <strong>crudo</strong> primero. La transformación se hace después, sobre lo que ya está guardado.</td>
+</tr>
+</table>
+
+<div class="clave">
+  <span class="etiqueta">Nuestro proyecto es ELT, y es una decisión con consecuencias</span>
+  <p>Guardamos primero la respuesta cruda de la API (capa bronce) y recién después la transformamos
+  en filas (capa plata). La ventaja concreta: si mañana descubrimos que veníamos interpretando mal
+  una columna, corregimos el código de transformación y <strong>reprocesamos lo que ya está en disco</strong>,
+  sin volver a pedirle nada a Riot. Con ETL habría que volver a descargar todo — y con una API que
+  permite 100 pedidos cada 2 minutos, eso significa horas perdidas.</p>
+</div>
+
+<h3>3. Qué problema resuelve un orquestador</h3>
+
+<p>Imaginemos el pipeline como un script de Python que hace todo de corrido. Funciona… hasta que:</p>
+
+<ul>
+  <li>Falla el paso 7 de 9, y hay que volver a correr los 6 anteriores que ya habían salido bien.</li>
+  <li>Hay que correrlo todos los días a las 8, y alguien se tiene que acordar.</li>
+  <li>Un paso tarda tres horas y nadie sabe si está avanzando o colgado.</li>
+  <li>Dos pasos son independientes y podrían correr en paralelo, pero el script los hace en fila.</li>
+  <li>Falló hace tres días y nadie se enteró.</li>
+</ul>
+
+<p>Un <strong>orquestador</strong> resuelve exactamente esa lista. No hace el trabajo: coordina quién
+lo hace, cuándo, en qué orden, qué pasa si falla y cómo se ve el estado. Apache Airflow es el
+orquestador que usa la industria y el que enseña la materia.</p>
+
+<div class="nota">
+  <span class="etiqueta">Un ejemplo concreto de nuestro proyecto</span>
+  <p>Cuando cancelamos una corrida a mitad de camino, las 204 partidas ya descargadas quedaron
+  intactas en disco y la siguiente corrida las reutilizó sin pedirle nada a la API. Con un script
+  monolítico habría que haber empezado de cero. Eso es lo que compra un orquestador bien usado.</p>
+</div>
+
+<h3>4. Apache Airflow: DAG, tarea, operador, hook, provider</h3>
+
+<h4>DAG</h4>
+<p>Es la sigla de <em>Directed Acyclic Graph</em>: grafo dirigido acíclico. Suena peor de lo que es.
+Un DAG es simplemente <strong>el dibujo del flujo de trabajo</strong>: cajitas (las tareas) unidas por
+flechas (las dependencias).</p>
+<ul>
+  <li><strong>Dirigido</strong> porque las flechas tienen sentido: A va antes que B.</li>
+  <li><strong>Acíclico</strong> porque no puede haber ciclos: si A depende de B y B depende de A,
+  ninguna de las dos podría empezar nunca.</li>
+</ul>
+<p>En Airflow, un DAG se escribe en Python. Nuestro DAG se llama <code>lol_ingest</code> y vive en
+<code>dags/lol_ingest.py</code>.</p>
+
+<h4>Tarea (task)</h4>
+<p>Cada cajita del grafo. Es una unidad de trabajo que se ejecuta, tiene su propio log, su propio
+estado (éxito, falla, salteada) y sus propios reintentos. Nuestro DAG tiene nueve.</p>
+
+<h4>Operador</h4>
+<p>Una plantilla de tarea que ya viene resuelta. Por ejemplo, <code>HttpOperator</code> hace un pedido
+HTTP: uno lo configura en vez de escribirlo. La cátedra da una regla para elegir entre las tres formas:</p>
+
+<table>
+<tr><th>Forma</th><th>Cuándo conviene</th></tr>
+<tr><td>Operador prefabricado</td><td>La acción es estándar y alguien ya la resolvió bien.</td></tr>
+<tr><td><code>@task</code> + hook</td><td>Se necesita lógica propia, pero se quiere reusar la conexión y el manejo de errores.</td></tr>
+<tr><td><code>@task</code> pelado</td><td>No hay sistema externo: transformar, validar, guardar.</td></tr>
+</table>
+
+<p>Nuestro proyecto usa <strong>casi todo <code>@task</code> pelado</strong>, porque el cliente de Riot
+necesita una lógica de rotación de claves y control de velocidad que ningún operador prefabricado
+resuelve. Esa decisión hay que poder justificarla, y la justificación es exactamente ésa.</p>
+
+<h4>Hook</h4>
+<p>Es la capa de abajo de un operador: el pedacito que sabe hablar con el sistema externo y manejar
+la conexión. Se usa cuando se quiere la conexión pero no el operador entero.</p>
+
+<h4>Provider</h4>
+<p>Un paquete que agrega integraciones con sistemas externos. De fábrica Airflow trae sólo
+<code>apache-airflow-providers-standard</code> y <code>common-sql</code>. El resto se agrega a
+<code>requirements.txt</code>. La cátedra deja una recomendación: <em>antes de escribir código para
+hablar con tu fuente, fijate si hay un provider que ya lo resuelva</em>.</p>
+
+<h4>TaskFlow API</h4>
+<p>Es la forma moderna de escribir DAGs: se usan <strong>decoradores</strong> (<code>@dag</code>,
+<code>@task</code>) y las dependencias se deducen solas del flujo de datos entre funciones. La forma
+antigua —instanciar operadores y unirlos con <code>&gt;&gt;</code>— sigue siendo válida y es lo que
+aparece en la mayoría de los tutoriales que se googlean, porque hay mucho material escrito para
+Airflow 2. Conviene saber leerla, pero para escribir código nuevo se usa la de decoradores.</p>
+
+<h4>XCom</h4>
+<p>Es el mecanismo por el que dos tareas se pasan datos. Tiene una regla de oro que la cátedra
+subraya: <strong>por XCom viajan metadatos, no datos</strong> — rutas, identificadores, banderas,
+conteos. Los datos van a disco.</p>
+
+<div class="aviso">
+  <span class="etiqueta">Por qué esa regla existe</span>
+  <p>XCom guarda lo que se le pasa en la base de datos de metadatos de Airflow. Si se le mandan
+  miles de filas, esa base se satura y el orquestador entero se degrada. Es uno de los errores más
+  comunes al empezar. En nuestro pipeline, la tarea que descarga devuelve una <em>lista de
+  identificadores de partidas</em> y las partidas mismas quedan en archivos.</p>
+</div>
+
+<h4>Sensores, ramificación y cortocircuito</h4>
+<table>
+<tr><th>Herramienta</th><th>Para qué sirve</th><th>Dónde la usamos</th></tr>
+<tr>
+  <td><strong>Sensor</strong> (<code>@task.sensor</code>)</td>
+  <td>Esperar algo que está <em>fuera</em> del control del DAG: que un sitio vuelva, que aparezca un archivo.</td>
+  <td><code>wait_for_riot</code> espera a que la API responda.</td>
+</tr>
+<tr>
+  <td><strong>Rama</strong> (<code>@task.branch</code>)</td>
+  <td>Elegir el camino en tiempo de ejecución devolviendo el nombre de la tarea siguiente.</td>
+  <td>No la usamos: nuestro flujo no se bifurca en dos caminos alternativos.</td>
+</tr>
+<tr>
+  <td><strong>Cortocircuito</strong> (<code>@task.short_circuit</code>)</td>
+  <td>Si devuelve <code>False</code>, todo lo que está aguas abajo queda <em>salteado</em> y la corrida termina <strong>bien</strong>.</td>
+  <td><code>check_key</code> corta la corrida si la API key no sirve.</td>
+</tr>
+</table>
+
+<p>Dos conceptos asociados que aparecen en nuestro código:</p>
+<ul>
+  <li><strong><code>mode="reschedule"</code></strong> en un sensor: en vez de ocupar un trabajador durmiendo
+  entre sondeos, la tarea se libera y Airflow la vuelve a encolar más tarde. Con un sensor da igual;
+  con cincuenta esperando, es la diferencia entre un orquestador sano y uno tapado.</li>
+  <li><strong>Trigger rules</strong>: por defecto una tarea corre si todas sus predecesoras salieron bien
+  (<code>ALL_SUCCESS</code>). Nuestro <code>check_key</code> usa <code>ALL_DONE</code>, que significa
+  &laquo;corré igual, hayan salido bien o mal&raquo;. Es necesario porque su tarea anterior puede quedar
+  <em>salteada</em>, y ése es justamente el caso que tiene que manejar: con la regla por defecto no se
+  ejecutaría nunca cuando más falta hace.</li>
+</ul>
+
+<h4>Mapeo dinámico de tareas</h4>
+<p>A veces no se sabe de antemano cuántas tareas hacen falta. <code>.expand()</code> crea una instancia
+de la tarea por cada elemento de una lista, y todas corren en paralelo. Nosotros lo usamos para
+generar <strong>una tarea por plataforma de juego</strong>: en la interfaz se ven seis instancias de
+<code>land_bronze</code>, una por servidor, cada una con su propio log y su propio estado.</p>
+
+<h3>5. Las piezas de Airflow 3 y qué hace cada una</h3>
+
+<p>Airflow no es un programa: son varios procesos que se coordinan a través de una base de datos.
+Ninguno le habla directo a otro.</p>
+
+<table>
+<tr><th>Proceso</th><th>Qué hace</th></tr>
+<tr><td><code>dag-processor</code></td><td>Lee los archivos <code>.py</code> de <code>dags/</code> cada pocos segundos y registra los DAGs que encuentra. <strong>En Airflow 2 vivía dentro del scheduler; en la 3 es un proceso aparte.</strong></td></tr>
+<tr><td><code>scheduler</code></td><td>Decide qué tarea está lista para correr y la manda a ejecutar.</td></tr>
+<tr><td><code>api-server</code></td><td>La interfaz web y la API REST. <strong>En Airflow 2 se llamaba <code>webserver</code>.</strong></td></tr>
+<tr><td><code>triggerer</code></td><td>Maneja las esperas asincrónicas (los sensores en modo diferido).</td></tr>
+<tr><td>base de metadatos</td><td>Guarda el estado de todo. En nuestro entorno local es un PostgreSQL que levanta solo.</td></tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">Por qué esto importa para escribir código</span>
+  <p>El <code>dag-processor</code> parsea la carpeta <code>dags/</code> <strong>cada pocos segundos</strong>.
+  Todo lo que sea lento de importar hace más lento el parseo de todo el proyecto. De ahí sale una regla
+  que aplicamos en todo el código: <code>import pandas</code> va <em>adentro</em> de la función de la
+  tarea, nunca arriba del archivo, y toda la lógica pesada vive en <code>include/</code> y se importa.</p>
+</div>
+
+<h4>Airflow 2 contra Airflow 3</h4>
+<p>La materia usa <strong>Airflow 3.3</strong>. Casi todo lo que se encuentra googleando está escrito
+para Airflow 2 y no compila. Ésta es la tabla de traducción que hay que tener a mano:</p>
+
+<table>
+<tr><th>Airflow 2</th><th>Airflow 3</th></tr>
+<tr><td><code>from airflow.decorators import dag, task</code></td><td><code>from airflow.sdk import dag, task</code></td></tr>
+<tr><td><code>from airflow.utils.trigger_rule import TriggerRule</code></td><td><code>from airflow.task.trigger_rule import TriggerRule</code></td></tr>
+<tr><td><code>schedule_interval=...</code></td><td><code>schedule=...</code></td></tr>
+<tr><td><code>context["execution_date"]</code></td><td><code>context["logical_date"]</code></td></tr>
+<tr><td><code>Variable.get(k, default_var=None)</code></td><td><code>Variable.get(k, default=None)</code></td></tr>
+<tr><td>servicio <code>webserver</code></td><td>servicio <code>api-server</code></td></tr>
+<tr><td>el scheduler parsea los DAGs</td><td>lo hace el <code>dag-processor</code>, aparte</td></tr>
+</table>
+
+<h3>6. Astro Runtime y Astro CLI: qué es cada cosa</h3>
+
+<p>Esto confunde mucho al principio, así que conviene separarlo con precisión:</p>
+
+<table>
+<tr><th>Cosa</th><th>Qué es</th><th>¿Se puede vivir sin ella?</th></tr>
+<tr><td><strong>Apache Airflow</strong></td><td>El orquestador. El software en sí.</td><td>No. Es el corazón.</td></tr>
+<tr><td><strong>Providers</strong></td><td>Integraciones con sistemas externos.</td><td>Sí, pero casi siempre se quiere alguno.</td></tr>
+<tr><td><strong>Astro Runtime</strong></td><td>Una <em>imagen de Docker</em> con Airflow ya armado y probado.</td><td>Sí: se puede instalar Airflow a mano.</td></tr>
+<tr><td><strong>Astro CLI</strong></td><td>El comando que levanta esa imagen en tu máquina.</td><td>Sí: se puede usar Docker directo.</td></tr>
+<tr><td><strong>Plugins</strong></td><td>Extensiones de la interfaz.</td><td>Sí. En esta materia no se escribe ninguno.</td></tr>
+</table>
+
+<p>Dicho corto: <code>astro dev start</code> <strong>no es un comando de Airflow, es de Astro</strong>.
+Se usa Astro porque ahorra una tarde de configuración: sin él habría que armar a mano la base de datos
+y los cuatro procesos.</p>
+
+<h3>7. El modelo medallón: bronce, plata y oro</h3>
+
+<p>Es una forma de organizar los datos en capas, cada una más elaborada que la anterior. El nombre
+viene de las medallas y el orden es el de valor creciente en refinamiento.</p>
+
+<table>
+<tr><th>Capa</th><th>Qué contiene</th><th>Regla</th><th>En nuestro proyecto</th></tr>
+<tr>
+  <td><strong>Bronce</strong></td>
+  <td>El dato <em>tal como llegó</em> de la fuente. Sin interpretar, sin limpiar, sin tocar.</td>
+  <td>Sólo se agrega, nunca se modifica ni se reescribe.</td>
+  <td>Las respuestas JSON de la API de Riot, comprimidas, en <code>include/output/bronze/</code>.</td>
+</tr>
+<tr>
+  <td><strong>Plata</strong></td>
+  <td>Datos limpios, tipados, una fila por observación, validados.</td>
+  <td>Se reconstruye siempre desde el bronce.</td>
+  <td>El CSV de 139 columnas. <strong>Es el entregable de la Entrega 1.</strong></td>
+</tr>
+<tr>
+  <td><strong>Oro</strong></td>
+  <td>Datos preparados para un uso específico: variables derivadas, agregados, tablas para un tablero.</td>
+  <td>Se construye sobre la plata.</td>
+  <td><strong>No se construye acá.</strong> Es lo que se arma en las Unidades 3 y 4.</td>
+</tr>
+</table>
+
+<div class="clave">
+  <span class="etiqueta">Por qué el bronce es la parte que más se subestima</span>
+  <p>La consigna de la Entrega 1 pregunta literalmente: <em>&laquo;¿Dónde guardás el dato crudo? Si mañana
+  descubrís que venías interpretando mal una columna, ¿podés arreglarlo sin volver a la fuente? El
+  dataset que entregás es la capa plata; la pregunta es si además tenés el bronce.&raquo;</em></p>
+  <p>Nuestra respuesta es sí, y es más completa de lo mínimo: el bronce no guarda sólo las partidas,
+  guarda <strong>todas</strong> las respuestas crudas —partidas, entradas de liga, maestrías y el
+  catálogo de campeones—. Gracias a eso la capa plata se reconstruye <strong>100 % sin red</strong>.</p>
+</div>
+
+<h3>8. Idempotencia, y por qué importa tanto acá</h3>
+
+<p>Una operación es <strong>idempotente</strong> si ejecutarla muchas veces da el mismo resultado que
+ejecutarla una vez. Apagar una luz es idempotente: si ya está apagada, apagarla de nuevo no cambia
+nada. Sumar uno no lo es.</p>
+
+<p>En un pipeline esto se traduce en una pregunta muy concreta que la consigna hace textualmente:
+<em>&laquo;¿Qué pasa si lo corrés de nuevo? ¿Sale el mismo archivo? Si no, ¿por qué?&raquo;</em></p>
+
+<div class="nota">
+  <span class="etiqueta">Nuestra respuesta, y hay que darla completa</span>
+  <p>Hay que separar dos cosas que se confunden fácil:</p>
+  <ul>
+    <li><strong>De la transformación para abajo, el pipeline es idempotente.</strong> Con el mismo bronce
+    en disco, produce siempre exactamente el mismo CSV. Es una función pura del disco: no hay azar,
+    no hay red, no hay reloj.</li>
+    <li><strong>La descarga es acumulativa, a propósito.</strong> Cada corrida sale a buscar partidas que
+    todavía no tiene, hasta llenar su cuota. Las que ya están nunca se vuelven a pedir; las nuevas se suman.</li>
+  </ul>
+  <p>O sea: <strong>no sale el mismo archivo, sale uno más grande</strong>. Y es deliberado: es la única
+  forma de juntar volumen con una API que permite 100 pedidos cada 2 minutos por región. Si se quisiera
+  congelar el dataset, alcanza con no volver a correr la descarga y reprocesar el bronce tal como está.</p>
+</div>
+
+<h3>9. Datos tidy</h3>
+
+<p><em>Tidy</em> significa <strong>ordenado</strong>, y define una forma canónica de organizar una tabla:</p>
+<ul>
+  <li>Cada fila es <strong>una observación</strong>.</li>
+  <li>Cada columna es <strong>una variable</strong>.</li>
+</ul>
+
+<p>El ejemplo clásico de la cátedra:</p>
+
+<table>
+<tr><th>Formato ancho (<span class="no">no tidy</span>)</th><th>Formato largo (<span class="ok">tidy</span>)</th></tr>
+<tr>
+<td><pre>Persona | Enero | Febrero | Marzo
+Ana     |  1500 |    1700 |  1600
+Bruno   |  1300 |    1400 |  1450</pre>
+&laquo;Mes&raquo; es una variable, pero está escondida como nombre de columna.</td>
+<td><pre>Persona | Mes     | Valor
+Ana     | Enero   | 1500
+Ana     | Febrero | 1700
+Ana     | Marzo   | 1600
+Bruno   | Enero   | 1300</pre>
+Cada fila es una observación persona-mes.</td>
+</tr>
+</table>
+
+<p>La cátedra hace una confesión que vale la pena copiar en espíritu: <strong>su propio dataset canónico
+no cumple del todo la regla</strong>. La columna <code>player_positions</code> del dataset FIFA guarda
+más de un valor en la misma celda en el 65 % de las filas. No es un descuido: es una concesión
+deliberada, porque separarlo complicaría todo lo demás.</p>
+
+<p>Y deja la instrucción explícita: <em>si tu dataset tiene una concesión parecida, no la escondas:
+explicala. Un grupo que sabe dónde su dataset se aparta del ideal y por qué está mejor parado que uno
+que repite la definición de memoria.</em> Nuestra concesión está desarrollada en la parte VII.4.</p>
+
+<h2 class="parte"><span class="n">Parte III</span>La fuente de datos: la API de Riot Games</h2>
+
+<h3>1. Qué publica Riot y cómo se accede</h3>
+
+<p>Riot Games —la empresa que hace League of Legends— publica una API REST oficial en
+<code>developer.riotgames.com</code>. A través de ella se puede consultar, entre otras cosas:</p>
+
+<ul>
+  <li>El <strong>ranking</strong> de jugadores de cada servidor, por rango.</li>
+  <li>La <strong>lista de partidas</strong> recientes de un jugador.</li>
+  <li>El <strong>detalle completo</strong> de una partida: quiénes jugaron, con qué campeones, cuánto duró.</li>
+  <li>La <strong>maestría</strong> de un jugador con cada campeón (cuánto lo jugó históricamente).</li>
+</ul>
+
+<p>Es una API REST: se le hace un pedido HTTP a una dirección y devuelve JSON. La autenticación es
+por un encabezado <code>X-Riot-Token</code> con la API key.</p>
+
+<div class="nota">
+  <span class="etiqueta">Por qué esta fuente cumple el criterio 4 de la cátedra</span>
+  <p>El criterio eliminatorio &laquo;descargable de forma automatizada&raquo; acepta explícitamente
+  <em>&laquo;APIs REST públicas, con o sin API key, siempre que se pueda automatizar&raquo;</em>.
+  Es exactamente nuestro caso, y con una ventaja sobre el scraping: la fuente es estable, está
+  documentada y no se rompe cuando alguien cambia el HTML de una página.</p>
+</div>
+
+<h3>2. La API key: tipos, límites y vencimiento</h3>
+
+<table>
+<tr><th>Tipo de key</th><th>Límites</th><th>Vencimiento</th></tr>
+<tr><td><strong>Development</strong> (la que usamos)</td><td>20 pedidos por segundo · 100 pedidos cada 2 minutos</td><td><strong>Cada 24 horas.</strong> Hay que regenerarla en el portal.</td></tr>
+<tr><td>Personal</td><td>Los mismos límites</td><td>No vence, pero requiere aprobación de Riot.</td></tr>
+<tr><td>Production</td><td>500 cada 10 s · 30.000 cada 10 min</td><td>No vence. Requiere un proyecto aprobado.</td></tr>
+</table>
+
+<div class="aviso">
+  <span class="etiqueta">Las dos características que condicionan todo el diseño</span>
+  <p><strong>Vence cada 24 horas.</strong> Por eso el DAG se dispara a mano y no está programado:
+  un DAG programado corriendo sin nadie mirando fallaría todos los días apenas venciera la key,
+  y el ruido de esas fallas taparía las reales. Y por eso lo primero que hace el pipeline es
+  verificar que la key sirve — enterarse a la hora seis de una corrida de ocho es el peor resultado posible.</p>
+  <p><strong>Los límites se aplican por región, no globalmente.</strong> Ésta es la propiedad que
+  hace viable el proyecto, y está explicada abajo.</p>
+</div>
+
+<h4>El pool de keys</h4>
+<p>Como el límite es por key <em>y</em> por región, tener varias keys multiplica el cupo. Nuestro
+cliente acepta <strong>una lista de keys separadas por coma</strong> —una por integrante del grupo—
+y reparte los pedidos entre ellas. Con cuatro keys la recolección va aproximadamente cuatro veces
+más rápido.</p>
+
+<h3>3. Las dos familias de hosts, el detalle que más confunde</h3>
+
+<p>Riot tiene <strong>dos tipos de direcciones</strong> y usar la equivocada devuelve un error 404
+que parece un bug del código. Es probablemente el detalle técnico más importante de toda esta parte.</p>
+
+<table>
+<tr><th>Familia</th><th>Ejemplos de host</th><th>Qué endpoints viven ahí</th></tr>
+<tr>
+  <td><strong>Plataforma</strong><br>(un servidor de juego)</td>
+  <td><code>la2</code>, <code>la1</code>, <code>br1</code>, <code>na1</code>, <code>euw1</code>, <code>kr</code></td>
+  <td>Ranking (league-v4), perfiles, maestrías (champion-mastery-v4)</td>
+</tr>
+<tr>
+  <td><strong>Región continental</strong></td>
+  <td><code>americas</code>, <code>europe</code>, <code>asia</code></td>
+  <td><strong>Todo lo de partidas</strong> (match-v5)</td>
+</tr>
+</table>
+
+<p>El mapeo de plataforma a región que usa el proyecto:</p>
+
+<table>
+<tr><th>Plataforma</th><th>Región</th><th>Nombre</th></tr>
+<tr><td><code>la2</code></td><td><code>americas</code></td><td>Latinoamérica Sur</td></tr>
+<tr><td><code>la1</code></td><td><code>americas</code></td><td>Latinoamérica Norte</td></tr>
+<tr><td><code>br1</code></td><td><code>americas</code></td><td>Brasil</td></tr>
+<tr><td><code>na1</code></td><td><code>americas</code></td><td>Norteamérica</td></tr>
+<tr><td><code>euw1</code></td><td><code>europe</code></td><td>Europa Oeste</td></tr>
+<tr><td><code>kr</code></td><td><code>asia</code></td><td>Corea</td></tr>
+</table>
+
+<div class="clave">
+  <span class="etiqueta">La consecuencia práctica, medida en nuestro proyecto</span>
+  <p>Como cada host tiene su propio cupo, correr las <strong>seis plataformas en paralelo</strong>
+  multiplica por seis la velocidad en los endpoints de perfil y maestría — que son justamente el
+  cuello de botella, porque hay que consultar 10 jugadores por partida.</p>
+  <p>Pero atención a la sutileza: <code>la2</code>, <code>la1</code>, <code>br1</code> y <code>na1</code>
+  <strong>comparten</strong> el cupo de partidas, porque las cuatro enrutan a <code>americas</code>.
+  En la práctica no molesta, porque las partidas son ~1 pedido y los perfiles ~18.</p>
+</div>
+
+<h3>4. Los siete endpoints que usa el pipeline</h3>
+
+<table>
+<tr><th></th><th>Endpoint</th><th>Host</th><th>Para qué</th></tr>
+<tr><td>A</td><td><code>/lol/league/v4/{challenger|grandmaster|master}leagues/by-queue/RANKED_SOLO_5x5</code></td><td>plataforma</td><td>Semilla de jugadores de los rangos más altos. Devuelve la liga entera.</td></tr>
+<tr><td>B</td><td><code>/lol/league/v4/entries/RANKED_SOLO_5x5/{TIER}/{DIVISION}?page=n</code></td><td>plataforma</td><td>Semilla de jugadores de Hierro a Diamante. Paginado.</td></tr>
+<tr><td>C</td><td><code>/lol/summoner/v4/summoners/{summonerId}</code></td><td>plataforma</td><td>Resolver un identificador de jugador. Hoy no hace falta: el ranking ya devuelve el <code>puuid</code>.</td></tr>
+<tr><td>D</td><td><code>/lol/match/v5/matches/by-puuid/{puuid}/ids</code></td><td><strong>región</strong></td><td>Identificadores de las últimas partidas clasificatorias del jugador.</td></tr>
+<tr><td>E</td><td><code>/lol/match/v5/matches/{matchId}</code></td><td><strong>región</strong></td><td>El detalle completo de la partida. <strong>Acá sale la variable objetivo.</strong></td></tr>
+<tr><td>F</td><td><code>/lol/league/v4/entries/by-puuid/{puuid}</code></td><td>plataforma</td><td>Rango, división, puntos y victorias/derrotas del jugador.</td></tr>
+<tr><td>G</td><td><code>/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}/by-champion/{championId}</code></td><td>plataforma</td><td>Puntos de maestría del jugador con ese campeón concreto.</td></tr>
+</table>
+
+<p>Dos aclaraciones de vocabulario:</p>
+<ul>
+  <li><strong><code>puuid</code></strong>: el identificador único y permanente de una cuenta de jugador.
+  Es lo que usamos para pedir sus partidas y su perfil.</li>
+  <li><strong>Cola 420</strong>: el código que Riot le da a la modalidad <em>Ranked Solo/Duo</em>.
+  Es la única que recolectamos, para que todas las partidas sean comparables entre sí.</li>
+</ul>
+
+<div class="nota">
+  <span class="etiqueta">Por qué sólo cola 420</span>
+  <p>Mezclar modalidades rompería la comparabilidad: una partida de ARAM se juega en otro mapa, con
+  otras reglas y otra duración típica. Si el dataset mezclara modalidades, el modelo estaría
+  aprendiendo a distinguir modalidades en vez de a predecir duración. Restringir a una sola modalidad
+  es una decisión de diseño del dataset, y hay que poder defenderla.</p>
+</div>
+
+<h3>5. Data Dragon: el catálogo público sin key</h3>
+
+<p><strong>Data Dragon</strong> es el CDN público de Riot con los metadatos del juego. No pide API key
+y no tiene límite de pedidos. De ahí sale todo lo que el pipeline sabe de un campeón más allá de su número:</p>
+
+<ul>
+  <li><code>https://ddragon.leagueoflegends.com/api/versions.json</code> — la lista de versiones; la primera es la más reciente.</li>
+  <li><code>.../cdn/{version}/data/en_US/champion.json</code> — el catálogo de campeones.</li>
+  <li><code>.../cdn/{version}/data/en_US/summoner.json</code> — el catálogo de hechizos de invocador.</li>
+</ul>
+
+<p>De cada campeón usamos: su nombre, sus <strong>etiquetas</strong> (Tank, Mage, Assassin, Marksman,
+Fighter, Support) y sus estadísticas base (ataque, defensa, magia, dificultad, vida, armadura, rango
+de ataque). Con eso se construyen las columnas de <em>composición de equipo</em>.</p>
+
+<p>De los hechizos nos importan cuatro, identificados por número: <strong>4</strong> Flash,
+<strong>11</strong> Smite, <strong>12</strong> Teleport, <strong>14</strong> Ignite. Contar cuántos
+lleva cada equipo dice algo del estilo de juego que planea.</p>
+
+<div class="nota">
+  <span class="etiqueta">Un detalle de diseño que conviene poder explicar</span>
+  <p>El catálogo se guarda en bronce <strong>particionado por versión</strong>
+  (<code>ddragon/version=16.17.1/</code>). No es capricho: los campeones cambian entre parches, y una
+  partida vieja tiene que poder reinterpretarse con el catálogo que le correspondía en su momento.
+  Sin esa partición, reprocesar el bronce dentro de seis meses daría resultados distintos.</p>
+</div>
+
+<h3>6. El recorrido de semilla a dataset</h3>
+
+<p>Riot <strong>no publica un listado de partidas</strong>. Publica un ranking de jugadores, y a cada
+jugador se le pueden pedir sus últimas partidas. Así que para llegar a las partidas hay que entrar
+por los jugadores. Ése recorrido —de un ranking a un dataset de partidas— es el corazón del pipeline:</p>
+
+<pre>por cada plataforma (la2, la1, br1, na1, euw1, kr):
+  por cada tier, en ORDEN ALEATORIO (Hierro .. Challenger):
+    por cada división y página:
+
+      [A/B] pedir el ranking  ................... la SEMILLA de jugadores
+
+      por cada jugador del ranking:
+        [D] pedir los ids de sus últimas 15 partidas clasificatorias
+
+        por cada partida que todavía no tengamos:
+          [E] pedir el detalle completo  .......... va a BRONCE
+
+          aplicar los filtros de admisión:
+             - ¿es de la Season 16?
+             - ¿duró más de 5 minutos?   (descarta remakes)
+             - ¿tiene 10 participantes, 5 por equipo?
+          si no pasa -> anotarla como descartada y NO volver a bajarla nunca
+
+          por cada uno de los 10 jugadores de esa partida:
+            [G] pedir su maestría con el campeón que usó  .... va a BRONCE
+            [F] pedir su entrada de ranking  ................. va a BRONCE</pre>
+
+<h4>Dos decisiones de este recorrido que hay que poder defender</h4>
+
+<div class="clave">
+  <span class="etiqueta">Por qué los tiers se recorren en orden aleatorio</span>
+  <p>Si se recorrieran siempre de Hierro hacia arriba, una corrida cortada por la mitad dejaría un
+  dataset con puros jugadores de bronce, y el modelo aprendería el <strong>sesgo de recolección</strong>
+  en vez de la señal real. Mezclando el orden, cualquier corte deja una muestra parecida al total.
+  Con una key que vence cada 24 horas, que la corrida se corte no es hipotético: es lo normal.</p>
+</div>
+
+<div class="aviso">
+  <span class="etiqueta">La distribución de rangos del dataset NO es la de la semilla</span>
+  <p>Los jugadores se muestrean recorriendo el ranking, pero de cada partida entran <strong>los 10
+  participantes</strong>, sin importar su rango. Como el emparejamiento junta gente de nivel parecido,
+  eso no distorsiona mucho, pero es una diferencia real entre &laquo;cómo elegimos&raquo; y &laquo;qué
+  terminamos midiendo&raquo;. Es exactamente el tipo de matiz que un docente puede preguntar, y la
+  respuesta honesta es reconocerlo.</p>
+</div>
+
+<h4>Cuánto cuesta cada partida, medido</h4>
+<p>En nuestra corrida de prueba: <strong>555 pedidos para 30 partidas = 18,5 pedidos por partida</strong>.
+El desglose aproximado es 1 pedido de detalle de partida y ~17 de perfiles y maestrías. Por eso el
+cuello de botella no es <code>match-v5</code> sino los endpoints de plataforma, y por eso importa tanto
+paralelizar por plataforma.</p>
+
+<p>Ese número mejora con el volumen: un jugador que aparece en varias partidas se consulta una sola
+vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más barata sale cada partida nueva.</p>
+
+<h2 class="parte"><span class="n">Parte IV</span>El repositorio, archivo por archivo</h2>
+
+<h3>1. Árbol completo y criterio de organización</h3>
+
+<div class="arbol">FF-15/
+├── CLAUDE.md                  116 líneas · contexto e instrucciones de trabajo
+├── README.md                  219 líneas · el entregable escrito
+├── Dockerfile                   4 líneas · la imagen del entorno
+├── requirements.txt             3 líneas · paquetes de Python
+├── packages.txt                 0 líneas · paquetes de sistema (vacío)
+├── pyproject.toml              32 líneas · configuración de ruff
+├── .gitignore                  23 líneas · qué NO se versiona
+├── .dockerignore                         · qué no entra a la imagen
+├── .env                                  · PYTHONPATH (no tiene secretos)
+├── airflow_settings.yaml                 · LA API KEY · gitignoreado
+├── airflow_settings.example.yaml         · plantilla sin la key, versionada
+│
+├── .astro/                               · metadatos de Astro CLI
+│   ├── config.yaml                       · nombre del proyecto
+│   ├── dag_integrity_exceptions.txt      · archivos a ignorar al parsear
+│   └── test_dag_integrity_default.py     · chequeo que trae Astro
+│
+├── .claude/skills/proyecto-integrador-ff15/
+│   ├── SKILL.md                          · workflow del proyecto
+│   └── references/                       · 5 documentos de referencia
+│
+├── dags/
+│   ├── .airflowignore                    · vacío
+│   └── lol_ingest.py          711 líneas · EL DAG: sólo orquestación
+│
+├── include/
+│   ├── lol/                              · LA LÓGICA · sin importar Airflow
+│   │   ├── __init__.py          9 líneas
+│   │   ├── riot.py            345 líneas · cliente, pool de keys, límites
+│   │   ├── ddragon.py          87 líneas · catálogo de campeones y hechizos
+│   │   ├── seeds.py            70 líneas · recorrido del ranking
+│   │   ├── schema.py           99 líneas · las 139 columnas y sus tipos
+│   │   └── transform.py       192 líneas · JSON crudo → fila
+│   └── output/                           · SALIDAS · gitignoreado
+│       ├── bronze/                       · capa bronce
+│       ├── silver/_parciales/            · plata por plataforma
+│       ├── reports/calidad.md            · el chequeo de la consigna
+│       └── lol_AAAA-MM-DD.csv            · EL ENTREGABLE
+│
+├── tests/dags/
+│   └── test_dag_integrity.py   90 líneas · 10 tests
+│
+├── docs/                                 · LA DOCUMENTACIÓN INTEGRAL
+│   ├── documentacion-proyecto.html       · este documento (fuente editable)
+│   ├── documentacion-proyecto.pdf        · este documento (58 páginas)
+│   └── generar_pdf.py                    · regenera el PDF con Chrome
+│
+└── Documentacion/                        · material de la cátedra</div>
+
+<h4>El criterio que ordena todo: <code>dags/</code> contra <code>include/</code></h4>
+
+<p>Ésta es la separación más importante del proyecto y la cátedra la subraya:</p>
+
+<div class="clave">
+  <p><em>&laquo;El dag-processor parsea <code>dags/</code> cada pocos segundos, así que ahí va sólo la
+  definición del flujo. La lógica pesada vive en <code>include/</code> y se importa.&raquo;</em></p>
+</div>
+
+<p>Nosotros llevamos esa idea un paso más allá, con una regla dura:
+<strong><code>include/lol/</code> no importa Airflow en ninguna línea.</strong></p>
+
+<table>
+<tr><th>Ventaja</th><th>Por qué</th></tr>
+<tr><td>Se puede testear sin Airflow</td><td>Los módulos se importan con <code>python</code> a secas y se prueban con <code>pytest</code> plano.</td></tr>
+<tr><td>Se reusa en las Unidades 2, 3 y 4</td><td>En un notebook de exploración no hay un DAG alrededor, pero <code>from lol import schema</code> funciona igual.</td></tr>
+<tr><td>El parseo del DAG es rápido</td><td>Nada pesado se importa al tope del archivo del DAG.</td></tr>
+</table>
+
+<p>La frontera es estricta: si un módulo de <code>include/lol/</code> necesitara un valor de configuración
+de Airflow, se lo pasa la tarea por parámetro. Por eso <code>RiotClient</code> recibe las keys como
+argumento en vez de ir a buscarlas él mismo.</p>
+
+<h3>2. Configuración del entorno</h3>
+
+<h4><code>Dockerfile</code></h4>
+<pre>FROM astrocrpublic.azurecr.io/runtime:3.3-4
+
+# El código del proyecto vive en include/lol y se importa como `lol`.
+ENV PYTHONPATH="/usr/local/airflow/include:${PYTHONPATH}"</pre>
+
+<p>Sólo dos instrucciones. La primera fija la imagen base: <strong>Astro Runtime 3.3-4</strong>, que trae
+Airflow 3.3 ya armado — la misma versión que usa la cátedra. La segunda agrega <code>include/</code> a
+la ruta de búsqueda de Python, que es lo que permite escribir <code>from lol import schema</code> desde
+el DAG.</p>
+
+<div class="nota">
+  <span class="etiqueta">Una diferencia con el proyecto de la cátedra</span>
+  <p>El <code>Dockerfile</code> de <code>airflow-fifa</code> instala Chromium con Playwright, porque
+  scrapea un sitio protegido por Cloudflare. El nuestro no lo necesita: Riot es una API REST y se
+  responde con pedidos HTTP comunes. Eso hace que nuestra imagen sea <strong>alrededor de 1&nbsp;GB más
+  liviana</strong> y que el primer arranque sea mucho más rápido.</p>
+</div>
+
+<h4><code>requirements.txt</code></h4>
+<pre>pandas&gt;=2.2
+requests&gt;=2.31
+apache-airflow-providers-http&gt;=6.0</pre>
+
+<p>Tres dependencias. <code>pandas</code> para armar y escribir los CSV, <code>requests</code> para hablar
+con la API, y el provider de HTTP para que exista el tipo de conexión <code>http</code> donde guardamos
+la key.</p>
+
+<p><strong>Importante:</strong> si se toca este archivo hay que hacer <code>astro dev restart</code>,
+porque los paquetes se instalan al construir la imagen. Cambiar un <code>.py</code> no necesita restart.</p>
+
+<h4><code>pyproject.toml</code></h4>
+<p>Configura <strong>ruff</strong>, el linter y formateador de Python. El proyecto de la cátedra no trae
+ninguno: el estilo se sostiene sólo por convención. Con un grupo de varias personas tocando los mismos
+archivos eso se degrada rápido, así que acá está por escrito: línea de 79 caracteres, orden de imports
+con <code>lol</code> reconocido como paquete propio, y un conjunto de reglas activas.</p>
+
+<h4><code>.astro/</code></h4>
+<p>Metadatos que usa Astro CLI. <code>config.yaml</code> tiene el nombre del proyecto;
+<code>test_dag_integrity_default.py</code> es un chequeo que trae Astro y que corre con
+<code>astro dev parse</code>.</p>
+
+<h3>3. Credenciales y seguridad</h3>
+
+<p>Ésta es la parte donde el proyecto se juega algo serio, y donde hay un antecedente concreto que
+conviene conocer.</p>
+
+<div class="aviso">
+  <span class="etiqueta">El antecedente</span>
+  <p>El prototipo previo del grupo (la carpeta <code>FF15</code>, sin guion) tenía
+  <strong>cinco API keys de Riot escritas en texto plano dentro de un archivo <code>.py</code></strong>,
+  y ese repositorio está publicado en GitHub — con las keys también en el historial de commits, así que
+  borrarlas del archivo no alcanza para sacarlas. Las development keys vencen cada 24 horas, así que el
+  daño real fue acotado, pero el patrón es exactamente lo que no hay que hacer.</p>
+</div>
+
+<p>La cátedra lo dice literal en el apunte de Airflow: <em>&laquo;si tu fuente pide API key, token o
+usuario y contraseña, esa credencial va en una Connection, nunca en el <code>.py</code>&raquo;</em>.</p>
+
+<h4>Cómo lo resolvimos</h4>
+
+<p>La key vive en una <strong>Connection de Airflow</strong> llamada <code>riot_api</code>, declarada en
+<code>airflow_settings.yaml</code>:</p>
+
+<pre>airflow:
+  connections:
+    - conn_id: riot_api
+      conn_type: http
+      conn_host: api.riotgames.com
+      conn_schema: https
+      conn_password: RGAPI-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</pre>
+
+<p>Astro CLI la carga sola al arrancar, así que no hay que darla de alta a mano en la interfaz.
+El código la lee así, y ésta es la única función de todo el proyecto que toca la credencial:</p>
+
+<pre>def api_keys() -&gt; list[str]:
+    """Las keys, desde la Connection. Nunca desde el código."""
+    conn = BaseHook.get_connection(CONN_ID)
+    crudo = conn.password or ""
+    keys = [k.strip() for k in crudo.split(",") if k.strip()]
+    if not keys:
+        raise ValueError(
+            f"La Connection `{CONN_ID}` no tiene ninguna API key ...")
+    return keys</pre>
+
+<p>El <code>split(",")</code> es lo que habilita el <strong>pool</strong>: se pueden pegar varias keys
+separadas por coma —una por integrante— y el cliente las usa en paralelo.</p>
+
+<h4>Los dos archivos, y por qué son dos</h4>
+<table>
+<tr><th>Archivo</th><th>¿Se versiona?</th><th>Por qué</th></tr>
+<tr><td><code>airflow_settings.yaml</code></td><td><span class="no">NO</span></td><td>Tiene la key real. Está en <code>.gitignore</code>.</td></tr>
+<tr><td><code>airflow_settings.example.yaml</code></td><td><span class="ok">SÍ</span></td><td>Plantilla con un placeholder. Es lo que copia un integrante nuevo al clonar el repo.</td></tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">Una diferencia deliberada con el proyecto de la cátedra</span>
+  <p>En <code>airflow-fifa</code> el archivo <code>airflow_settings.yaml</code> <strong>sí</strong> se
+  versiona, y el comentario de su <code>.gitignore</code> explica por qué: su única conexión es la de
+  la PokéAPI, que es pública y no tiene ningún secreto. En el nuestro hay una credencial real, así que
+  la decisión se invierte. Saber <em>por qué</em> nuestro caso difiere del ejemplo es justamente el tipo
+  de cosa que distingue copiar de entender.</p>
+</div>
+
+<h3>4. <code>include/lol/</code> — la lógica del dominio</h3>
+
+<h4>4.1 <code>riot.py</code> · 345 líneas · el cliente de la API</h4>
+
+<p>Es el módulo más complejo del proyecto. Su responsabilidad: hablar con la API de Riot respetando
+los límites, rotando entre varias keys y sin que nadie de afuera tenga que pensar en eso.</p>
+
+<p><strong>Las constantes del dominio</strong> — el mapeo de plataformas, los rangos y los límites:</p>
+
+<pre>PLATFORM_ROUTING = {
+    "la2": {"region": "americas", "name": "LAS"},
+    "la1": {"region": "americas", "name": "LAN"},
+    "br1": {"region": "americas", "name": "BR"},
+    "na1": {"region": "americas", "name": "NA"},
+    "euw1": {"region": "europe", "name": "EUW"},
+    "kr": {"region": "asia", "name": "KR"},
+}
+
+ALL_TIERS = ["IRON", "BRONZE", "SILVER", "GOLD", "PLATINUM", "EMERALD",
+             "DIAMOND", "MASTER", "GRANDMASTER", "CHALLENGER"]
+
+# Los tres de arriba no tienen divisiones y su endpoint devuelve la liga
+# entera: no acepta `page`.
+APEX_TIERS = {"MASTER", "GRANDMASTER", "CHALLENGER"}
+
+PER_SECOND_LIMIT = 20      ; PER_SECOND_WINDOW = 1.0
+PER_TWO_MIN_LIMIT = 100    ; PER_TWO_MIN_WINDOW = 120.0</pre>
+
+<p><strong>El limitador de velocidad</strong> es el corazón del módulo. La idea: se lleva la cuenta de
+los pedidos hechos por cada par <em>(key, host)</em>, y antes de disparar uno nuevo se verifica que
+haya cupo en las dos ventanas de tiempo.</p>
+
+<pre>def _tomar_turno(self, host: str) -&gt; str:
+    """Devuelve una key con cupo para `host`, esperando si hace falta.
+
+    No castiga a una key en un host donde sí tiene cupo sólo porque
+    está en cooldown en otro: los baldes son independientes.
+    """
+    while True:
+        ahora = time.time()
+        esperas = []
+        with self._lock:
+            candidatas = [k for k in self.keys if k not in self._invalidas]
+            if not candidatas:
+                raise RiotKeysExhausted(...)
+            for _ in range(len(candidatas)):
+                self._idx = (self._idx + 1) % len(candidatas)
+                key = candidatas[self._idx]
+                # ¿está esta key castigada en este host?
+                # ¿cuántos pedidos lleva en los últimos 120 s?
+                # ¿y en el último segundo?
+                # si hay cupo: se anota el pedido y se devuelve la key
+        # si ninguna tenía cupo, dormir lo mínimo necesario
+        time.sleep(min(max(min(esperas), 0.02), 2.0))</pre>
+
+<div class="clave">
+  <span class="etiqueta">Por qué el control es <em>proactivo</em> y no reactivo</span>
+  <p>La forma fácil sería mandar pedidos hasta que Riot conteste <code>429 Too Many Requests</code> y
+  ahí frenar. Funciona, pero desperdicia un pedido y el tiempo de ida y vuelta <em>cada vez</em>.
+  Nuestro cliente calcula antes de disparar si hay cupo, y sólo espera lo justo. El <code>429</code>
+  queda igual como red de contención por si Riot aplica un límite que no conocemos.</p>
+</div>
+
+<p><strong>El manejo de errores</strong>, que traduce cada código HTTP a una acción distinta:</p>
+
+<table>
+<tr><th>Código</th><th>Qué significa</th><th>Qué hace el cliente</th></tr>
+<tr><td><code>200</code></td><td>Todo bien</td><td>Devuelve el JSON.</td></tr>
+<tr><td><code>429</code></td><td>Demasiados pedidos</td><td>Lee el encabezado <code>Retry-After</code>, castiga esa key <em>en ese host</em> y sigue con otra key.</td></tr>
+<tr><td><code>401</code> / <code>403</code></td><td>Key inválida o vencida</td><td>La saca del pool. Si se vacía el pool, lanza <code>RiotKeysExhausted</code> con un mensaje que dice exactamente qué hacer.</td></tr>
+<tr><td><code>404</code></td><td>No existe</td><td>Devuelve <code>None</code> sin reintentar.</td></tr>
+<tr><td><code>5xx</code> / timeout</td><td>Problema del servidor o de red</td><td>Reintenta con espera creciente.</td></tr>
+</table>
+
+<p><strong>Las cachés en memoria.</strong> Un jugador aparece en muchas partidas; sin caché, cada partida
+volvería a pedir los mismos 10 perfiles. Con ella, el costo por partida baja a medida que el dataset crece.</p>
+
+<p><strong>Las dos funciones puras del final</strong> traducen las respuestas crudas a valores del dataset.
+Están en este módulo pero no dependen de la red, y eso es lo que permite que la capa plata las use
+leyendo del bronce:</p>
+
+<pre>def resumen_liga(entradas):
+    """De las entradas de liga crudas al elo estimado y el winrate."""
+    for e in (entradas or []):
+        if e.get("queueType") != "RANKED_SOLO_5x5":
+            continue          # un jugador puede tener también flex:
+                              # mezclarlas compararía cosas distintas
+        ...
+        return {"estimated_elo": TIER_BASE_MMR[tier] + RANK_BONUS[rank]
+                                 + int(lp * 0.5),
+                "winrate": round(wins / total, 4),
+                "es_unranked": 0}
+    return {"estimated_elo": 1500, "winrate": 0.50, "es_unranked": 1}</pre>
+
+<h4>4.2 <code>ddragon.py</code> · 87 líneas · el catálogo del juego</h4>
+
+<p>Descarga e indexa los metadatos de campeones y hechizos. Está separado del cliente de Riot a
+propósito: Data Dragon es público, no pide key y no tiene límite, así que mezclarlo con el pool de
+keys sería gastar cupo en algo que no lo necesita.</p>
+
+<p>La función clave reindexa el catálogo:</p>
+
+<pre>def index_champions(champion_json: dict) -&gt; dict[int, dict]:
+    """Indexa por id numérico, que es como los devuelve match-v5.
+
+    El CDN los publica indexados por nombre interno ("MonkeyKing"), pero
+    las partidas traen `championId`. Sin este reindexado habría que hacer
+    una búsqueda lineal por cada uno de los 10 campeones de cada partida.
+    """</pre>
+
+<h4>4.3 <code>seeds.py</code> · 70 líneas · el recorrido del ranking</h4>
+
+<p>Un <strong>generador</strong> que va entregando jugadores del ranking. Es un generador y no una lista
+por una razón concreta: la corrida se corta cuando se alcanza la cuota de partidas, no cuando se agota
+el ranking. Pedir todas las páginas por adelantado gastaría cupo en jugadores que no se van a visitar nunca.</p>
+
+<pre>def iter_puuids(client, platform, tiers, max_paginas=40, semilla=None):
+    rnd = random.Random(semilla)
+    vistos: set[str] = set()
+
+    for page in range(1, max_paginas + 1):
+        tiers_mezclados = list(tiers)
+        rnd.shuffle(tiers_mezclados)          # el orden aleatorio
+        for tier in tiers_mezclados:
+            divisiones = ["I"] if tier in APEX_TIERS else DIVISIONS
+            if tier in APEX_TIERS and page &gt; 1:
+                continue                       # su endpoint no pagina
+            for division in divisiones:
+                entradas = client.league_entries(platform, tier,
+                                                 division, page)
+                rnd.shuffle(entradas)
+                for e in entradas:
+                    puuid = e.get("puuid")
+                    if not puuid or puuid in vistos:
+                        continue
+                    vistos.add(puuid)
+                    yield puuid, tier</pre>
+
+<h4>4.4 <code>schema.py</code> · 99 líneas · el contrato del dataset</h4>
+
+<p>Define <strong>qué columnas tiene el dataset y en qué orden</strong>. Es el contrato: si el
+transformador produce algo distinto, la validación falla y el DAG falla.</p>
+
+<pre>EQUIPOS = ["t1", "t2"]
+POSICIONES = ["top", "jng", "mid", "bot", "sup"]
+
+FEATURES_JUGADOR = [        # 10 por jugador
+    "champ_id", "champ_name", "sum1", "sum2",
+    "rune_primary", "rune_sub",
+    "player_elo", "player_winrate", "champ_mastery_pts", "is_main",
+]
+
+FEATURES_EQUIPO = [ ... ]   # 18 por equipo
+
+def columnas_equipo(prefijo):
+    """Las 50 columnas de jugador + 18 de equipo, para t1 o t2."""
+    cols = [f"{prefijo}_{pos}_{f}"
+            for pos in POSICIONES for f in FEATURES_JUGADOR]
+    cols += [f"{prefijo}_{f}" for f in FEATURES_EQUIPO]
+    return cols
+
+COLUMNS = (IDENTIDAD + TARGET + CALIDAD
+           + columnas_equipo("t1") + columnas_equipo("t2"))</pre>
+
+<p>Las columnas se <strong>generan</strong>, no se escriben a mano. Así es imposible que se escape un typo
+en <code>t2_sup_champ_mastery_pts</code>, y agregar una variable por jugador es cambiar una lista de
+diez elementos en vez de escribir veinte nombres.</p>
+
+<p>La cuenta: <code>3 + (10 × 5 × 2) + (18 × 2) = 3 + 100 + 36 = 139</code>.</p>
+
+<p>El módulo también fija las <strong>reglas de admisión</strong>:</p>
+<pre>SEASON_PREFIX = "16."
+DURACION_MINIMA_S = 300               # descarta remakes
+DURACION_MAXIMA_PLAUSIBLE_S = 20_000  # ~5,5 hs: nada dura tanto</pre>
+
+<h4>4.5 <code>transform.py</code> · 192 líneas · de JSON crudo a fila</h4>
+
+<p>Todo este módulo es <strong>puro</strong>: no toca la red ni el disco. Recibe el JSON tal como lo
+guardó el bronce más los perfiles de los jugadores, y devuelve un diccionario con las 139 columnas.
+Esa pureza es lo que permite corregir un error de parseo y reprocesar todo el bronce sin gastar un
+solo pedido.</p>
+
+<p><strong>La corrección de la unidad de tiempo</strong> — una trampa real de esta fuente:</p>
+
+<pre>def normalizar_duracion(bruto) -&gt; int:
+    """`gameDuration` a segundos.
+
+    Riot cambió el criterio alrededor del parche 11.20: las partidas con
+    `gameEndTimestamp` lo devuelven en segundos y las anteriores en
+    milisegundos. Mezclar las dos unidades en la misma columna arruinaría
+    el target sin que nada falle, que es la peor clase de bug.
+    """
+    valor = int(bruto or 0)
+    if valor &gt; schema.DURACION_MAXIMA_PLAUSIBLE_S:
+        log.info("gameDuration=%s parece venir en ms; se convierte a s.", valor)
+        valor = valor // 1000
+    return valor</pre>
+
+<p><strong>Los filtros de admisión</strong>, que lanzan una excepción con el motivo exacto:</p>
+
+<pre>def admitir(match_data: dict):
+    info = match_data.get("info") or {}
+    version = info.get("gameVersion") or ""
+    if not version.startswith(schema.SEASON_PREFIX):
+        raise PartidaDescartada(f"no es Season 16 (gameVersion={version!r})")
+    duracion = normalizar_duracion(info.get("gameDuration"))
+    if duracion &lt; schema.DURACION_MINIMA_S:
+        raise PartidaDescartada(f"dura {duracion}s, parece un remake")
+    participantes = info.get("participants") or []
+    if len(participantes) != 10:
+        raise PartidaDescartada(f"tiene {len(participantes)} participantes, no 10")
+    for team_id in (100, 200):
+        n = sum(1 for p in participantes if p.get("teamId") == team_id)
+        if n != 5:
+            raise PartidaDescartada(f"el equipo {team_id} tiene {n} jugadores, no 5")
+    return info, participantes, duracion</pre>
+
+<p><strong>La asignación de carriles</strong>, y una corrección importante respecto del prototipo previo:</p>
+
+<pre>def ordenar_por_rol(participantes):
+    """Ordena los 5 de un equipo en top/jng/mid/bot/sup.
+
+    Devuelve también CUÁNTOS quedaron sin emparejar. `teamPosition`
+    puede venir vacío en remakes y en partidas con autofill; en ese caso
+    el jugador se coloca igual en el slot que sobre —descartar la partida
+    entera sería peor— pero el conteo viaja hasta la columna
+    `roles_inferidos`, así esas filas se pueden filtrar más adelante en
+    vez de arrastrar una etiqueta silenciosamente equivocada.
+    """</pre>
+
+<div class="clave">
+  <span class="etiqueta">Un bug del prototipo previo, corregido</span>
+  <p>El prototipo hacía exactamente lo mismo <strong>sin contar nada</strong>. Cuando la fuente no
+  informaba la posición, el jugador terminaba etiquetado como &laquo;jungla&raquo; sin haberlo sido, y
+  no quedaba ningún rastro. El dato estaba mal y no había forma de saberlo. Ahora la columna
+  <code>roles_inferidos</code> registra cuántos jugadores de esa partida quedaron sin emparejar, y las
+  filas afectadas se filtran con <code>df[df.roles_inferidos == 0]</code>. <strong>El error existía
+  igual; lo que cambió es que ahora es visible.</strong></p>
+</div>
+
+<h3>5. <code>dags/lol_ingest.py</code> — la orquestación</h3>
+
+<p>711 líneas, pero la mayoría son docstrings: cada tarea explica <em>por qué</em> está donde está.
+Esos textos se renderizan en la interfaz de Airflow y son la chuleta para la defensa oral.</p>
+
+<h4>La declaración del DAG</h4>
+<pre>@dag(
+    dag_id="lol_ingest",
+    schedule=None,
+    start_date=pendulum.datetime(2026, 8, 1,
+                                 tz="America/Argentina/Buenos_Aires"),
+    catchup=False,
+    max_active_tasks=6,
+    tags=["ciencia-de-datos", "unidad-1", "integrador", "5K09-02"],
+    doc_md=__doc__,
+    params={ ... },
+)
+def lol_ingest():
+    ...
+
+lol_ingest()   # SIN ESTA LÍNEA el DAG no aparece en la interfaz</pre>
+
+<table>
+<tr><th>Argumento</th><th>Qué significa</th></tr>
+<tr><td><code>schedule=None</code></td><td>Se dispara a mano, no automáticamente. Justificado abajo.</td></tr>
+<tr><td><code>catchup=False</code></td><td>Si el entorno estuvo apagado una semana, no intenta recuperar las corridas perdidas.</td></tr>
+<tr><td><code>max_active_tasks=6</code></td><td>Las seis plataformas corren a la vez.</td></tr>
+<tr><td><code>doc_md=__doc__</code></td><td>El docstring del archivo se muestra en la interfaz.</td></tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">Por qué <code>schedule=None</code> y no <code>@daily</code></span>
+  <p>El DAG de la cátedra corre todos los días. El nuestro no, y la razón es concreta: la development
+  key de Riot <strong>vence cada 24 horas</strong>. Un DAG programado corriendo sin nadie mirando
+  fallaría todos los días apenas venciera la key, y el ruido de esas fallas taparía las reales.
+  Se dispara a mano, con la key recién renovada. Es una decisión defendible y hay que saber explicarla:
+  el DAG de ejemplo de la cátedra (<code>pokemon_api</code>) también usa <code>schedule=None</code>.</p>
+</div>
+
+<h4>Los cuatro parámetros de corrida</h4>
+<table>
+<tr><th>Parámetro</th><th>Default</th><th>Qué hace</th></tr>
+<tr><td><code>partidas_objetivo</code></td><td>1500</td><td>Cuántas partidas juntar. Se reparte en partes iguales entre las plataformas.</td></tr>
+<tr><td><code>plataformas</code></td><td>las 6</td><td>Qué servidores recorrer.</td></tr>
+<tr><td><code>tiers</code></td><td>los 10</td><td>De qué rangos salen los jugadores semilla.</td></tr>
+<tr><td><code>forzar</code></td><td><code>false</code></td><td>Ignora el bronce ya bajado y vuelve a pedir todo.</td></tr>
+</table>
+
+<p>Todos llevan <code>title</code> y <code>description</code> en castellano, para que el formulario de
+disparo de la interfaz se explique solo.</p>
+
+<h4>El grafo</h4>
+<div class="grafo">wait_for_riot → check_key ─┬→ fetch_ddragon ──────────────────┐
+                           │                                  ├→ refine_silver[6] → consolidate → validate → save
+                           └→ plan_plataformas → land_bronze[6] ┘</div>
+
+<h4>Las nueve tareas, una por una</h4>
+
+<p><strong>1 · <code>wait_for_riot</code></strong> — un <em>sensor</em>. Comprueba que la API responde y
+que la key sirve. Sondea cada 2 minutos hasta 30, en modo <code>reschedule</code> para no ocupar un
+trabajador durmiendo, y con <code>soft_fail=True</code> para que agotar el tiempo deje la tarea en
+<em>salteada</em> y no en <em>fallada</em>: que Riot no responda no es un error de nuestro pipeline.</p>
+
+<p>Distingue dos fallas que se resuelven distinto, y eso es lo que la hace útil:</p>
+
+<pre>try:
+    responde = cliente.ping()
+except RiotKeysExhausted as e:
+    # Ninguna key del pool sirve. Cortar ya, no seguir sondeando.
+    return PokeReturnValue(is_done=True,
+                           xcom_value={"ok": False, "motivo": str(e)})
+
+if responde:
+    return PokeReturnValue(is_done=True, xcom_value={"ok": True})
+
+log.warning("Riot no responde todavía. Reintento en 2 min.")
+return PokeReturnValue(is_done=False)</pre>
+
+<div class="clave">
+  <span class="etiqueta">Verificado en la práctica</span>
+  <p>Con una key inválida, esta tarea resuelve <strong>en 3 segundos</strong> en vez de sondear media
+  hora. Si Riot está caído, en cambio, espera los 30 minutos completos, porque un corte de diez minutos
+  no tiene por qué arruinar la corrida. <em>Esperar arregla un corte; no arregla una key vencida.</em></p>
+</div>
+
+<p><strong>2 · <code>check_key</code></strong> — un <em>cortocircuito</em>. Si el sensor no consiguió
+respuesta, devuelve <code>False</code>, todo lo de abajo queda salteado y la corrida termina
+<strong>bien</strong>. Corre con <code>trigger_rule=ALL_DONE</code> porque su tarea anterior puede haber
+quedado salteada — que es justamente el caso que tiene que manejar. Con la regla por defecto no se
+ejecutaría nunca cuando más falta hace.</p>
+
+<p><strong>3 · <code>fetch_ddragon</code></strong> — primera tarea de <span style="color:#8a5a20;font-weight:600">bronce</span>.
+Baja el catálogo de campeones y hechizos y lo guarda crudo, particionado por versión. Si ya está, no
+lo vuelve a pedir.</p>
+
+<p><strong>4 · <code>plan_plataformas</code></strong> — reparte el objetivo entre las plataformas elegidas:</p>
+
+<pre>cuota = math.ceil(params["partidas_objetivo"] / len(plataformas))</pre>
+
+<div class="nota">
+  <span class="etiqueta">Por qué se reparte por adelantado</span>
+  <p>Airflow corre cada tarea mapeada en <strong>su propio proceso</strong>, así que no existe un
+  contador compartido en memoria como tendría un script monolítico. La cuota se reparte antes de
+  arrancar y se deduplica al final. Es un ejemplo lindo de cómo la arquitectura del orquestador
+  condiciona el diseño del algoritmo.</p>
+</div>
+
+<p><strong>5 · <code>land_bronze</code></strong> — <span style="color:#8a5a20;font-weight:600">bronce</span>.
+Se mapea sobre las plataformas, así que en la interfaz aparecen seis instancias. <strong>Es la única
+tarea de todo el DAG que toca la red.</strong> No parsea, no limpia, no valida: guarda el JSON tal como
+vino y anota dónde quedó.</p>
+
+<p>El detalle más valioso de esta tarea es el orden de las operaciones:</p>
+
+<pre>datos = cliente.match(region, match_id)
+
+# Se filtra ANTES de gastar ~17 pedidos en los perfiles de los
+# 10 jugadores de una partida que igual se va a tirar.
+try:
+    _, participantes, _ = transform.admitir(datos)
+except transform.PartidaDescartada as e:
+    descartadas.add(match_id)      # y NO se vuelve a bajar nunca
+    continue
+
+escribir_json(destino, datos)
+
+with ThreadPoolExecutor(max_workers=4) as pool:
+    list(pool.map(perfil_de, participantes))</pre>
+
+<p>Además, la escritura es <strong>atómica</strong>: se escribe a un archivo temporal y se renombra.
+Así una tarea cortada a mitad de escritura no deja un archivo truncado que reviente el parseo después.</p>
+
+<p><strong>6 · <code>refine_silver</code></strong> — <span style="color:#5b6770;font-weight:600">plata</span>.
+Una por plataforma, y <strong>sin red</strong>. Convierte el JSON crudo en filas tipadas leyendo del bronce.</p>
+
+<div class="aviso">
+  <span class="etiqueta">Un bug que encontramos y corregimos, y que vale la pena conocer</span>
+  <p>La primera versión iteraba sólo las partidas que había bajado <em>esa</em> corrida. Con eso, correr
+  el DAG una segunda vez nunca hubiera hecho crecer el CSV: cada corrida producía un archivo con su
+  propia cuota y pisaba el anterior. Toda la estrategia de acumular hacia 20.000 en varias tandas no
+  funcionaba. Ahora hace <code>glob</code> sobre <strong>todo el bronce</strong> de su plataforma:</p>
+  <pre>rutas = sorted(
+    (BRONCE_DIR / "matches" / f"plataforma={platform}").glob("*.json.gz"))</pre>
+  <p>Verificado: con 60 partidas en bronce, una corrida de cuota 10 produce un CSV de 70 filas.</p>
+</div>
+
+<p><strong>7 · <code>consolidate</code></strong> — junta los parciales de las seis plataformas,
+<strong>deduplica por <code>match_id</code></strong> y castea los tipos. La deduplicación acá es lo que
+sostiene la promesa de que la clave primaria es única, que es el criterio que más pesa en la entrega.</p>
+
+<p><strong>8 · <code>validate</code></strong> — los chequeos duros. Si alguno falla, el DAG falla:
+no se publica un dataset roto. Verifica que las columnas sean exactamente las esperadas, que la clave
+no repita, que no haya nulos en las columnas obligatorias, que el objetivo esté en rango plausible y
+que ninguna columna esté 100 % vacía.</p>
+
+<p>Y además escribe el <strong>reporte de calidad</strong> en <code>include/output/reports/calidad.md</code>,
+con los seis números que la consigna pide tener a mano — para no calcularlos a las apuradas cinco
+minutos antes de la entrega.</p>
+
+<p><strong>9 · <code>save</code></strong> — escribe el entregable fechado. Un detalle sutil:</p>
+
+<pre>dag_run = context["dag_run"]
+momento = dag_run.logical_date or dag_run.run_after
+ds = momento.date().isoformat()</pre>
+
+<p>La fecha sale del <em>DagRun</em> y no de la variable <code>ds</code>. <code>ds</code> sólo existe
+cuando el DAG tiene <code>schedule</code>, y el nuestro corre a demanda. Es un tropiezo clásico al pasar
+de Airflow 2 a 3, y está explícitamente listado entre los errores frecuentes del apunte de la cátedra.</p>
+
+<h3>6. Tests, calidad de código y documentación</h3>
+
+<h4><code>tests/dags/test_dag_integrity.py</code> · 10 tests</h4>
+<table>
+<tr><th>Grupo</th><th>Qué verifica</th></tr>
+<tr><td>El DAG</td><td>Que no haya errores de import, que se registre, que estén las nueve tareas, que corra a demanda y que no haga catchup.</td></tr>
+<tr><td>El esquema</td><td>Que sean 139 columnas sin repetidas, que cada columna caiga en exactamente un grupo de tipo, y que estén la clave y el objetivo.</td></tr>
+<tr><td>Las trampas de la fuente</td><td>Que una duración en milisegundos se normalice, y que un <code>teamPosition</code> vacío se cuente en <code>roles_inferidos</code>.</td></tr>
+</table>
+
+<p>Los dos últimos son los más valiosos: son <em>tests de regresión</em> sobre bugs reales. Si alguien
+en el futuro simplifica esa lógica sin entenderla, el test lo frena.</p>
+
+<div class="nota">
+  <span class="etiqueta">Un detalle técnico que costó descubrir</span>
+  <p>En Airflow 3, <code>DagBag.get_dag()</code> consulta la tabla <code>dag</code> de la base de metadatos,
+  que no existe en el contexto de pytest. Hay que usar el diccionario <code>DagBag.dags</code>, que es el
+  resultado directo del parseo. Vale la pena saberlo: los tests del proyecto de la cátedra
+  (<code>airflow-fifa</code>) <strong>fallan</strong>, en parte por esto y en parte porque quedaron
+  desactualizados respecto de su propio DAG.</p>
+</div>
+
+<h4>Documentación del repositorio</h4>
+<table>
+<tr><th>Archivo</th><th>Para qué</th></tr>
+<tr><td><code>README.md</code></td><td>El entregable escrito: qué es el dataset, cómo se ejecuta, y las decisiones que hay que poder defender.</td></tr>
+<tr><td><code>CLAUDE.md</code></td><td>Contexto e instrucciones para trabajar en el repo con asistencia de IA. Incluye la regla de mantener este documento actualizado.</td></tr>
+<tr><td><code>.claude/skills/</code></td><td>La skill del proyecto: el workflow y cinco documentos de referencia (entregas, criterios, convenciones de Airflow, la API de Riot, el esquema).</td></tr>
+<tr><td><code>docs/</code></td><td>Este documento y el script que regenera el PDF.</td></tr>
+<tr><td><code>Documentacion/</code></td><td>El material original de la cátedra. Es la fuente de verdad de las consignas.</td></tr>
+</table>
+
+<h2 class="parte"><span class="n">Parte V</span>El dataset producido</h2>
+
+<h3>1. Unidad de análisis, clave y objetivo</h3>
+
+<div class="clave">
+<table style="margin-bottom:0">
+<tr><td style="width:32%"><strong>Una fila es</strong></td><td>una partida clasificatoria de League of Legends, modalidad Solo/Duo (cola 420), de la Season 16</td></tr>
+<tr><td><strong>Clave primaria</strong></td><td><code>match_id</code> — por ejemplo <code>LA2_1617259431</code></td></tr>
+<tr><td><strong>Columna objetivo</strong></td><td><code>game_duration_s</code> — duración en segundos, continua</td></tr>
+<tr><td><strong>Tipo de problema</strong></td><td>Regresión (el objetivo es un número continuo, no una categoría)</td></tr>
+<tr><td><strong>Ancho</strong></td><td>139 columnas</td></tr>
+</table>
+</div>
+
+<p>El <code>match_id</code> lleva el prefijo de la plataforma donde se jugó (<code>LA2_</code>,
+<code>KR_</code>, <code>EUW1_</code>…), lo cual tiene un efecto lateral útil: la clave es única a nivel
+global sin necesidad de combinarla con nada, y de paso permite saber de qué servidor vino cada partida
+con un simple <code>df.match_id.str.split("_").str[0]</code>.</p>
+
+<h3>2. Las 139 columnas por bloques</h3>
+
+<p>La cuenta: <code>3 + (10 × 5 × 2) + (18 × 2) = 139</code>.</p>
+
+<h4>Bloque A · Identidad, objetivo y calidad — 3 columnas</h4>
+<table>
+<tr><th>Columna</th><th>Tipo</th><th>De dónde sale</th></tr>
+<tr><td><code>match_id</code></td><td>texto</td><td><code>metadata.matchId</code> del detalle de partida</td></tr>
+<tr><td><code>game_duration_s</code></td><td>entero</td><td><code>info.gameDuration</code>, con la corrección de milisegundos</td></tr>
+<tr><td><code>roles_inferidos</code></td><td>entero</td><td><strong>Derivada.</strong> Cuántos de los 10 jugadores no traían su carril informado</td></tr>
+</table>
+
+<h4>Bloque B · Por jugador — 100 columnas</h4>
+<p>Diez variables × cinco posiciones × dos equipos. El nombre se arma como
+<code>{t1|t2}_{top|jng|mid|bot|sup}_{variable}</code>. Por ejemplo:
+<code>t1_top_player_elo</code> es el elo del jugador que ocupó el carril superior del equipo azul.</p>
+
+<table>
+<tr><th>Variable</th><th>Tipo</th><th>Qué es y de dónde sale</th></tr>
+<tr><td><code>champ_id</code></td><td>entero</td><td>Número del campeón elegido, de la partida.</td></tr>
+<tr><td><code>champ_name</code></td><td>texto</td><td>Nombre del campeón. Es la única categórica de texto del dataset.</td></tr>
+<tr><td><code>sum1</code>, <code>sum2</code></td><td>entero</td><td>Los dos hechizos de invocador (4 Flash, 11 Smite, 12 Teleport, 14 Ignite…).</td></tr>
+<tr><td><code>rune_primary</code></td><td>entero</td><td>Rama principal de runas. <code>0</code> si el payload no la trae.</td></tr>
+<tr><td><code>rune_sub</code></td><td>entero</td><td>Rama secundaria. <code>0</code> si falta.</td></tr>
+<tr><td><code>player_elo</code></td><td>entero</td><td><strong>Derivada.</strong> Proxy de habilidad. Ver 5.4.</td></tr>
+<tr><td><code>player_winrate</code></td><td>flotante</td><td>Victorias sobre total en solo/duo. <code>0.50</code> si no tiene ranking.</td></tr>
+<tr><td><code>champ_mastery_pts</code></td><td>entero</td><td>Puntos de maestría con ese campeón. <code>0</code> si nunca lo jugó.</td></tr>
+<tr><td><code>is_main</code></td><td>entero</td><td><strong>Derivada.</strong> <code>1</code> si la maestría supera 50.000 puntos.</td></tr>
+</table>
+
+<h4>Bloque C · Agregados de equipo — 36 columnas</h4>
+<p>Dieciocho variables × dos equipos, con el nombre <code>{t1|t2}_{variable}</code>.
+Describen la <em>composición</em> del equipo: qué tipo de equipo se armó en el draft.</p>
+
+<table>
+<tr><th>Variable</th><th>Cómo se calcula</th></tr>
+<tr><td><code>mains_count</code></td><td>Cuántos de los 5 jugadores usan un campeón que dominan (suma de <code>is_main</code>).</td></tr>
+<tr><td><code>num_tanks</code>, <code>num_mages</code>, <code>num_assassins</code>, <code>num_marksmen</code>, <code>num_fighters</code>, <code>num_supports</code></td><td>Cuántos de los 5 campeones tienen esa etiqueta en Data Dragon.</td></tr>
+<tr><td><code>avg_attack</code>, <code>avg_defense</code>, <code>avg_magic</code>, <code>avg_difficulty</code>, <code>avg_attackrange</code></td><td>Promedio de esa estadística base sobre los 5 campeones.</td></tr>
+<tr><td><code>total_base_hp</code>, <code>total_base_armor</code></td><td>Suma cruda (no promedio) de vida y armadura base.</td></tr>
+<tr><td><code>count_teleport</code>, <code>count_ignite</code>, <code>count_flash</code>, <code>count_smite</code></td><td>Cuántos de los 10 hechizos del equipo son ése.</td></tr>
+</table>
+
+<div class="aviso">
+  <span class="etiqueta">Un detalle que puede preguntar el docente</span>
+  <p>Las seis columnas de conteo por tipo de campeón <strong>no suman 5</strong>. Un campeón puede tener
+  varias etiquetas a la vez —Ornn es Tank <em>y</em> Fighter—, así que la suma puede dar más de 5.
+  No es un error de cálculo: es cómo Data Dragon clasifica a los campeones, y saberlo evita interpretar
+  mal esas columnas en la exploración de la Unidad 2.</p>
+</div>
+
+<h4>Verificación de sanidad</h4>
+<p>En la muestra recolectada, <code>t1_count_smite</code> y <code>t2_count_smite</code> valen
+<strong>1 en todas las partidas</strong>. Tiene sentido: Smite es el hechizo obligatorio del jungla, y
+hay exactamente un jungla por equipo. Es una comprobación barata de que el pipeline está leyendo bien
+la fuente y asignando bien los equipos.</p>
+
+<h3>3. Reglas de admisión de una partida</h3>
+
+<p>Una partida entra al dataset sólo si pasa los cuatro filtros. Si no pasa, se anota en el índice de
+descartadas y <strong>no se vuelve a descargar nunca</strong>.</p>
+
+<table>
+<tr><th>Filtro</th><th>Regla</th><th>Por qué</th></tr>
+<tr><td>Temporada</td><td><code>gameVersion</code> empieza con <code>"16."</code></td><td>Las reglas del juego cambian entre temporadas. Mezclarlas compararía cosas distintas.</td></tr>
+<tr><td>Duración mínima</td><td>≥ 300 segundos</td><td>Descarta los <em>remakes</em>: partidas que se cancelan en los primeros minutos porque alguien no se conectó. No son partidas reales.</td></tr>
+<tr><td>Participantes</td><td>Exactamente 10</td><td>Un payload con otra cantidad está corrupto o es de otra modalidad.</td></tr>
+<tr><td>Equipos</td><td>5 y 5</td><td>Garantiza que se puedan armar los dos bloques de cinco jugadores.</td></tr>
+</table>
+
+<p>El filtro se aplica <strong>antes</strong> de pedir los perfiles de los 10 jugadores. Es una decisión
+de eficiencia: ahorra ~17 pedidos por cada partida que igual se iba a descartar.</p>
+
+<h3>4. Variables derivadas y su justificación</h3>
+
+<p>Tres columnas no vienen de la fuente: las calculamos nosotros. Hay que poder defender las tres.</p>
+
+<h4><code>player_elo</code> — el proxy de habilidad</h4>
+
+<div class="aviso">
+  <span class="etiqueta">Riot NO expone el MMR</span>
+  <p>El <em>matchmaking rating</em> real —el número interno con el que Riot empareja jugadores— es
+  privado. Lo que sí publica es el rango visible: tier, división y puntos de liga. <code>player_elo</code>
+  es una <strong>construcción del grupo</strong> que convierte esa escala ordinal en un número
+  comparable. Hay que presentarla como tal: es una variable derivada, no observada.</p>
+</div>
+
+<pre>estimated_elo = TIER_BASE_MMR[tier] + RANK_BONUS[rank] + int(lp * 0.5)</pre>
+
+<table>
+<tr><th>Tier</th><th>Base</th><th>Tier</th><th>Base</th><th>División</th><th>Bonus</th></tr>
+<tr><td>IRON</td><td>800</td><td>EMERALD</td><td>2300</td><td>IV</td><td>0</td></tr>
+<tr><td>BRONZE</td><td>1100</td><td>DIAMOND</td><td>2600</td><td>III</td><td>75</td></tr>
+<tr><td>SILVER</td><td>1400</td><td>MASTER</td><td>2900</td><td>II</td><td>150</td></tr>
+<tr><td>GOLD</td><td>1700</td><td>GRANDMASTER</td><td>3200</td><td>I</td><td>225</td></tr>
+<tr><td>PLATINUM</td><td>2000</td><td>CHALLENGER</td><td>3500</td><td colspan="2"></td></tr>
+</table>
+
+<p>Ejemplo verificado: un jugador Oro I con 40 puntos da <code>1700 + 225 + 20 = 1945</code>.</p>
+
+<p>La lógica de los coeficientes: 300 puntos entre tiers consecutivos, repartidos en cuatro divisiones
+de 75, y los puntos de liga pesan la mitad para que un jugador a punto de ascender quede cerca del tier
+siguiente sin superponerse. <strong>Son una elección del grupo, no una medición.</strong> Si en la Unidad 3
+resulta que la escala no ayuda al modelo, se puede reemplazar por el tier como categórica — el bronce
+guarda la respuesta cruda, así que rehacerlo no cuesta ningún pedido a la API.</p>
+
+<h4><code>is_main</code> — el umbral de 50.000 puntos</h4>
+<p>Marca si el jugador domina el campeón que eligió. El umbral lo eligió el grupo: 50.000 puntos de
+maestría equivalen aproximadamente a decenas de partidas con ese campeón. Es un corte arbitrario y
+conviene decirlo así. Una alternativa para la Unidad 2 sería usar directamente
+<code>champ_mastery_pts</code> (que ya está en el dataset) y dejar que el modelo encuentre el corte.</p>
+
+<h4><code>roles_inferidos</code> — la bandera de calidad</h4>
+<p>Cuenta cuántos de los 10 jugadores de esa partida no traían su carril informado en la fuente y
+fueron asignados al slot que sobraba. Filas con <code>roles_inferidos > 0</code> tienen todos sus datos
+correctos; lo único incierto es la etiqueta de carril. Se filtran con
+<code>df[df.roles_inferidos == 0]</code>.</p>
+
+<h3>5. Los nulos: dónde, por qué y qué se hizo</h3>
+
+<p>La consigna es explícita: <em>&laquo;No pedimos cero nulos: eso no existe en datos reales. Pedimos
+que sepas cuáles tenés y qué significan.&raquo;</em></p>
+
+<p>En nuestro dataset <strong>no hay nulos</strong>, y eso no es porque los datos vengan perfectos:
+es porque donde la fuente no tiene el dato, imputamos un valor que <em>significa algo</em> en vez de
+dejar un hueco. Hay que poder defender esa decisión, incluyendo sus contras.</p>
+
+<table>
+<tr><th>Situación</th><th>Qué queda</th><th>Razonamiento</th></tr>
+<tr>
+  <td>Jugador sin ranking en solo/duo (nuevo, inactivo, o sólo juega flex)</td>
+  <td><code>player_elo = 1500</code><br><code>player_winrate = 0.50</code></td>
+  <td>Codifica «habilidad desconocida, asumimos promedio». 1500 cae entre Gold y Platinum, que es la zona más poblada.</td>
+</tr>
+<tr>
+  <td>Jugador que nunca jugó ese campeón</td>
+  <td><code>champ_mastery_pts = 0</code><br><code>is_main = 0</code></td>
+  <td>Es literalmente cierto: tiene cero puntos de maestría. No es una imputación, es el valor real.</td>
+</tr>
+<tr>
+  <td><code>perks</code> ausente en el payload</td>
+  <td><code>rune_primary = rune_sub = 0</code></td>
+  <td><code>0</code> no es un identificador de rama válido, así que el caso queda distinguible.</td>
+</tr>
+<tr>
+  <td>Campeón más nuevo que el catálogo de Data Dragon guardado</td>
+  <td>Aporta 0 a los agregados de composición</td>
+  <td>Se emite un aviso en el log para que no pase desapercibido.</td>
+</tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">La contra de esta decisión, y hay que decirla</span>
+  <p>Imputar con 1500 y 0.50 mezcla dos cosas distintas: un jugador que <em>es</em> de nivel medio y un
+  jugador del que <em>no sabemos nada</em>. El modelo no puede distinguirlos.</p>
+  <p>La alternativa sería agregar una columna <code>es_unranked</code> por jugador —el código ya la
+  calcula internamente, sólo no la escribe al CSV— para que el modelo pueda tratar el caso aparte.
+  Está deliberadamente pendiente para discutir en la Unidad 2, cuando la exploración muestre qué
+  proporción de jugadores cae en esa situación. Reconocer una decisión abierta es mejor que fingir que
+  no existe.</p>
+</div>
+
+<h3>6. Las capas en disco</h3>
+
+<div class="arbol">include/output/
+├── bronze/                                     ← CAPA BRONCE
+│   ├── ddragon/version=16.17.1/
+│   │   ├── champion.json.gz                    catálogo de campeones
+│   │   └── summoner.json.gz                    catálogo de hechizos
+│   ├── matches/plataforma=la2/
+│   │   ├── LA2_1617259431.json.gz              una partida cruda
+│   │   └── _manifiesto.txt                     progreso de la corrida
+│   ├── players/plataforma=la2/puuid=AO23g.../
+│   │   ├── liga.json.gz                        ranking del jugador
+│   │   └── maestria_875.json.gz                maestría con ese campeón
+│   └── descartadas/plataforma=la2.txt          ids que no volver a bajar
+│
+├── silver/_parciales/                          ← CAPA PLATA
+│   └── plataforma_la2.csv                      filas de una plataforma
+│
+├── _consolidado.csv                            todas, deduplicadas
+├── lol_2026-08-27.csv                          ← EL ENTREGABLE
+└── reports/calidad.md                          el chequeo de la consigna</div>
+
+<h4>Por qué el bronce está particionado así</h4>
+<p>Las carpetas con nombre <code>clave=valor</code> son <strong>particionado estilo Hive</strong>, el
+mismo idioma que usan los data lakes sobre S3 pero con carpetas en vez de prefijos de bucket. Permite
+borrar una plataforma entera sin tocar las demás, y saber qué contiene un archivo sólo por su ruta.</p>
+
+<h4>Por qué todo está comprimido</h4>
+<p>Los JSON de Riot son texto muy repetitivo y comprimen muchísimo. Con 204 partidas y 3.620 perfiles,
+el bronce ocupa <strong>14&nbsp;MB</strong>. Sin comprimir serían más de 100&nbsp;MB.</p>
+
+<h4>Estado actual del bronce</h4>
+<table>
+<tr><th>Plataforma</th><th>Partidas</th></tr>
+<tr><td><code>la2</code> (LAS)</td><td>93</td></tr>
+<tr><td><code>na1</code> (NA)</td><td>23</td></tr>
+<tr><td><code>br1</code> (BR)</td><td>22</td></tr>
+<tr><td><code>euw1</code> (EUW)</td><td>22</td></tr>
+<tr><td><code>kr</code> (KR)</td><td>22</td></tr>
+<tr><td><code>la1</code> (LAN)</td><td>22</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>204</strong> partidas · 3.620 perfiles · 22 descartadas</td></tr>
+</table>
+
+<h2 class="parte"><span class="n">Parte VI</span>Guía de ejecución</h2>
+
+<p>Esta parte está escrita para que cualquiera del grupo pueda levantar el proyecto en su máquina
+desde cero y llegar al CSV completo, sin haber participado del desarrollo.</p>
+
+<h3>1. Requisitos previos</h3>
+
+<table>
+<tr><th>Herramienta</th><th>Para qué</th><th>Cómo instalarla en Windows</th></tr>
+<tr><td><strong>Docker Desktop</strong></td><td>Airflow corre dentro de contenedores.</td><td>Desde <code>docker.com</code>. Tiene que estar <strong>abierto y corriendo</strong> antes de arrancar.</td></tr>
+<tr><td><strong>Astro CLI</strong></td><td>Levanta el entorno de Airflow.</td><td><code>winget install -e --id Astronomer.Astro</code></td></tr>
+<tr><td><strong>Git</strong></td><td>Clonar el repositorio.</td><td><code>winget install -e --id Git.Git</code></td></tr>
+<tr><td>Python 3.11+</td><td>Sólo para verificar el CSV desde afuera. Opcional.</td><td><code>winget install -e --id Python.Python.3.11</code></td></tr>
+</table>
+
+<p><strong>Espacio en disco:</strong> la imagen de Astro Runtime pesa ~1,5&nbsp;GB y PostgreSQL ~0,45&nbsp;GB.
+Con 6 a 8&nbsp;GB libres alcanza cómodo. El bronce crece aparte: estimamos ~70&nbsp;KB por partida, así
+que 20.000 partidas son alrededor de <strong>1,4&nbsp;GB</strong>.</p>
+
+<h3>2. Puesta en marcha desde cero</h3>
+
+<pre>git clone https://github.com/aguilarezequiel/FF-15.git
+cd FF-15
+
+# La configuración con la key NO viene en el repo. Se copia de la plantilla:
+cp airflow_settings.example.yaml airflow_settings.yaml
+# (en PowerShell:  Copy-Item airflow_settings.example.yaml airflow_settings.yaml)
+
+# Editar airflow_settings.yaml y pegar la key en conn_password  (ver punto 3)
+
+astro dev start</pre>
+
+<p>El primer arranque tarda unos minutos porque construye la imagen. Cuando termina imprime:</p>
+
+<pre>Airflow UI: http://localhost:8080
+Added Connection: riot_api</pre>
+
+<p>Se entra a <code>http://localhost:8080</code> con usuario <code>admin</code> y contraseña
+<code>admin</code>. El DAG <code>lol_ingest</code> tiene que aparecer en la lista.</p>
+
+<h4>Comandos que se usan a diario</h4>
+<table>
+<tr><th>Comando</th><th>Cuándo</th></tr>
+<tr><td><code>astro dev start</code></td><td>Levantar el entorno.</td></tr>
+<tr><td><code>astro dev stop</code></td><td>Apagarlo sin borrar nada.</td></tr>
+<tr><td><code>astro dev restart</code></td><td><strong>Sólo</strong> si se tocó <code>requirements.txt</code>, <code>packages.txt</code>, el <code>Dockerfile</code> o <code>airflow_settings.yaml</code>. Cambiar un <code>.py</code> no lo necesita.</td></tr>
+<tr><td><code>astro dev parse</code></td><td>Verificar que los DAGs no tengan errores de sintaxis.</td></tr>
+<tr><td><code>astro dev pytest</code></td><td>Correr los 10 tests.</td></tr>
+<tr><td><code>astro dev logs -f</code></td><td>Ver los logs de los contenedores.</td></tr>
+</table>
+
+<h3>3. Obtener y renovar la API key</h3>
+
+<ol>
+  <li>Entrar a <a>https://developer.riotgames.com</a> e iniciar sesión con la cuenta de Riot.</li>
+  <li><strong>Recargar la página</strong> (importante: a veces muestra una key vieja cacheada).</li>
+  <li>Apretar <code>REGENERATE API KEY</code>.</li>
+  <li>Copiar la key que aparece — empieza con <code>RGAPI-</code> y tiene 42 caracteres.</li>
+  <li>Pegarla en <code>airflow_settings.yaml</code>, en el campo <code>conn_password</code>.</li>
+  <li><code>astro dev restart</code> para que Airflow la recargue.</li>
+</ol>
+
+<div class="aviso">
+  <span class="etiqueta">Dos cosas que nos pasaron y te van a pasar</span>
+  <p><strong>La key tarda hasta un minuto en activarse.</strong> Si la probás apenas la generás, Riot
+  responde <code>401 Unknown apikey</code>. No está rota: no se propagó todavía. Esperá un minuto y
+  reintentá. (El pipeline maneja esto solo: el sensor sondea cada 2 minutos.)</p>
+  <p><strong>Regenerar invalida la anterior.</strong> Si dos integrantes regeneran desde la misma cuenta,
+  el segundo le rompe la key al primero. Coordinen: <strong>cada integrante con su propia cuenta de Riot</strong>.</p>
+</div>
+
+<h4>El pool de keys — cómo acelerar la recolección</h4>
+<p>Los límites de Riot son por key <strong>y</strong> por región. Con varias keys, el cupo se multiplica.
+Se pegan todas en el mismo campo, separadas por coma:</p>
+
+<pre>conn_password: RGAPI-aaaa-...,RGAPI-bbbb-...,RGAPI-cccc-...</pre>
+
+<p>El cliente arma el pool solo y reparte los pedidos. <strong>Es la palanca más efectiva que tiene el
+grupo para acortar el tiempo de recolección.</strong></p>
+
+<h3>4. Cómo llegar a 20.000 filas</h3>
+
+<h4>Los números medidos</h4>
+<table>
+<tr><th>Medición</th><th>Valor</th></tr>
+<tr><td>Pedidos por partida</td><td>18,5 (1 de partida + ~17 de perfiles)</td></tr>
+<tr><td>Ritmo por plataforma</td><td>~178 partidas/hora con una key</td></tr>
+<tr><td>Ritmo con las 6 plataformas</td><td>~1.070 partidas/hora con una key</td></tr>
+</table>
+
+<p>Estos números <strong>mejoran a medida que el dataset crece</strong>, porque los perfiles de
+jugadores repetidos salen de la caché en vez de la API.</p>
+
+<h4>Cuánto tarda según cuántas keys tenga el grupo</h4>
+<table>
+<tr><th>Keys</th><th>Ritmo aprox.</th><th>1.500 partidas</th><th>5.000 partidas</th><th>20.000 partidas</th></tr>
+<tr><td>1</td><td>~1.070 /h</td><td>~1,5 h</td><td>~5 h</td><td><strong>~19 h</strong></td></tr>
+<tr><td>2</td><td>~2.100 /h</td><td>~45 min</td><td>~2,5 h</td><td><strong>~9,5 h</strong></td></tr>
+<tr><td>4</td><td>~4.200 /h</td><td>~25 min</td><td>~1,2 h</td><td><strong>~5 h</strong></td></tr>
+<tr><td>6</td><td>~6.400 /h</td><td>~15 min</td><td>~50 min</td><td><strong>~3 h</strong></td></tr>
+</table>
+
+<div class="aviso">
+  <span class="etiqueta">Con una sola key, 20.000 no entra cómodo en la ventana de 24 horas</span>
+  <p>19 horas de recolección contra una key que vive 24 es demasiado justo: cualquier interrupción
+  arruina el intento. <strong>Con dos keys o más, entra sobrado.</strong> Vale mucho la pena que al menos
+  dos integrantes generen la suya.</p>
+</div>
+
+<h4>La estrategia recomendada: por tandas</h4>
+
+<p>En vez de una corrida única de 20.000, conviene hacer varias más chicas. Una corrida única es
+todo-o-nada: si falla una plataforma cerca del final, <code>consolidate</code> no corre y no sale
+ningún CSV, aunque el bronce esté sano en disco.</p>
+
+<p>Con tandas, en cambio, <strong>cada una es una corrida en verde completa que deja un CSV válido</strong>
+y suma al bronce. En todo momento hay un entregable presentable.</p>
+
+<table>
+<tr><th>Tanda</th><th><code>partidas_objetivo</code></th><th>Total acumulado</th><th>Por qué</th></tr>
+<tr><td>1</td><td>3.000</td><td>~3.000</td><td>Supera el mínimo de 1.000 de la consigna. Ya hay entregable.</td></tr>
+<tr><td>2</td><td>5.000</td><td>~8.000</td><td>Zona cómoda para modelar en la Unidad 3.</td></tr>
+<tr><td>3</td><td>6.000</td><td>~14.000</td><td></td></tr>
+<tr><td>4</td><td>6.000</td><td>~20.000</td><td>Objetivo alcanzado.</td></tr>
+</table>
+
+<div class="clave">
+  <span class="etiqueta">Por qué esto funciona</span>
+  <p>El bronce es <strong>acumulativo y resumible</strong>. Cada tanda suma partidas nuevas al disco, y
+  <code>refine_silver</code> reconstruye la plata sobre <em>todo</em> el bronce acumulado. Si la key vence
+  a mitad de una tanda, se genera una nueva y la siguiente corrida sigue desde donde quedó. Nada se pierde.</p>
+</div>
+
+<h4>Cómo disparar una tanda desde la interfaz</h4>
+<ol>
+  <li>Entrar a <code>http://localhost:8080</code>.</li>
+  <li>Buscar el DAG <code>lol_ingest</code> y despausarlo con el interruptor de la izquierda.</li>
+  <li>Apretar el botón de <strong>Trigger</strong> y elegir <strong>Trigger DAG w/ config</strong>.</li>
+  <li>Completar el formulario:
+    <ul>
+      <li><code>partidas_objetivo</code>: el número de la tanda</li>
+      <li><code>plataformas</code>: dejar las seis</li>
+      <li><code>tiers</code>: dejar los diez</li>
+      <li><code>forzar</code>: <code>false</code></li>
+    </ul>
+  </li>
+  <li>Confirmar. La corrida arranca y se puede seguir en la vista <strong>Graph</strong>.</li>
+</ol>
+
+<h4>Y desde la terminal, si se prefiere</h4>
+<pre>astro dev run dags unpause lol_ingest
+astro dev run dags trigger lol_ingest --conf '{"partidas_objetivo":3000}'</pre>
+
+<h4>Al terminar cada tanda, verificar</h4>
+<pre>python -c "import pandas as pd, glob; \
+f=sorted(glob.glob('include/output/lol_*.csv'))[-1]; \
+d=pd.read_csv(f); print(f, d.shape, 'clave unica:', d['match_id'].is_unique)"</pre>
+
+<p>Y leer el reporte que dejó la corrida en <code>include/output/reports/calidad.md</code>.</p>
+
+<h3>5. Qué mirar mientras corre</h3>
+
+<table>
+<tr><th>Dónde</th><th>Qué muestra</th></tr>
+<tr><td>Vista <strong>Graph</strong></td><td>El grafo con el color de cada tarea. Las seis instancias de <code>land_bronze</code> aparecen con el nombre de su plataforma (LAS, NA, BR…).</td></tr>
+<tr><td>Logs de <code>land_bronze</code></td><td>El progreso real. Cada 10 partidas escribe una línea con el avance y los pedidos hechos a Riot.</td></tr>
+<tr><td>Carpeta <code>include/output/bronze/</code></td><td>Los archivos aparecen a medida que llegan.</td></tr>
+</table>
+
+<p>Una línea de progreso típica:</p>
+<pre>LAS · 120/500 partidas en bronce (118 nuevas, 2 reusadas, 6 descartadas) · 2231 requests a Riot</pre>
+
+<h4>Qué significa cada color</h4>
+<table>
+<tr><th>Color</th><th>Estado</th><th>Qué quiere decir</th></tr>
+<tr><td>Verde</td><td>success</td><td>Terminó bien.</td></tr>
+<tr><td>Celeste claro</td><td>running</td><td>Está corriendo.</td></tr>
+<tr><td>Rosa</td><td>skipped</td><td>Se salteó. <strong>No siempre es un problema</strong>: si <code>check_key</code> cortó, todo lo de abajo queda así y es el comportamiento correcto.</td></tr>
+<tr><td>Rojo</td><td>failed</td><td>Falló. Hay que abrir el log.</td></tr>
+<tr><td>Gris</td><td>queued</td><td>Esperando lugar para ejecutarse.</td></tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">Regla que conviene adoptar</span>
+  <p><strong>Leer el log, no sólo el color del cuadradito.</strong> Un <em>skipped</em> puede ser el
+  comportamiento correcto o un bug silencioso, y sólo el log lo distingue.</p>
+</div>
+
+<h3>6. Problemas frecuentes y cómo resolverlos</h3>
+
+<table>
+<tr><th>Síntoma</th><th>Causa</th><th>Solución</th></tr>
+<tr>
+  <td>El DAG no aparece en la interfaz</td>
+  <td>El <code>dag-processor</code> escanea cada tanto. Si persiste, hay un error de sintaxis (aparece un banner rojo).</td>
+  <td><code>astro dev parse</code>. La causa más común en Airflow es <strong>olvidarse la llamada a la función al final del archivo</strong>.</td>
+</tr>
+<tr>
+  <td><code>check_key</code> corta y todo queda salteado</td>
+  <td>La API key venció, es inválida, o se generó hace menos de un minuto.</td>
+  <td>Leer el log de <code>check_key</code>: dice exactamente qué pasó. Regenerar la key, actualizar <code>airflow_settings.yaml</code> y <code>astro dev restart</code>.</td>
+</tr>
+<tr>
+  <td>La recolección va muy lenta</td>
+  <td>Una sola key.</td>
+  <td>Sumar keys del grupo separadas por coma.</td>
+</tr>
+<tr>
+  <td><code>consolidate</code> falla con «ninguna plataforma produjo filas»</td>
+  <td>Ninguna tarea de descarga consiguió partidas.</td>
+  <td>Mirar los logs de <code>land_bronze</code>. Casi siempre es la key.</td>
+</tr>
+<tr>
+  <td><code>validate</code> avisa que hay menos de 1.000 filas</td>
+  <td>Todavía no se juntó volumen suficiente.</td>
+  <td>No es un error: el DAG termina en verde igual. Correr más tandas.</td>
+</tr>
+<tr>
+  <td>Tareas clavadas en <code>queued</code></td>
+  <td>El scheduler se cayó.</td>
+  <td><code>astro dev logs -f</code> para ver el contenedor del scheduler; si hace falta, <code>astro dev restart</code>.</td>
+</tr>
+<tr>
+  <td><code>PermissionError</code> al escribir en <code>include/</code></td>
+  <td>El contenedor corre como usuario <code>astro</code>.</td>
+  <td>En Linux o WSL: <code>chmod -R 777 include/output</code>. En Windows con Docker Desktop no suele pasar.</td>
+</tr>
+<tr>
+  <td>Todo se cuelga sin mensaje</td>
+  <td>Espacio en disco.</td>
+  <td>Verificar cuánto queda libre.</td>
+</tr>
+</table>
+
+<h4>Cómo cancelar una corrida en marcha</h4>
+<p>Desde la interfaz: abrir la corrida y marcarla como <em>failed</em>. Desde la terminal, usando la
+API de Airflow:</p>
+
+<pre>TOKEN=$(curl -s -X POST http://localhost:8080/auth/token \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin"}' | python -c "import sys,json; print(json.load(sys.stdin)['access_token'])")
+
+curl -s -X PATCH "http://localhost:8080/api/v2/dags/lol_ingest/dagRuns/&lt;RUN_ID&gt;" \
+  -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"state":"failed"}'</pre>
+
+<p><strong>Cancelar no destruye nada:</strong> el bronce ya descargado queda en disco y la próxima
+corrida lo reutiliza.</p>
+
+<h3>7. Antes de la entrega — lista de control</h3>
+
+<table>
+<tr><th></th><th>Qué</th></tr>
+<tr><td>☐</td><td>El CSV tiene <strong>más de 1.000 filas</strong> (idealmente más de 10.000).</td></tr>
+<tr><td>☐</td><td>Hay una <strong>corrida en verde completa</strong> en el historial, hecha por el grupo.</td></tr>
+<tr><td>☐</td><td>El reporte <code>include/output/reports/calidad.md</code> está generado y leído.</td></tr>
+<tr><td>☐</td><td>La API key está <strong>vigente</strong> (se regenera el mismo día de la entrega).</td></tr>
+<tr><td>☐</td><td>Airflow arranca sin errores: probarlo la noche anterior.</td></tr>
+<tr><td>☐</td><td>El CSV está abierto o listo para abrir.</td></tr>
+<tr><td>☐</td><td>Todos los integrantes leyeron este documento y saben responder la parte VII.</td></tr>
+<tr><td>☐</td><td>Se definió quién explica qué (parte VII.6).</td></tr>
+</table>
+
+<div class="aviso">
+  <span class="etiqueta">El día de la entrega</span>
+  <p>Llegar con Airflow <strong>ya levantado</strong> y la corrida <strong>ya hecha</strong>. Arrancar el
+  entorno o correr el pipeline en vivo se come la mitad de los veinte minutos, y la consigna lo dice
+  explícitamente entre las cosas que no hay que hacer.</p>
+</div>
+
+<h2 class="parte"><span class="n">Parte VII</span>La defensa de la Entrega 1</h2>
+
+<p>Esta parte es la preparación para los veinte minutos con el docente. La evaluación es
+<strong>individual</strong>: las preguntas van dirigidas a integrantes puntuales, así que todo el grupo
+tiene que poder responder lo que sigue.</p>
+
+<h3>1. Cómo se estructuran los 20 minutos</h3>
+
+<h4>Minutos 0–2 · De qué se trata</h4>
+<p>Tres oraciones, sin filminas. Un guion posible:</p>
+
+<div class="clave">
+  <p>«Queremos saber si se puede predecir cuánto va a durar una partida de League of Legends sabiendo
+  únicamente lo que se conoce antes de que arranque: quiénes juegan, con qué campeones y con qué
+  hechizos. La fuente es la API oficial de Riot Games. <strong>Una fila de nuestro dataset es una
+  partida clasificatoria de la Season 16</strong>, identificada por su <code>match_id</code>, y la
+  columna que queremos predecir es su duración en segundos.»</p>
+</div>
+
+<h4>Minutos 2–7 · La corrida</h4>
+<p>Se muestra la ejecución en verde en la vista <em>Graph</em> y se recorre el grafo explicando
+<strong>qué hace cada tarea y por qué está donde está</strong>. Un recorrido posible:</p>
+
+<ol>
+  <li><strong><code>wait_for_riot</code></strong> — «Antes de nada verificamos que la API responda y que
+  la key sirva. Es un sensor: espera algo que está fuera de nuestro control. Está primero a propósito,
+  porque la corrida puede durar horas y enterarnos al final de que la key venció sería el peor resultado.»</li>
+  <li><strong><code>check_key</code></strong> — «Si la key no sirve, corta acá y la corrida termina bien,
+  no fallada. Distinguimos que Riot esté caído —donde esperar sirve— de que la key esté vencida —donde
+  esperar no arregla nada—.»</li>
+  <li><strong><code>fetch_ddragon</code></strong> — «Bajamos el catálogo de campeones del CDN público.
+  Va a bronce, particionado por versión, porque los campeones cambian entre parches.»</li>
+  <li><strong><code>plan_plataformas</code></strong> — «Repartimos el objetivo entre los seis servidores.
+  Riot aplica los límites por región, así que paralelizar por servidor multiplica la velocidad.»</li>
+  <li><strong><code>land_bronze</code></strong> — «Estas seis tareas son la única parte del pipeline que
+  toca la red. Guardan el JSON tal como llegó, sin interpretarlo. Una partida que ya está no se vuelve
+  a pedir nunca.»</li>
+  <li><strong><code>refine_silver</code></strong> — «Acá pasa la transformación, y no toca la red: lee
+  del bronce. Por eso podemos corregir un error de parseo y reprocesar sin gastar un solo pedido a la API.»</li>
+  <li><strong><code>consolidate</code></strong> — «Junta las seis plataformas y deduplica por
+  <code>match_id</code>. Es lo que garantiza que la clave primaria sea única.»</li>
+  <li><strong><code>validate</code></strong> — «Chequeos duros. Si la clave repite o falta una columna
+  obligatoria, el DAG falla: no publicamos un dataset roto. Además deja escrito el reporte de calidad.»</li>
+  <li><strong><code>save</code></strong> — «Escribe el CSV fechado con la corrida.»</li>
+</ol>
+
+<h4>Minutos 7–12 · El dataset</h4>
+<p>Se abre el CSV y se lo defiende contra los criterios: cuántas filas, cuál es la clave, dónde hay
+nulos, cuál es la columna objetivo. Todo eso está en las secciones 2 y 3 que siguen.</p>
+
+<h3>2. Las seis verificaciones numéricas</h3>
+
+<p>Cada corrida deja estos números calculados en <code>include/output/reports/calidad.md</code>.
+Conviene tenerlo abierto.</p>
+
+<table>
+<tr><th>Criterio</th><th>Qué tiene que dar</th><th>Cómo se verifica</th></tr>
+<tr><td><strong>Clave sin duplicados</strong></td><td><code>True</code></td><td><code>df["match_id"].is_unique</code></td></tr>
+<tr><td><strong>Volumen suficiente</strong></td><td>más de 1.000 filas</td><td><code>len(df)</code></td></tr>
+<tr><td><strong>Ancho suficiente</strong></td><td>5 o más columnas útiles</td><td><code>df.shape</code> → 139</td></tr>
+<tr><td><strong>Mezcla de tipos</strong></td><td>numéricas y categóricas</td><td><code>df.dtypes.value_counts()</code> → 108 enteras, 20 flotantes, 11 de texto</td></tr>
+<tr><td><strong>Nulos conocidos</strong></td><td>saber cuáles y por qué</td><td><code>df.isna().mean().sort_values(ascending=False)</code></td></tr>
+<tr><td><strong>Sin columnas vacías</strong></td><td>ninguna al 100 %</td><td><code>df.columns[df.isna().all()]</code> → vacío</td></tr>
+</table>
+
+<div class="clave">
+  <span class="etiqueta">La clave primaria es el criterio que más pesa</span>
+  <p>La consigna lo dice así: <em>«es el test operativo de la unidad de análisis: si la clave repite, o la
+  unidad está mal definida o el pipeline está duplicando filas. No existe un dataset con la clave limpia
+  y la unidad equivocada.»</em></p>
+  <p>Nuestra respuesta: la clave es <code>match_id</code>, viene de la fuente (no la inventamos nosotros),
+  y <code>consolidate</code> deduplica explícitamente antes de publicar. Además <code>validate</code>
+  hace fallar el DAG si llegara a repetirse.</p>
+</div>
+
+<h3>3. Las cinco preguntas que se explican</h3>
+
+<p>La consigna las lista textualmente. Estas son las respuestas.</p>
+
+<div class="pregunta">
+  <span class="q">«Una fila es un ___»</span>
+  <p><strong>Una partida clasificatoria de League of Legends, modalidad Solo/Duo, de la Season 16.</strong></p>
+  <p>Coincide con la pregunta del proyecto: queremos predecir cuánto dura <em>una partida</em>, y la
+  unidad sobre la que sacamos conclusiones es exactamente esa. Si nuestra unidad fuera el jugador,
+  habría un desajuste con la pregunta.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Cuál es la columna objetivo?</span>
+  <p><strong><code>game_duration_s</code></strong>: la duración de la partida en segundos.</p>
+  <p>Es continua, así que el problema es de <strong>regresión</strong>. Sale del campo
+  <code>gameDuration</code> del detalle de partida, con una corrección: Riot devuelve ese campo en
+  milisegundos en partidas anteriores al parche 11.20, así que normalizamos.</p>
+  <p>Como estructura latente alternativa, el dataset también permite <strong>agrupamiento no supervisado</strong>
+  sobre las columnas de composición, para encontrar arquetipos de equipo.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Por qué hay nulos donde hay nulos?</span>
+  <p><strong>No hay nulos</strong>, y esa es la parte que hay que explicar bien, porque no es que los
+  datos vengan perfectos.</p>
+  <p>Donde la fuente no tiene el dato, imputamos un valor que significa algo: un jugador sin ranking
+  queda con <code>player_elo = 1500</code> y <code>winrate = 0.50</code> («habilidad desconocida,
+  asumimos promedio»); un jugador que nunca usó ese campeón queda con <code>champ_mastery_pts = 0</code>,
+  que es literalmente cierto.</p>
+  <p><strong>La contra, que conviene decir antes de que la pregunten:</strong> imputar con 1500 mezcla
+  «es de nivel medio» con «no sabemos nada de él». La alternativa sería una columna
+  <code>es_unranked</code> explícita — el código ya la calcula internamente, sólo no la escribe.
+  Está pendiente para la Unidad 2, cuando la exploración muestre qué proporción de jugadores cae ahí.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Qué pasa si lo corrés de nuevo? ¿Sale el mismo archivo?</span>
+  <p><strong>No: sale uno más grande, y es a propósito.</strong></p>
+  <p>Hay que separar dos cosas. De <code>refine_silver</code> para abajo el pipeline es una
+  <strong>función pura del disco</strong>: con el mismo bronce produce siempre exactamente el mismo CSV.
+  Pero <code>land_bronze</code> es <strong>acumulativo</strong>: cada corrida busca partidas que todavía
+  no tiene. Las que ya están nunca se vuelven a pedir; las nuevas se suman.</p>
+  <p>Es la única forma de juntar volumen con una API que permite 100 pedidos cada 2 minutos por región
+  y una key que vence cada 24 horas. Si quisiéramos congelar el dataset, alcanza con no volver a correr
+  la descarga y reprocesar el bronce tal como está.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Dónde guardás el dato crudo? ¿Tenés el bronce?</span>
+  <p><strong>Sí, y guardamos más que el mínimo.</strong> En <code>include/output/bronze/</code> queda la
+  respuesta JSON de la API tal como llegó, comprimida y particionada por plataforma.</p>
+  <p>No guardamos sólo las partidas: guardamos <strong>las tres respuestas</strong> que hacen falta para
+  reconstruir una fila —el detalle de la partida, la entrada de ranking de cada jugador y su maestría—
+  más el catálogo de campeones. Por eso la capa plata se reconstruye <strong>100 % sin red</strong>.</p>
+  <p>La prueba concreta: si mañana descubrimos que veníamos interpretando mal una columna, corregimos
+  <code>transform.py</code> y reprocesamos los 14&nbsp;MB que ya están en disco, <strong>sin gastar un
+  solo pedido a Riot</strong>. Con 20.000 partidas, eso son horas de descarga ahorradas.</p>
+</div>
+
+<h3>4. La confesión sobre tidy</h3>
+
+<p>La consigna pide explícitamente declarar dónde el dataset se aparta del ideal:
+<em>«Si tu dataset tiene una concesión parecida, no la escondas: explicala. Un grupo que sabe dónde su
+dataset se aparta del ideal y por qué está mejor parado que uno que repite la definición de memoria.»</em></p>
+
+<div class="clave">
+  <span class="etiqueta">Nuestra concesión</span>
+  <p>El dataset <strong>no es del todo tidy</strong>. La observación más fina que existe acá es
+  <em>jugador-en-partida</em>: hay diez por partida. Están <strong>aplanados en 100 columnas</strong>
+  (<code>t1_top_champ_id</code> … <code>t2_sup_is_main</code>) en lugar de ocupar diez filas.</p>
+</div>
+
+<h4>Por qué es una concesión deliberada y no un descuido</h4>
+<ol>
+  <li><strong>La unidad de la pregunta es la partida, no el jugador.</strong> Queremos predecir cuánto
+  dura <em>una partida</em>. En formato largo habría diez filas por partida con el target
+  <code>game_duration_s</code> repetido idéntico en las diez — lo cual rompe la correspondencia
+  una-fila-una-observación justo respecto de la pregunta que importa.</li>
+  <li><strong>Obligaría a re-agregar antes de cada modelo.</strong> Todo modelo de regresión sobre la
+  duración necesitaría volver a juntar las diez filas en una. La agregación quedaría duplicada en cada
+  análisis en vez de estar resuelta una sola vez en el pipeline.</li>
+  <li><strong>Es el mismo tipo de concesión que hace la cátedra.</strong> El dataset FIFA guarda varios
+  valores en la celda <code>player_positions</code> en el 65 % de las filas, por la misma razón:
+  normalizarlo complicaría todo lo demás.</li>
+</ol>
+
+<h4>Qué sí cumple</h4>
+<p>Los otros dos criterios eliminatorios relacionados están sólidos: la <strong>unidad de análisis está
+alineada</strong> con la pregunta (una fila = una partida = aquello sobre lo que concluimos), y
+<strong>cada columna es una variable</strong> — ninguna celda guarda listas ni valores múltiples, que es
+el problema que tiene el dataset de la cátedra.</p>
+
+<h3>5. Limitaciones que declaramos</h3>
+
+<p>Decirlas antes de que las pregunten es mejor que que las descubran.</p>
+
+<div class="aviso">
+  <span class="etiqueta">1 · Fuga temporal en winrate y maestría</span>
+  <p><code>player_winrate</code> y <code>champ_mastery_pts</code> se consultan <strong>en el momento de la
+  recolección</strong>, no en el momento en que se jugó la partida. Para una partida de hace semanas son
+  valores <em>posteriores</em> al hecho, lo cual tensiona el claim de «sólo variables pre-partida».</p>
+  <p><strong>Por qué no se puede arreglar:</strong> la API de Riot no expone winrate ni maestría históricos.
+  <strong>Qué se puede hacer:</strong> acotar el efecto recolectando partidas recientes, que es lo que
+  hacemos al pedir las últimas 15 de cada jugador. Y declararlo, que es lo que estamos haciendo acá.</p>
+</div>
+
+<div class="aviso">
+  <span class="etiqueta">2 · <code>player_elo</code> es una construcción nuestra</span>
+  <p>Riot no publica el MMR. Nuestra fórmula convierte tier, división y puntos en un número comparable,
+  pero los coeficientes son una elección del grupo, no una medición. Hay que presentarla como variable
+  derivada, no como dato observado. Si en la Unidad 3 no aporta, se reemplaza — el bronce permite
+  rehacerlo sin costo de API.</p>
+</div>
+
+<div class="aviso">
+  <span class="etiqueta">3 · El sesgo de muestreo</span>
+  <p>Los jugadores se muestrean recorriendo el ranking, pero de cada partida entran los diez
+  participantes sin importar su rango. La distribución de rangos del dataset <strong>no es</strong> la de
+  la semilla. Como el emparejamiento junta gente de nivel parecido no distorsiona mucho, pero es una
+  diferencia real entre cómo elegimos y qué terminamos midiendo.</p>
+</div>
+
+<div class="aviso">
+  <span class="etiqueta">4 · El umbral de <code>is_main</code></span>
+  <p>50.000 puntos de maestría es un corte elegido por el grupo, sin análisis de sensibilidad.
+  <code>champ_mastery_pts</code> está igual en el dataset, así que en la Unidad 3 se puede dejar que el
+  modelo encuentre el corte en vez de imponerlo.</p>
+</div>
+
+<h3>6. Reparto de conocimiento en el grupo</h3>
+
+<p>La consigna es tajante: <em>«Que hable uno solo es el error más caro, porque las preguntas van
+dirigidas y la nota es individual.»</em></p>
+
+<p>Propuesta de reparto. <strong>Completar con los nombres del grupo</strong> y que cada uno lea al menos
+las partes indicadas. Todos deberían poder responder las cinco preguntas de la sección 3 — eso no se reparte.</p>
+
+<table>
+<tr><th>Área</th><th>Quién</th><th>Qué tiene que dominar</th><th>Partes a leer</th></tr>
+<tr>
+  <td><strong>La fuente</strong></td><td style="color:#a3341f">________________</td>
+  <td>Qué es la API de Riot, los límites y el vencimiento de la key, las dos familias de hosts, los siete endpoints, y el recorrido de semilla a dataset.</td>
+  <td>III completa</td>
+</tr>
+<tr>
+  <td><strong>La extracción</strong></td><td style="color:#a3341f">________________</td>
+  <td><code>riot.py</code> y <code>seeds.py</code>: el pool de keys, el limitador proactivo, el manejo de errores, y por qué los tiers se recorren en orden aleatorio.</td>
+  <td>III, IV.4.1, IV.4.3</td>
+</tr>
+<tr>
+  <td><strong>La transformación</strong></td><td style="color:#a3341f">________________</td>
+  <td><code>transform.py</code> y <code>schema.py</code>: los filtros de admisión, la corrección de milisegundos, la asignación de carriles y <code>roles_inferidos</code>, y cómo se generan las 139 columnas.</td>
+  <td>IV.4.4, IV.4.5, V</td>
+</tr>
+<tr>
+  <td><strong>La orquestación</strong></td><td style="color:#a3341f">________________</td>
+  <td>El grafo completo, qué hace cada una de las nueve tareas y por qué está donde está. Sensores, cortocircuito, trigger rules, mapeo dinámico.</td>
+  <td>II, IV.5</td>
+</tr>
+<tr>
+  <td><strong>El dataset</strong></td><td style="color:#a3341f">________________</td>
+  <td>Los seis criterios medibles con sus números, los nulos y su justificación, la confesión de tidy.</td>
+  <td>V, VII.2, VII.3, VII.4</td>
+</tr>
+<tr>
+  <td><strong>La operación</strong></td><td style="color:#a3341f">________________</td>
+  <td>Levantar el entorno, renovar la key, disparar una tanda, leer los logs, resolver los problemas frecuentes. <strong>Es quien lleva la notebook el día de la entrega.</strong></td>
+  <td>VI completa</td>
+</tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">Cómo prepararse en grupo</span>
+  <p>Juntarse una vez antes del 9/9 y hacer un simulacro: cada uno explica su área en dos minutos y los
+  demás preguntan. Las preguntas de la sección 7 sirven de guion. Lo que no se puede explicar en voz
+  alta, no se entendió.</p>
+</div>
+
+<h3>7. Banco de preguntas probables</h3>
+
+<div class="pregunta">
+  <span class="q">¿Por qué eligieron Airflow y no un script de Python?</span>
+  <p>Porque la corrida dura horas y necesita sobrevivir a interrupciones. Airflow nos da reintentos por
+  tarea, logs separados, paralelismo entre las seis plataformas, estado visible y la posibilidad de
+  retomar sin repetir lo hecho. Cuando cancelamos una corrida a mitad de camino, las 204 partidas ya
+  descargadas quedaron intactas y la siguiente las reutilizó. Con un script monolítico habría que
+  empezar de cero.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Por qué el DAG no está programado?</span>
+  <p>Porque la development key de Riot vence cada 24 horas. Un DAG programado corriendo sin nadie mirando
+  fallaría todos los días apenas venciera la key, y el ruido de esas fallas taparía las reales. Se dispara
+  a mano con la key recién renovada. El DAG de ejemplo de la cátedra, <code>pokemon_api</code>, también
+  usa <code>schedule=None</code>.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Por qué seis tareas de descarga en vez de una?</span>
+  <p>Porque Riot aplica los límites <strong>por región</strong>: cada plataforma tiene su propio cupo.
+  Seis tareas en paralelo multiplican por seis la velocidad en los endpoints de perfil y maestría,
+  que son el cuello de botella real: medimos 18,5 pedidos por partida, de los cuales ~17 son perfiles.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Dónde está la API key?</span>
+  <p>En una Connection de Airflow llamada <code>riot_api</code>, declarada en
+  <code>airflow_settings.yaml</code>, que está en <code>.gitignore</code>. En el repositorio se versiona
+  <code>airflow_settings.example.yaml</code> con un placeholder. <strong>La key no aparece en ningún
+  <code>.py</code>.</strong> El campo acepta varias keys separadas por coma, una por integrante, y el
+  cliente arma un pool.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Qué pasa si Riot está caído cuando corren el pipeline?</span>
+  <p>El sensor <code>wait_for_riot</code> sondea cada 2 minutos durante media hora antes de rendirse.
+  Si se agota, queda <em>salteado</em> —no fallado—, <code>check_key</code> corta y la corrida termina
+  bien sin hacer nada. Distinguimos ese caso del de una key inválida: ahí no esperamos, cortamos en
+  el acto, porque esperar no arregla una key vencida.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Por qué descartan las partidas de menos de 5 minutos?</span>
+  <p>Son <em>remakes</em>: partidas que se cancelan al principio porque alguien no se conectó. No son
+  partidas reales y su duración no tiene nada que ver con las variables que estamos midiendo. Incluirlas
+  metería ruido en el objetivo. Además, una vez descartada, la partida queda anotada en un índice y no
+  se vuelve a descargar nunca: era el mayor desperdicio de cupo del prototipo anterior.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Cómo saben que no hay fuga de información?</span>
+  <p>Porque el esquema excluye por diseño todo lo que ocurre durante la partida: no hay kills, ni oro,
+  ni torres, ni deltas por minuto, ni bans. Sólo entran datos del draft (campeones, hechizos, runas)
+  y perfiles de jugador.</p>
+  <p>Dicho eso, hay una fuga acotada que declaramos: winrate y maestría se consultan hoy, no al momento
+  de la partida. La API no ofrece histórico, así que no se puede resolver con esta fuente.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">Si les cambio el parseo de una columna, ¿tienen que volver a descargar todo?</span>
+  <p>No, y ésa es exactamente la razón de tener capa bronce. Se corrige <code>transform.py</code>, se
+  vuelve a disparar el DAG y <code>refine_silver</code> reconstruye la plata leyendo del disco, sin
+  tocar la red. Con 20.000 partidas eso son horas de descarga ahorradas.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Por qué el CSV tiene 139 columnas y no las 138 del prototipo?</span>
+  <p>Agregamos <code>roles_inferidos</code>. El prototipo asignaba los carriles buscando el campo
+  <code>teamPosition</code>, y cuando venía vacío —pasa en remakes y con autofill— mandaba al jugador
+  al slot que sobrara <strong>sin dejar ningún rastro</strong>. El dato quedaba mal y no había forma de
+  saberlo. Ahora contamos cuántos jugadores quedaron así y esas filas se pueden filtrar. El error existía
+  igual; lo que cambió es que ahora es visible.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Qué es esa columna <code>t1_num_tanks</code> y por qué las seis no suman 5?</span>
+  <p>Cuenta cuántos de los cinco campeones del equipo están etiquetados como Tank en Data Dragon.
+  No suman 5 porque un campeón puede tener varias etiquetas a la vez: Ornn es Tank y Fighter. No es un
+  error de cálculo, es cómo clasifica el catálogo oficial.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Cómo garantizan que la clave no se repita?</span>
+  <p>Tres capas. El <code>match_id</code> viene de la fuente y ya incluye el prefijo de la plataforma,
+  así que es único globalmente. <code>consolidate</code> hace un <code>drop_duplicates("match_id")</code>
+  explícito al juntar las seis plataformas. Y <code>validate</code> hace fallar el DAG si aun así
+  se repitiera.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Por qué no usaron un operador prefabricado para los pedidos HTTP?</span>
+  <p>Porque nuestro cliente necesita rotar entre varias API keys y llevar la cuenta de los pedidos por
+  par (key, host) para respetar los límites de Riot. Ningún operador prefabricado hace eso. La cátedra da
+  la regla: operador cuando la acción es estándar, <code>@task</code> propio cuando se necesita lógica
+  específica. Sí usamos la infraestructura de Connections de Airflow para la credencial, que es la parte
+  que sí conviene reusar.</p>
+</div>
+
+<h2 class="parte"><span class="n">Anexo</span>Glosario</h2>
+
+<p>Términos que aparecen en este documento, en el código y en las clases.</p>
+
+<h3>De la materia y de ingeniería de datos</h3>
+<table>
+<tr><th>Término</th><th>Qué es</th></tr>
+<tr><td><strong>Pipeline</strong></td><td>Secuencia de pasos por la que pasa el dato desde el origen hasta el destino.</td></tr>
+<tr><td><strong>ETL</strong></td><td><em>Extract, Transform, Load.</em> Se transforma antes de guardar. Se guarda sólo el resultado.</td></tr>
+<tr><td><strong>ELT</strong></td><td><em>Extract, Load, Transform.</em> Se guarda el dato crudo primero y se transforma después. <strong>Es lo que hacemos.</strong></td></tr>
+<tr><td><strong>Modelo medallón</strong></td><td>Organización en capas: bronce (crudo), plata (limpio) y oro (listo para un uso específico).</td></tr>
+<tr><td><strong>Bronce</strong></td><td>El dato tal como llegó de la fuente, sin interpretar. Sólo se agrega, nunca se modifica.</td></tr>
+<tr><td><strong>Plata</strong></td><td>Datos limpios, tipados y validados, una fila por observación. <strong>Es nuestro entregable.</strong></td></tr>
+<tr><td><strong>Oro</strong></td><td>Datos preparados para un uso concreto. Se construye en las Unidades 3 y 4.</td></tr>
+<tr><td><strong>Idempotencia</strong></td><td>Que ejecutar algo muchas veces dé el mismo resultado que ejecutarlo una vez.</td></tr>
+<tr><td><strong>Tidy</strong></td><td>Formato donde cada fila es una observación y cada columna una variable.</td></tr>
+<tr><td><strong>Unidad de análisis</strong></td><td>Qué representa cada fila. En nuestro caso, una partida.</td></tr>
+<tr><td><strong>Clave primaria</strong></td><td>La columna que identifica unívocamente cada fila. Acá, <code>match_id</code>.</td></tr>
+<tr><td><strong>Variable objetivo</strong></td><td>La que se quiere predecir. Acá, <code>game_duration_s</code>.</td></tr>
+<tr><td><strong>Regresión</strong></td><td>Predecir un número continuo. (Predecir una categoría es <em>clasificación</em>.)</td></tr>
+<tr><td><strong>Fuga de información</strong></td><td><em>Data leakage.</em> Que entre al modelo información que en la realidad no estaría disponible al momento de predecir.</td></tr>
+<tr><td><strong>Sesgo de recolección</strong></td><td>Que la forma de juntar los datos introduzca un patrón que no existe en la realidad.</td></tr>
+<tr><td><strong>Feature engineering</strong></td><td>Derivar variables nuevas a partir de las existentes. <code>player_elo</code> es un ejemplo.</td></tr>
+</table>
+
+<h3>De Airflow</h3>
+<table>
+<tr><th>Término</th><th>Qué es</th></tr>
+<tr><td><strong>DAG</strong></td><td><em>Directed Acyclic Graph.</em> El dibujo del flujo de trabajo: tareas unidas por dependencias, sin ciclos.</td></tr>
+<tr><td><strong>Tarea</strong> (<em>task</em>)</td><td>Una cajita del grafo. Unidad de ejecución con su log, su estado y sus reintentos.</td></tr>
+<tr><td><strong>DagRun</strong></td><td>Una ejecución concreta del DAG. Cada disparo crea una.</td></tr>
+<tr><td><strong>Operador</strong></td><td>Plantilla de tarea prefabricada.</td></tr>
+<tr><td><strong>Hook</strong></td><td>La capa de abajo de un operador: lo que sabe hablar con el sistema externo.</td></tr>
+<tr><td><strong>Provider</strong></td><td>Paquete que agrega integraciones. Se declara en <code>requirements.txt</code>.</td></tr>
+<tr><td><strong>TaskFlow API</strong></td><td>La forma moderna de escribir DAGs, con decoradores <code>@dag</code> y <code>@task</code>.</td></tr>
+<tr><td><strong>XCom</strong></td><td>Mecanismo para pasar datos entre tareas. <strong>Sólo metadatos</strong>: rutas, ids, conteos.</td></tr>
+<tr><td><strong>Connection</strong></td><td>Donde Airflow guarda credenciales y datos de conexión. La nuestra se llama <code>riot_api</code>.</td></tr>
+<tr><td><strong>Sensor</strong></td><td>Tarea que espera a que ocurra algo fuera del control del DAG.</td></tr>
+<tr><td><strong><code>mode="reschedule"</code></strong></td><td>Modo de sensor que libera el trabajador entre sondeos en vez de ocuparlo durmiendo.</td></tr>
+<tr><td><strong><code>soft_fail</code></strong></td><td>Que un sensor que agota su tiempo quede <em>salteado</em> y no <em>fallado</em>.</td></tr>
+<tr><td><strong>Short-circuit</strong></td><td>Tarea que, si devuelve <code>False</code>, saltea todo lo que está aguas abajo y termina bien.</td></tr>
+<tr><td><strong>Trigger rule</strong></td><td>Condición para que una tarea corra. Por defecto <code>ALL_SUCCESS</code>; nosotros usamos <code>ALL_DONE</code> en <code>check_key</code>.</td></tr>
+<tr><td><strong>Mapeo dinámico</strong></td><td><code>.expand()</code>: crear una instancia de la tarea por cada elemento de una lista. Lo usamos por plataforma.</td></tr>
+<tr><td><strong><code>catchup</code></strong></td><td>Si Airflow debe recuperar las corridas que se perdió mientras estuvo apagado. El nuestro está en <code>False</code>.</td></tr>
+<tr><td><strong><code>dag-processor</code></strong></td><td>El proceso que lee los archivos de <code>dags/</code>. En Airflow 2 vivía dentro del scheduler.</td></tr>
+<tr><td><strong><code>api-server</code></strong></td><td>La interfaz web y la API REST. En Airflow 2 se llamaba <code>webserver</code>.</td></tr>
+<tr><td><strong>Astro Runtime</strong></td><td>Imagen de Docker con Airflow ya armado. Usamos la 3.3-4.</td></tr>
+<tr><td><strong>Astro CLI</strong></td><td>El comando que levanta esa imagen. <code>astro dev start</code> es de Astro, no de Airflow.</td></tr>
+</table>
+
+<h3>De League of Legends y de la API de Riot</h3>
+<table>
+<tr><th>Término</th><th>Qué es</th></tr>
+<tr><td><strong>Campeón</strong></td><td>El personaje que controla un jugador. Hay más de 160.</td></tr>
+<tr><td><strong>Carril</strong> (<em>lane</em>)</td><td>La posición que ocupa un jugador: top, jungla, mid, bot o support. Cinco por equipo.</td></tr>
+<tr><td><strong>Draft</strong></td><td>La fase previa donde cada equipo elige sus campeones. <strong>Todo lo que usamos sale de acá o de antes.</strong></td></tr>
+<tr><td><strong>Hechizo de invocador</strong></td><td>Habilidad extra que cada jugador elige antes de empezar. Flash (4), Smite (11), Teleport (12), Ignite (14).</td></tr>
+<tr><td><strong>Runas</strong></td><td>Configuración de bonificaciones elegida antes de la partida. Guardamos las dos ramas.</td></tr>
+<tr><td><strong>Maestría</strong></td><td>Puntos acumulados por un jugador con un campeón. Indica cuánto lo jugó.</td></tr>
+<tr><td><strong>Tier / división</strong></td><td>El rango: Hierro a Challenger, con divisiones IV a I.</td></tr>
+<tr><td><strong>LP</strong></td><td><em>League Points.</em> Puntos dentro de una división.</td></tr>
+<tr><td><strong>MMR</strong></td><td><em>Matchmaking Rating.</em> El número interno con el que Riot empareja. <strong>Riot no lo publica</strong>; por eso construimos <code>player_elo</code>.</td></tr>
+<tr><td><strong><code>puuid</code></strong></td><td>Identificador único y permanente de una cuenta.</td></tr>
+<tr><td><strong>Cola 420</strong></td><td>El código de la modalidad Ranked Solo/Duo. La única que recolectamos.</td></tr>
+<tr><td><strong>Remake</strong></td><td>Partida cancelada en los primeros minutos porque alguien no se conectó. Las descartamos.</td></tr>
+<tr><td><strong>Plataforma</strong></td><td>El servidor de juego: <code>la2</code>, <code>na1</code>, <code>kr</code>… Determina el host de algunos endpoints.</td></tr>
+<tr><td><strong>Región continental</strong></td><td><code>americas</code>, <code>europe</code>, <code>asia</code>. Es el host de los endpoints de partidas.</td></tr>
+<tr><td><strong>Data Dragon</strong></td><td>El CDN público de Riot con los metadatos del juego. No pide API key.</td></tr>
+<tr><td><strong>Development key</strong></td><td>API key de prueba: 20 pedidos por segundo, 100 cada 2 minutos, <strong>vence cada 24 horas</strong>.</td></tr>
+<tr><td><strong><code>429</code></strong></td><td>Código HTTP de «demasiados pedidos». El cliente castiga esa key en ese host y sigue con otra.</td></tr>
+</table>
+
+<h2 class="parte"><span class="n">Cierre</span>Qué falta y hacia dónde sigue</h2>
+
+<h3>Lo que falta para cerrar la Entrega 1</h3>
+<table>
+<tr><th></th><th>Tarea</th><th>Quién</th></tr>
+<tr><td>1</td><td>Que al menos dos integrantes generen su API key de Riot y las peguen separadas por coma.</td><td>El grupo</td></tr>
+<tr><td>2</td><td>Correr las tandas de recolección hasta llegar a 20.000 partidas (parte VI.4).</td><td>Quien opera</td></tr>
+<tr><td>3</td><td>Verificar el reporte de calidad y que el CSV supere las 1.000 filas.</td><td>Quien opera</td></tr>
+<tr><td>4</td><td>Que todo el grupo lea este documento y repase la parte VII.</td><td>Todos</td></tr>
+<tr><td>5</td><td>Completar los nombres en la tabla de reparto (VII.6) y hacer un simulacro.</td><td>El grupo</td></tr>
+<tr><td>6</td><td>Regenerar la key el mismo día de la entrega y verificar que Airflow levanta.</td><td>Quien lleva la notebook</td></tr>
+</table>
+
+<h3>Hacia dónde sigue el proyecto</h3>
+
+<p>Lo que se construyó acá es el insumo de todo lo que viene. Las decisiones que quedaron abiertas
+tienen su lugar natural en las entregas siguientes:</p>
+
+<table>
+<tr><th>Unidad</th><th>Qué se hace</th><th>Qué de acá se retoma</th></tr>
+<tr>
+  <td><strong>2 · Exploración</strong><br>16/09</td>
+  <td>Explorar el dataset, formular hipótesis y encontrar hallazgos.</td>
+  <td>Evaluar si conviene una columna <code>es_unranked</code> explícita. Ver qué proporción de filas tiene <code>roles_inferidos &gt; 0</code>. Analizar la distribución de la duración y buscar qué variables se le correlacionan.</td>
+</tr>
+<tr>
+  <td><strong>3 · Modelado</strong><br>14/10</td>
+  <td>Comparar modelos de regresión sobre <code>game_duration_s</code> y medir su desempeño.</td>
+  <td>Acá aparece la <strong>capa oro</strong>: variables derivadas y agregados construidos sobre esta plata. Revisar si <code>player_elo</code> aporta o conviene el tier como categórica, y si <code>is_main</code> conviene o el modelo encuentra su propio corte sobre <code>champ_mastery_pts</code>.</td>
+</tr>
+<tr>
+  <td><strong>4 · Visualización</strong><br>04/11</td>
+  <td>Visualizaciones y una aplicación funcionando.</td>
+  <td>El mismo CSV alimenta los agregados de la app.</td>
+</tr>
+</table>
+
+<div class="clave">
+  <span class="etiqueta">Lo que el bronce nos deja disponible</span>
+  <p>Como guardamos las respuestas crudas de la API, cualquiera de esos cambios de criterio
+  —una columna nueva, otra fórmula de elo, otro umbral— se resuelve corrigiendo
+  <code>transform.py</code> y reprocesando el disco, <strong>sin gastar un solo pedido a Riot ni
+  esperar horas de descarga</strong>. Ésa es la razón concreta por la que el modelo medallón vale
+  la pena, y es lo que hay que poder explicar el 9 de septiembre.</p>
+</div>
+
+<div class="pie">
+  <p><strong>FF-15 · Proyecto Integrador de Ciencia de Datos · UTN FRM · 2026 · Grupo 5K09-02</strong><br>
+  Documento generado a partir del estado del repositorio <code>github.com/aguilarezequiel/FF-15</code>.
+  Fuente editable: <code>docs/documentacion-proyecto.html</code> · Regenerar el PDF: <code>python docs/generar_pdf.py</code></p>
+  <p>Este documento se mantiene actualizado con cada avance del proyecto: se agrega lo nuevo y se
+  elimina lo que dejó de ser cierto.</p>
+</div>
+
+</body>
+</html>
