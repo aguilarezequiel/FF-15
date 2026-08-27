@@ -77,7 +77,7 @@ Estas no son estilo, son cosas que rompen el pipeline o la nota si se ignoran:
   ```
 - **`import pandas` va adentro de la tarea**, no en el tope del módulo del DAG.
 - **`logging` con `%s` diferido**, nunca `print()` ni f-strings en la llamada al log: `log.info("%s filas", n)`.
-- **Bronce es append-only.** Lo que ya está bajado no se vuelve a pedir. Es lo que hace que la segunda corrida no gaste ni una request y que un bug de parseo se arregle sin volver a la fuente.
+- **Bronce es append-only.** Una partida ya bajada no se vuelve a pedir jamás. La plata se reconstruye sobre **todo** el bronce acumulado, no sólo sobre lo que bajó la corrida actual: así el dataset crece corrida a corrida y un bug de parseo se arregla sin volver a la fuente.
 - **Rutas absolutas del contenedor** (`Path("/usr/local/airflow/include/output")`), nunca relativas: Airflow fija su propio CWD.
 - Cada tarea lleva **docstring que explica el porqué de la decisión de diseño**, no lo que hace el código. Se renderizan en la UI y son la chuleta de la defensa oral.
 

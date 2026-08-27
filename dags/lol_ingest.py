@@ -21,10 +21,21 @@ medallón:
 * **Plata** (`refine_silver` + `consolidate`) — filas tipadas, una por
   partida, deduplicadas y validadas. **No toca la red**: lee del bronce.
 
-La separación no es decorativa. Una partida que ya está en bronce no se
-vuelve a pedir, así que una segunda corrida no genera ni una request. Y si
-mañana aparece un bug en el parseo se corrige la plata y se reprocesa el
-bronce que ya está en disco, sin gastar cuota de API.
+La separación no es decorativa. Una partida que ya está en bronce **no se
+vuelve a pedir nunca**, y la plata se reconstruye entera sobre todo el
+bronce acumulado. De ahí salen las dos propiedades que la justifican:
+
+* El dataset **crece corrida a corrida**. Con una development key no se
+  juntan miles de partidas de una sentada, así que cada corrida suma al
+  bronce y la plata se rehace sobre el total.
+* Un bug en el parseo se arregla **sin volver a la fuente**: se corrige
+  `refine_silver` y se reprocesa lo que ya está en disco.
+
+Ojo con qué es idempotente y qué no, porque es la pregunta que se hace en
+la entrega. Con el mismo bronce, la plata siempre da el mismo CSV: de
+`refine_silver` para abajo todo es una función pura del disco. Lo que
+cambia entre corridas es **cuánto** bronce hay, porque cada corrida sale a
+buscar partidas que todavía no tiene.
 
 La tercera capa —**oro**: features del modelo, agregados— no se construye
 acá. Se arma en las Unidades 3 y 4 sobre esta misma plata.
@@ -336,10 +347,10 @@ def lol_ingest():
         Es la única tarea del DAG que toca la red. No parsea, no limpia,
         no valida: deja el JSON tal como vino y anota dónde quedó.
 
-        La regla del bronce es **append-only**, y de ahí salen las dos
-        propiedades que la justifican: la segunda corrida sobre las mismas
-        partidas no genera ni una request, y un error de parseo se
-        corrige sin volver a la fuente.
+        La regla del bronce es **append-only**: una partida ya bajada no
+        se vuelve a pedir jamás, ni en esta corrida ni en las que vengan.
+        Cada corrida sale a buscar partidas nuevas hasta llenar su cuota,
+        y lo que ya está en disco se cuenta sin gastar una request.
 
         Se guardan también las partidas **descartadas** —las que no son de
         Season 16, las que duran menos de cinco minutos, los remakes— en
@@ -459,6 +470,14 @@ def lol_ingest():
         es la propiedad que hace valiosa la separación: esta tarea se
         puede correr cien veces mientras se depura el parseo y Riot ni se
         entera.
+
+        Procesa **todo el bronce de la plataforma**, no sólo lo que bajó
+        esta corrida. Es lo que hace que el dataset se acumule: con una
+        development key no se llegan a juntar miles de partidas de una
+        sentada, así que cada corrida suma al bronce y la plata se
+        reconstruye entera sobre el total. Como efecto secundario, una
+        corrida que se cortó después de dejar bronce en disco no pierde
+        nada: la siguiente lo levanta igual.
         """
         import pandas as pd
 
@@ -466,11 +485,12 @@ def lol_ingest():
         base = BRONCE_DIR / "ddragon" / f"version={version}"
         campeones = ddragon.index_champions(leer_json(base / "champion.json.gz"))
 
+        rutas = sorted(
+            (BRONCE_DIR / "matches" / f"plataforma={platform}").glob("*.json.gz"))
+
         filas, descartes = [], 0
-        for match_id in lote["matches"]:
-            ruta = _ruta_partida(platform, match_id)
-            if not ruta.exists():
-                continue
+        for ruta in rutas:
+            match_id = ruta.name.removesuffix(".json.gz")
             datos = leer_json(ruta)
 
             perfiles = {}
@@ -496,9 +516,9 @@ def lol_ingest():
         pd.DataFrame(filas, columns=schema.COLUMNS).to_csv(destino,
                                                            index=False)
         log.info("%s · %s filas de plata desde %s partidas de bronce "
-                 "(%s descartadas) -> %s",
-                 lote["nombre"], len(filas), len(lote["matches"]),
-                 descartes, destino.name)
+                 "(%s bajadas en esta corrida, %s descartadas) -> %s",
+                 lote["nombre"], len(filas), len(rutas),
+                 len(lote["matches"]), descartes, destino.name)
         return str(destino)
 
     # ------------------------------------------------------------------ 7

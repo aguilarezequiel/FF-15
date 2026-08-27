@@ -94,9 +94,11 @@ include/output/bronze/
 
 La separación no es decorativa:
 
-- Una partida que ya está en bronce **no se vuelve a pedir**. La segunda corrida sobre las mismas partidas no genera ni una request.
+- Una partida que ya está en bronce **no se vuelve a pedir nunca**, ni en esta corrida ni en las que vengan.
+- `refine_silver` reprocesa **todo el bronce acumulado**, no sólo lo que bajó la corrida actual. Por eso el dataset **crece corrida a corrida**: con una development key no se juntan miles de partidas de una sentada.
 - Un bug en el parseo se corrige **sin volver a la fuente**: se arregla `refine_silver` y se reprocesa lo que ya está en disco.
 - El bronce guarda **las tres respuestas** que hacen falta para reconstruir una fila —partida, liga y maestría— así la capa plata queda 100 % offline.
+- Una corrida que se corta a la mitad no pierde nada: dejó su bronce en disco y la siguiente lo levanta.
 
 ---
 
@@ -134,9 +136,14 @@ Es una decisión discutible y está abierta: en la Unidad 2 vale la pena evaluar
 
 ### Qué pasa si lo corrés de nuevo
 
-Sale el **mismo archivo**, siempre que el bronce no haya cambiado: `refine_silver` y todo lo que sigue son funciones puras sobre lo que está en disco. Lo que sí cambia entre corridas es *cuánto* bronce hay, porque cada corrida suma partidas nuevas.
+**No sale el mismo archivo: sale uno más grande.** Y es a propósito.
 
-Dicho de otro modo: el pipeline es idempotente sobre una entrada fija, y acumulativo sobre la fuente.
+Hay que separar dos cosas que se confunden fácil:
+
+- **De `refine_silver` para abajo, el pipeline es una función pura del disco.** Con el mismo bronce, produce siempre exactamente el mismo CSV. Ahí sí es idempotente.
+- **`land_bronze` es acumulativo.** Cada corrida sale a buscar partidas que todavía no tiene, hasta llenar su cuota. Las que ya están no se vuelven a pedir, pero sí se suman las nuevas.
+
+O sea: el bronce crece, y la plata se rehace entera sobre el total. Es la única forma de llegar a un volumen grande con una development key que se limita a 100 requests cada 2 minutos por región y vence cada 24 horas. Si se quisiera congelar el dataset, alcanza con no volver a correr `land_bronze` y reprocesar el bronce tal como está.
 
 ### Dónde el dataset se aparta de *tidy*
 
