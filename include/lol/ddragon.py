@@ -22,8 +22,9 @@ CDN = "https://ddragon.leagueoflegends.com/cdn"
 
 # Ids de hechizos de invocador que el esquema cuenta por equipo. Están acá,
 # con nombre, en vez de sueltos como números mágicos en el transform.
+# Smite (11) no está: es obligatorio para el jungla, así que contarlo daba
+# 1 en toda partida real —varianza cero— y se sacó del esquema.
 SPELL_FLASH = 4
-SPELL_SMITE = 11
 SPELL_TELEPORT = 12
 SPELL_IGNITE = 14
 

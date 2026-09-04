@@ -119,7 +119,7 @@ Leerlas cuando la tarea lo pida — no hace falta cargarlas todas de entrada.
 | `references/criterios-fuente.md` | Al defender el dataset o al discutir si algo cumple. Los 7 criterios verbatim. |
 | `references/airflow-catedra.md` | Antes de escribir o tocar un DAG. Imports de Airflow 3, argumentos del `@dag`, mapeo dinámico, sensores, branching, errores frecuentes. |
 | `references/riot-api.md` | Al tocar `include/lol/riot.py`, `seeds.py` o `ddragon.py`. Endpoints, routing, rate limits, rotación de keys y las trampas conocidas. |
-| `references/dataset-schema.md` | Al tocar `schema.py` o `transform.py`, o al explicar una columna. Las 138 columnas y cómo se deriva cada una. |
+| `references/dataset-schema.md` | Al tocar `schema.py` o `transform.py`, o al explicar una columna. Las 137 columnas y cómo se deriva cada una. |
 
 ## Mantener esto vivo
 

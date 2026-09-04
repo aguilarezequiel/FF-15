@@ -93,7 +93,7 @@ Hay que saber qué significa cada columna, sus unidades, su origen, y qué repre
 | 3 | Algo modelable | ✓ | Supervisado: regresión sobre `game_duration_s`. No supervisado: arquetipos de composición de equipo. |
 | 4 | Descargable automatizado | ✓ | API REST oficial de Riot Games, con key, orquestada en Airflow. Cero intervención humana dentro del pipeline. |
 | 5 | Volumen | ✓ | Objetivo parametrizable; el prototipo previo llegó a 20.020 partidas. |
-| 6 | Columnas informativas | ✓ | 138 columnas: enteras, flotantes y categóricas (nombres de campeón). |
+| 6 | Columnas informativas | ✓ | 137 columnas: enteras, flotantes y categóricas (nombres de campeón). |
 | 7 | Documentación | ✓ | Documentación oficial del Riot Developer Portal + Data Dragon. |
 
 ### La confesión de tidy, que hay que decir en voz alta

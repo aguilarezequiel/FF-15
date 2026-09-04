@@ -160,7 +160,6 @@ def _bloque_equipo(participantes: list[dict], prefijo: str,
     bloque[f"{prefijo}_count_teleport"] = hechizos.count(ddragon.SPELL_TELEPORT)
     bloque[f"{prefijo}_count_ignite"] = hechizos.count(ddragon.SPELL_IGNITE)
     bloque[f"{prefijo}_count_flash"] = hechizos.count(ddragon.SPELL_FLASH)
-    bloque[f"{prefijo}_count_smite"] = hechizos.count(ddragon.SPELL_SMITE)
 
     return bloque, inferidos
 

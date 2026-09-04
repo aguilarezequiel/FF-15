@@ -82,7 +82,7 @@ CDN pública, **sin API key y sin rate limit**:
 
 De `champion.json` se usan, por campeón: `key` (el id numérico, que es como viene en match-v5), `name`, `tags` (`Fighter`, `Tank`, `Mage`, `Assassin`, `Marksman`, `Support`), `info.{attack,defense,magic,difficulty}` y `stats.{hp,armor,attackrange}`.
 
-Ids de hechizos de invocador que importan: **4** Flash · **11** Smite · **12** Teleport · **14** Ignite.
+Ids de hechizos de invocador que el esquema cuenta por equipo: **4** Flash · **12** Teleport · **14** Ignite. Smite (**11**) no se cuenta: el juego se lo impone al jungla, así que la columna daba 1 en toda partida (varianza cero) y se quitó.
 
 ## El recorrido semilla → dataset
 

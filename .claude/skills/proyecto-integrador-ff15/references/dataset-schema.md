@@ -1,4 +1,4 @@
-# Esquema del dataset — 138 columnas
+# Esquema del dataset — 137 columnas
 
 Definido en `include/lol/schema.py`, construido en `include/lol/transform.py`.
 
@@ -6,7 +6,7 @@ Definido en `include/lol/schema.py`, construido en `include/lol/transform.py`.
 - **Clave primaria:** `match_id`.
 - **Columna objetivo:** `game_duration_s` — regresión.
 
-Aritmética del ancho: `2 + (10 features × 5 posiciones × 2 equipos = 100) + (18 agregados × 2 equipos = 36) = 138`.
+Aritmética del ancho: `3 (match_id + game_duration_s + roles_inferidos) + (10 features × 5 posiciones × 2 equipos = 100) + (17 agregados × 2 equipos = 34) = 137`.
 
 ## Filtros de admisión
 
@@ -17,12 +17,13 @@ Una partida entra al dataset sólo si:
 3. Tiene exactamente 10 participantes.
 4. 5 por `teamId` 100 y 5 por `teamId` 200.
 
-## 1 · Identidad y target (2 columnas)
+## 1 · Identidad, target y calidad (3 columnas)
 
 | Columna | Origen |
 |---|---|
 | `match_id` | Match-V5 `metadata.matchId`, ej. `LA2_1617259431` |
 | `game_duration_s` | Match-V5 `info.gameDuration`, en segundos, **con chequeo defensivo ms→s** |
+| `roles_inferidos` | **derivada**: cuántos de los 10 jugadores no traían `teamPosition` y se ubicaron en un slot libre (ver «Asignación de posiciones») |
 
 ## 2 · Bloque por jugador (100 columnas)
 
@@ -68,7 +69,7 @@ estimated_elo = TIER_BASE_MMR[tier] + RANK_BONUS[rank] + int(leaguePoints * 0.5)
 
 Sólo se lee la entrada con `queueType == "RANKED_SOLO_5x5"`. Sin entrada: `elo = 1500`, `winrate = 0.50`.
 
-## 3 · Agregados por equipo (36 columnas)
+## 3 · Agregados por equipo (34 columnas)
 
 Nomenclatura: `{t1|t2}_{feature}`.
 
@@ -83,9 +84,10 @@ Nomenclatura: `{t1|t2}_{feature}`.
 | `_count_teleport` | Cuántos `12` entre los 10 hechizos del equipo |
 | `_count_ignite` | Cuántos `14` |
 | `_count_flash` | Cuántos `4` |
-| `_count_smite` | Cuántos `11` |
 
 Los 10 hechizos de un equipo son los 5 `sum1` más los 5 `sum2`.
+
+**No hay `_count_smite`.** El juego obliga al jungla a llevar Smite (`11`) y hay un jungla por equipo, así que valía 1 en toda partida real. Columna de varianza cero: no aporta a un modelo, se quitó del esquema.
 
 ## Orden de las columnas en el CSV
 
@@ -114,6 +116,6 @@ La decisión de imputar con defaults en vez de dejar `NaN` es deliberada y hay q
 
 ## Precedente
 
-El prototipo `../FF15` produjo este mismo esquema con **20.020 filas** en `data/processed/matches_season16.csv`.
+El prototipo `../FF15` produjo un esquema casi igual (138 columnas: sin `roles_inferidos`, con `t1_count_smite` / `t2_count_smite`) con **20.020 filas** en `data/processed/matches_season16.csv`.
 
 Dos advertencias sobre ese archivo: contiene 36 filas con prefijo `EUN1`, una plataforma que ya no está en el código, así que **no es reproducible byte a byte** con la versión final del prototipo. Y no es el entregable de la Entrega 1 — el entregable tiene que salir de una corrida del pipeline nuevo.
