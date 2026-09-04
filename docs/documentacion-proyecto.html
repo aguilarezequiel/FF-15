@@ -120,7 +120,7 @@ la VI es la guía práctica para ejecutarlo; y la VII prepara la defensa oral.</
 <tr><td>Pipeline</td><td>Completo y funcionando. Nueve tareas, todas verificadas en verde con datos reales de la API.</td></tr>
 <tr><td>Corridas exitosas</td><td>Cinco, visibles en el historial de la interfaz de Airflow.</td></tr>
 <tr><td>Bronce acumulado</td><td>204 partidas crudas, 3.620 perfiles de jugador, 22 partidas descartadas. 14&nbsp;MB en disco.</td></tr>
-<tr><td>Dataset (capa plata)</td><td>70 filas × 139 columnas. <strong>Falta volumen:</strong> la consigna pide más de 1.000 filas.</td></tr>
+<tr><td>Dataset (capa plata)</td><td>70 filas × 137 columnas. <strong>Falta volumen:</strong> la consigna pide más de 1.000 filas.</td></tr>
 <tr><td>Calidad de código</td><td>10/10 tests en verde · <code>ruff</code> sin hallazgos · <code>astro dev parse</code> limpio.</td></tr>
 <tr><td>Lo único que falta</td><td>Correr las tandas de recolección hasta el objetivo de 20.000 partidas. Está explicado paso a paso en la parte VI.</td></tr>
 </table>
@@ -173,7 +173,7 @@ la VI es la guía práctica para ejecutarlo; y la VII prepara la defensa oral.</
   <li>Parte V · El dataset producido
     <ol>
       <li>Unidad de análisis, clave y objetivo</li>
-      <li>Las 139 columnas por bloques</li>
+      <li>Las 137 columnas por bloques</li>
       <li>Reglas de admisión de una partida</li>
       <li>Variables derivadas y su justificación</li>
       <li>Los nulos: dónde, por qué y qué se hizo</li>
@@ -349,7 +349,7 @@ una salida de emergencia si se pone más trabajo.</p>
 <tr>
   <td>6</td><td><strong>Varias columnas informativas</strong></td>
   <td>Cinco o más útiles, mezclando tipos.</td>
-  <td><span class="ok">Cumple holgado.</span> 139 columnas: 108 enteras, 20 flotantes y 11 de texto categórico.</td>
+  <td><span class="ok">Cumple holgado.</span> 137 columnas: 106 enteras, 20 flotantes y 11 de texto categórico.</td>
 </tr>
 <tr>
   <td>7</td><td><strong>Documentación entendible</strong></td>
@@ -367,7 +367,7 @@ una salida de emergencia si se pone más trabajo.</p>
 <tr><td>Datos ya agregados (promedios por provincia, totales por año)</td><td>Trabajamos con la observación individual: una partida concreta, con sus 10 jugadores identificados.</td></tr>
 <tr><td>Sin variable objetivo ni estructura latente</td><td><code>game_duration_s</code> es un objetivo explícito y continuo.</td></tr>
 <tr><td>Muy pocas filas</td><td>La fuente es prácticamente inagotable: se juegan millones de partidas por día.</td></tr>
-<tr><td>Una sola columna útil</td><td>139 columnas, de cuatro naturalezas distintas (jugador, campeón, composición, contexto).</td></tr>
+<tr><td>Una sola columna útil</td><td>137 columnas, de cuatro naturalezas distintas (jugador, campeón, composición, contexto).</td></tr>
 <tr><td>Bajable sólo a mano</td><td>API REST pública y documentada.</td></tr>
 <tr><td>Fuente elegida por descarte, sin interés real</td><td>Es un tema que el grupo eligió y conoce, lo cual pesa: son cuatro meses de convivencia con esta decisión.</td></tr>
 </table>
@@ -677,7 +677,7 @@ viene de las medallas y el orden es el de valor creciente en refinamiento.</p>
   <td><strong>Plata</strong></td>
   <td>Datos limpios, tipados, una fila por observación, validados.</td>
   <td>Se reconstruye siempre desde el bronce.</td>
-  <td>El CSV de 139 columnas. <strong>Es el entregable de la Entrega 1.</strong></td>
+  <td>El CSV de 137 columnas. <strong>Es el entregable de la Entrega 1.</strong></td>
 </tr>
 <tr>
   <td><strong>Oro</strong></td>
@@ -891,9 +891,10 @@ y no tiene límite de pedidos. De ahí sale todo lo que el pipeline sabe de un c
 Fighter, Support) y sus estadísticas base (ataque, defensa, magia, dificultad, vida, armadura, rango
 de ataque). Con eso se construyen las columnas de <em>composición de equipo</em>.</p>
 
-<p>De los hechizos nos importan cuatro, identificados por número: <strong>4</strong> Flash,
-<strong>11</strong> Smite, <strong>12</strong> Teleport, <strong>14</strong> Ignite. Contar cuántos
-lleva cada equipo dice algo del estilo de juego que planea.</p>
+<p>De los hechizos nos importan tres para las columnas de conteo, identificados por número:
+<strong>4</strong> Flash, <strong>12</strong> Teleport, <strong>14</strong> Ignite. Contar cuántos
+lleva cada equipo dice algo del estilo de juego que planea. Smite (el <strong>11</strong>) no se
+cuenta: el juego se lo impone al jungla, así que da 1 en toda partida.</p>
 
 <div class="nota">
   <span class="etiqueta">Un detalle de diseño que conviene poder explicar</span>
@@ -993,10 +994,10 @@ vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más 
 │   ├── lol/                              · LA LÓGICA · sin importar Airflow
 │   │   ├── __init__.py          9 líneas
 │   │   ├── riot.py            345 líneas · cliente, pool de keys, límites
-│   │   ├── ddragon.py          87 líneas · catálogo de campeones y hechizos
+│   │   ├── ddragon.py          88 líneas · catálogo de campeones y hechizos
 │   │   ├── seeds.py            70 líneas · recorrido del ranking
-│   │   ├── schema.py           99 líneas · las 139 columnas y sus tipos
-│   │   └── transform.py       192 líneas · JSON crudo → fila
+│   │   ├── schema.py          103 líneas · las 137 columnas y sus tipos
+│   │   └── transform.py       191 líneas · JSON crudo → fila
 │   └── output/                           · SALIDAS · gitignoreado
 │       ├── bronze/                       · capa bronce
 │       ├── silver/_parciales/            · plata por plataforma
@@ -1236,7 +1237,7 @@ leyendo del bronce:</p>
                 "es_unranked": 0}
     return {"estimated_elo": 1500, "winrate": 0.50, "es_unranked": 1}</pre>
 
-<h4>4.2 <code>ddragon.py</code> · 87 líneas · el catálogo del juego</h4>
+<h4>4.2 <code>ddragon.py</code> · 88 líneas · el catálogo del juego</h4>
 
 <p>Descarga e indexa los metadatos de campeones y hechizos. Está separado del cliente de Riot a
 propósito: Data Dragon es público, no pide key y no tiene límite, así que mezclarlo con el pool de
@@ -1280,7 +1281,7 @@ el ranking. Pedir todas las páginas por adelantado gastaría cupo en jugadores 
                     vistos.add(puuid)
                     yield puuid, tier</pre>
 
-<h4>4.4 <code>schema.py</code> · 99 líneas · el contrato del dataset</h4>
+<h4>4.4 <code>schema.py</code> · 103 líneas · el contrato del dataset</h4>
 
 <p>Define <strong>qué columnas tiene el dataset y en qué orden</strong>. Es el contrato: si el
 transformador produce algo distinto, la validación falla y el DAG falla.</p>
@@ -1294,10 +1295,10 @@ FEATURES_JUGADOR = [        # 10 por jugador
     "player_elo", "player_winrate", "champ_mastery_pts", "is_main",
 ]
 
-FEATURES_EQUIPO = [ ... ]   # 18 por equipo
+FEATURES_EQUIPO = [ ... ]   # 17 por equipo
 
 def columnas_equipo(prefijo):
-    """Las 50 columnas de jugador + 18 de equipo, para t1 o t2."""
+    """Las 50 columnas de jugador + 17 de equipo, para t1 o t2."""
     cols = [f"{prefijo}_{pos}_{f}"
             for pos in POSICIONES for f in FEATURES_JUGADOR]
     cols += [f"{prefijo}_{f}" for f in FEATURES_EQUIPO]
@@ -1310,17 +1311,17 @@ COLUMNS = (IDENTIDAD + TARGET + CALIDAD
 en <code>t2_sup_champ_mastery_pts</code>, y agregar una variable por jugador es cambiar una lista de
 diez elementos en vez de escribir veinte nombres.</p>
 
-<p>La cuenta: <code>3 + (10 × 5 × 2) + (18 × 2) = 3 + 100 + 36 = 139</code>.</p>
+<p>La cuenta: <code>3 + (10 × 5 × 2) + (17 × 2) = 3 + 100 + 34 = 137</code>.</p>
 
 <p>El módulo también fija las <strong>reglas de admisión</strong>:</p>
 <pre>SEASON_PREFIX = "16."
 DURACION_MINIMA_S = 300               # descarta remakes
 DURACION_MAXIMA_PLAUSIBLE_S = 20_000  # ~5,5 hs: nada dura tanto</pre>
 
-<h4>4.5 <code>transform.py</code> · 192 líneas · de JSON crudo a fila</h4>
+<h4>4.5 <code>transform.py</code> · 191 líneas · de JSON crudo a fila</h4>
 
 <p>Todo este módulo es <strong>puro</strong>: no toca la red ni el disco. Recibe el JSON tal como lo
-guardó el bronce más los perfiles de los jugadores, y devuelve un diccionario con las 139 columnas.
+guardó el bronce más los perfiles de los jugadores, y devuelve un diccionario con las 137 columnas.
 Esa pureza es lo que permite corregir un error de parseo y reprocesar todo el bronce sin gastar un
 solo pedido.</p>
 
@@ -1557,7 +1558,7 @@ de Airflow 2 a 3, y está explícitamente listado entre los errores frecuentes d
 <table>
 <tr><th>Grupo</th><th>Qué verifica</th></tr>
 <tr><td>El DAG</td><td>Que no haya errores de import, que se registre, que estén las nueve tareas, que corra a demanda y que no haga catchup.</td></tr>
-<tr><td>El esquema</td><td>Que sean 139 columnas sin repetidas, que cada columna caiga en exactamente un grupo de tipo, y que estén la clave y el objetivo.</td></tr>
+<tr><td>El esquema</td><td>Que sean 137 columnas sin repetidas, que cada columna caiga en exactamente un grupo de tipo, y que estén la clave y el objetivo.</td></tr>
 <tr><td>Las trampas de la fuente</td><td>Que una duración en milisegundos se normalice, y que un <code>teamPosition</code> vacío se cuente en <code>roles_inferidos</code>.</td></tr>
 </table>
 
@@ -1593,7 +1594,7 @@ en el futuro simplifica esa lógica sin entenderla, el test lo frena.</p>
 <tr><td><strong>Clave primaria</strong></td><td><code>match_id</code> — por ejemplo <code>LA2_1617259431</code></td></tr>
 <tr><td><strong>Columna objetivo</strong></td><td><code>game_duration_s</code> — duración en segundos, continua</td></tr>
 <tr><td><strong>Tipo de problema</strong></td><td>Regresión (el objetivo es un número continuo, no una categoría)</td></tr>
-<tr><td><strong>Ancho</strong></td><td>139 columnas</td></tr>
+<tr><td><strong>Ancho</strong></td><td>137 columnas</td></tr>
 </table>
 </div>
 
@@ -1602,9 +1603,9 @@ en el futuro simplifica esa lógica sin entenderla, el test lo frena.</p>
 global sin necesidad de combinarla con nada, y de paso permite saber de qué servidor vino cada partida
 con un simple <code>df.match_id.str.split("_").str[0]</code>.</p>
 
-<h3>2. Las 139 columnas por bloques</h3>
+<h3>2. Las 137 columnas por bloques</h3>
 
-<p>La cuenta: <code>3 + (10 × 5 × 2) + (18 × 2) = 139</code>.</p>
+<p>La cuenta: <code>3 + (10 × 5 × 2) + (17 × 2) = 137</code>.</p>
 
 <h4>Bloque A · Identidad, objetivo y calidad — 3 columnas</h4>
 <table>
@@ -1632,8 +1633,8 @@ con un simple <code>df.match_id.str.split("_").str[0]</code>.</p>
 <tr><td><code>is_main</code></td><td>entero</td><td><strong>Derivada.</strong> <code>1</code> si la maestría supera 50.000 puntos.</td></tr>
 </table>
 
-<h4>Bloque C · Agregados de equipo — 36 columnas</h4>
-<p>Dieciocho variables × dos equipos, con el nombre <code>{t1|t2}_{variable}</code>.
+<h4>Bloque C · Agregados de equipo — 34 columnas</h4>
+<p>Diecisiete variables × dos equipos, con el nombre <code>{t1|t2}_{variable}</code>.
 Describen la <em>composición</em> del equipo: qué tipo de equipo se armó en el draft.</p>
 
 <table>
@@ -1642,7 +1643,7 @@ Describen la <em>composición</em> del equipo: qué tipo de equipo se armó en e
 <tr><td><code>num_tanks</code>, <code>num_mages</code>, <code>num_assassins</code>, <code>num_marksmen</code>, <code>num_fighters</code>, <code>num_supports</code></td><td>Cuántos de los 5 campeones tienen esa etiqueta en Data Dragon.</td></tr>
 <tr><td><code>avg_attack</code>, <code>avg_defense</code>, <code>avg_magic</code>, <code>avg_difficulty</code>, <code>avg_attackrange</code></td><td>Promedio de esa estadística base sobre los 5 campeones.</td></tr>
 <tr><td><code>total_base_hp</code>, <code>total_base_armor</code></td><td>Suma cruda (no promedio) de vida y armadura base.</td></tr>
-<tr><td><code>count_teleport</code>, <code>count_ignite</code>, <code>count_flash</code>, <code>count_smite</code></td><td>Cuántos de los 10 hechizos del equipo son ése.</td></tr>
+<tr><td><code>count_teleport</code>, <code>count_ignite</code>, <code>count_flash</code></td><td>Cuántos de los 10 hechizos del equipo son ése.</td></tr>
 </table>
 
 <div class="aviso">
@@ -1653,11 +1654,11 @@ Describen la <em>composición</em> del equipo: qué tipo de equipo se armó en e
   mal esas columnas en la exploración de la Unidad 2.</p>
 </div>
 
-<h4>Verificación de sanidad</h4>
-<p>En la muestra recolectada, <code>t1_count_smite</code> y <code>t2_count_smite</code> valen
-<strong>1 en todas las partidas</strong>. Tiene sentido: Smite es el hechizo obligatorio del jungla, y
-hay exactamente un jungla por equipo. Es una comprobación barata de que el pipeline está leyendo bien
-la fuente y asignando bien los equipos.</p>
+<h4>Por qué no hay una columna <code>count_smite</code></h4>
+<p>El esquema del prototipo traía <code>t1_count_smite</code> y <code>t2_count_smite</code>. En toda la
+muestra valían <strong>1</strong>: Smite es obligatorio para el jungla y hay un jungla por equipo. Una
+columna constante no aporta nada a un modelo —varianza cero— así que se quitó. Los otros tres conteos
+de hechizo (<code>flash</code>, <code>teleport</code>, <code>ignite</code>) sí varían y se conservan.</p>
 
 <h3>3. Reglas de admisión de una partida</h3>
 
@@ -2136,7 +2137,7 @@ Conviene tenerlo abierto.</p>
 <tr><th>Criterio</th><th>Qué tiene que dar</th><th>Cómo se verifica</th></tr>
 <tr><td><strong>Clave sin duplicados</strong></td><td><code>True</code></td><td><code>df["match_id"].is_unique</code></td></tr>
 <tr><td><strong>Volumen suficiente</strong></td><td>más de 1.000 filas</td><td><code>len(df)</code></td></tr>
-<tr><td><strong>Ancho suficiente</strong></td><td>5 o más columnas útiles</td><td><code>df.shape</code> → 139</td></tr>
+<tr><td><strong>Ancho suficiente</strong></td><td>5 o más columnas útiles</td><td><code>df.shape</code> → 137</td></tr>
 <tr><td><strong>Mezcla de tipos</strong></td><td>numéricas y categóricas</td><td><code>df.dtypes.value_counts()</code> → 108 enteras, 20 flotantes, 11 de texto</td></tr>
 <tr><td><strong>Nulos conocidos</strong></td><td>saber cuáles y por qué</td><td><code>df.isna().mean().sort_values(ascending=False)</code></td></tr>
 <tr><td><strong>Sin columnas vacías</strong></td><td>ninguna al 100 %</td><td><code>df.columns[df.isna().all()]</code> → vacío</td></tr>
@@ -2304,7 +2305,7 @@ las partes indicadas. Todos deberían poder responder las cinco preguntas de la 
 </tr>
 <tr>
   <td><strong>La transformación</strong></td><td style="color:#a3341f">________________</td>
-  <td><code>transform.py</code> y <code>schema.py</code>: los filtros de admisión, la corrección de milisegundos, la asignación de carriles y <code>roles_inferidos</code>, y cómo se generan las 139 columnas.</td>
+  <td><code>transform.py</code> y <code>schema.py</code>: los filtros de admisión, la corrección de milisegundos, la asignación de carriles y <code>roles_inferidos</code>, y cómo se generan las 137 columnas.</td>
   <td>IV.4.4, IV.4.5, V</td>
 </tr>
 <tr>
@@ -2399,12 +2400,13 @@ las partes indicadas. Todos deberían poder responder las cinco preguntas de la 
 </div>
 
 <div class="pregunta">
-  <span class="q">¿Por qué el CSV tiene 139 columnas y no las 138 del prototipo?</span>
-  <p>Agregamos <code>roles_inferidos</code>. El prototipo asignaba los carriles buscando el campo
-  <code>teamPosition</code>, y cuando venía vacío —pasa en remakes y con autofill— mandaba al jugador
-  al slot que sobrara <strong>sin dejar ningún rastro</strong>. El dato quedaba mal y no había forma de
-  saberlo. Ahora contamos cuántos jugadores quedaron así y esas filas se pueden filtrar. El error existía
-  igual; lo que cambió es que ahora es visible.</p>
+  <span class="q">¿Por qué el CSV tiene 137 columnas y no las 138 del prototipo?</span>
+  <p>Dos cambios. <strong>Sumamos</strong> <code>roles_inferidos</code>: el prototipo asignaba los
+  carriles buscando <code>teamPosition</code>, y cuando venía vacío —remakes, autofill— mandaba al
+  jugador al slot que sobrara <strong>sin dejar rastro</strong>. Ahora contamos cuántos quedaron así y
+  esas filas se pueden filtrar. <strong>Quitamos</strong> <code>t1_count_smite</code> y
+  <code>t2_count_smite</code>: el juego obliga al jungla a llevar Smite, así que valían 1 en toda
+  partida real. Una columna de varianza cero no aporta a un modelo. Neto: 138 + 1 − 2 = 137.</p>
 </div>
 
 <div class="pregunta">

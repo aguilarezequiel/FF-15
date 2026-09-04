@@ -55,8 +55,8 @@ def test_no_hace_catchup():
 # --- el esquema ------------------------------------------------------------
 
 def test_ancho_del_esquema():
-    """138 columnas portadas del prototipo + la bandera roles_inferidos."""
-    assert len(schema.COLUMNS) == 139
+    """138 del prototipo + roles_inferidos (+1) - los dos count_smite (-2)."""
+    assert len(schema.COLUMNS) == 137
     assert len(set(schema.COLUMNS)) == len(schema.COLUMNS)
 
 

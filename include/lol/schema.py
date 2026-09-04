@@ -45,7 +45,11 @@ FEATURES_JUGADOR = [
     "player_elo", "player_winrate", "champ_mastery_pts", "is_main",
 ]
 
-# Los 18 agregados de cada equipo.
+# Los 17 agregados de cada equipo.
+#
+# NO entra `count_smite`: el juego obliga al jungla a llevar Smite y hay un
+# jungla por equipo, así que vale 1 en toda partida real. Es una columna de
+# varianza cero —no aporta nada a un modelo— y se quitó por eso.
 FEATURES_EQUIPO = [
     "mains_count",
     "num_tanks", "num_mages", "num_assassins",
@@ -53,12 +57,12 @@ FEATURES_EQUIPO = [
     "avg_attack", "avg_defense", "avg_magic", "avg_difficulty",
     "avg_attackrange",
     "total_base_hp", "total_base_armor",
-    "count_teleport", "count_ignite", "count_flash", "count_smite",
+    "count_teleport", "count_ignite", "count_flash",
 ]
 
 
 def columnas_equipo(prefijo: str) -> list[str]:
-    """Las 50 columnas de jugador + 18 de equipo, para t1 o t2."""
+    """Las 50 columnas de jugador + 17 de equipo, para t1 o t2."""
     cols = [f"{prefijo}_{pos}_{f}"
             for pos in POSICIONES for f in FEATURES_JUGADOR]
     cols += [f"{prefijo}_{f}" for f in FEATURES_EQUIPO]

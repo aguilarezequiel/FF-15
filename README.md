@@ -16,7 +16,7 @@ Pipeline de Apache Airflow que construye el dataset del proyecto a partir de la 
 | **Una fila es** | una partida clasificatoria (cola solo/duo, 420) de League of Legends, Season 16 |
 | **Clave primaria** | `match_id` — ej. `LA2_1617259431` |
 | **Columna objetivo** | `game_duration_s` — segundos, continua → **regresión** |
-| **Ancho** | 139 columnas |
+| **Ancho** | 137 columnas |
 
 ---
 
@@ -71,7 +71,7 @@ wait_for_riot → check_key ─┬→ fetch_ddragon ──┐
 | `fetch_ddragon` | **Bronce.** Catálogo de campeones y hechizos desde el CDN público, particionado por versión: los campeones cambian entre parches y una partida vieja tiene que poder reinterpretarse con el catálogo que le correspondía. |
 | `plan_plataformas` | Reparte `partidas_objetivo` entre las plataformas elegidas. |
 | `land_bronze` | **Una tarea por plataforma, y la única que toca la red.** Baja el detalle de la partida y los perfiles de los 10 jugadores, y los guarda crudos. |
-| `refine_silver` | Una por plataforma, **sin red**. Del JSON crudo a las 139 columnas tipadas. |
+| `refine_silver` | Una por plataforma, **sin red**. Del JSON crudo a las 137 columnas tipadas. |
 | `consolidate` | Junta los parciales, deduplica por `match_id` y castea tipos. |
 | `validate` | Chequeos duros —si alguno falla, el DAG falla— y escribe el reporte de calidad. |
 | `save` | Escribe el entregable fechado con la corrida. |
@@ -109,7 +109,7 @@ Cada corrida deja el reporte en `include/output/reports/calidad.md`, con los sei
 ```python
 df["match_id"].is_unique                        # True — el criterio que más pesa
 len(df)                                         # > 1.000
-df.shape                                        # (n, 139)
+df.shape                                        # (n, 137)
 df.dtypes.value_counts()                        # Int64, float64 y object
 df.isna().mean().sort_values(ascending=False)
 df.columns[df.isna().all()]                     # vacío
@@ -205,7 +205,7 @@ include/lol/          · toda la lógica pesada, sin un solo import de Airflow
   ├── riot.py         · cliente, pool de keys y limitador por (key, host)
   ├── ddragon.py      · catálogo de campeones y hechizos
   ├── seeds.py        · recorrido de la escalera → puuids
-  ├── schema.py       · las 139 columnas, tipos y reglas de admisión
+  ├── schema.py       · las 137 columnas, tipos y reglas de admisión
   └── transform.py    · payload crudo → fila (puro)
 include/output/       · bronce, plata y entregables (gitignoreado)
 tests/                · astro dev pytest
