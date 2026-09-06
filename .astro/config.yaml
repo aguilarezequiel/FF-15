@@ -1,2 +1,6 @@
+postgres:
+    port: "5433"
 project:
-  name: ff-15
+    name: ff-15
+webserver:
+    port: "8081"

@@ -191,7 +191,7 @@ ruff check .        # estilo
 
 Para entender el proyecto entero —la teoría de la materia, el recorrido archivo por archivo,
 la guía de ejecución y la preparación de la defensa— está
-**[`docs/documentacion-proyecto.pdf`](docs/documentacion-proyecto.pdf)** (58 páginas).
+**[`docs/documentacion-proyecto.pdf`](docs/documentacion-proyecto.pdf)** (63 páginas).
 
 Se edita en `docs/documentacion-proyecto.html` y se regenera con `python docs/generar_pdf.py`.
 Es un documento vivo: cada avance del proyecto se refleja ahí, agregando lo nuevo y borrando

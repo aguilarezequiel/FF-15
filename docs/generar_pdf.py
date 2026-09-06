@@ -1,7 +1,13 @@
 """
-Regenera documentacion-proyecto.pdf a partir del HTML.
+Regenera un PDF de docs/ a partir de su HTML.
 
-Uso:   python docs/generar_pdf.py
+Uso:   python docs/generar_pdf.py                          → documentacion-proyecto.html
+       python docs/generar_pdf.py informe-sesgo-muestreo.html
+
+Sin argumentos imprime el documento integral, que es el caso de siempre.
+Con un nombre de archivo imprime ese, dejando el PDF al lado con el mismo
+nombre. Sirve para los informes puntuales que viven aparte del documento
+integral sin mezclarse con él.
 
 No hace falta instalar nada: imprime con el Chrome o el Edge que ya está
 en la máquina, en modo headless. Se eligió esa vía en lugar de pandoc,
@@ -19,8 +25,9 @@ import sys
 from pathlib import Path
 
 AQUI = Path(__file__).resolve().parent
-FUENTE = AQUI / "documentacion-proyecto.html"
-DESTINO = AQUI / "documentacion-proyecto.pdf"
+FUENTE = AQUI / (sys.argv[1] if len(sys.argv) > 1
+                 else "documentacion-proyecto.html")
+DESTINO = FUENTE.with_suffix(".pdf")
 
 # Rutas habituales en Windows. El primero que exista es el que se usa.
 NAVEGADORES = [

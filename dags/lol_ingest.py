@@ -380,8 +380,14 @@ def lol_ingest():
         landeadas: list[str] = []
         nuevas = reusadas = descartes_nuevos = 0
 
-        def perfil_de(participante: dict) -> None:
-            """Baja liga y maestría de un jugador, si no están en bronce."""
+        def perfil_de(participante: dict, owner_key: str | None) -> None:
+            """Baja liga y maestría de un jugador, si no están en bronce.
+
+            `owner_key` es la key que trajo el detalle de esta partida:
+            los `puuid` de los participantes vienen encriptados para ella,
+            no para la que semilló al jugador ni para ninguna otra del
+            pool. Ver `RiotClient._request`.
+            """
             puuid = participante.get("puuid")
             cid = participante.get("championId")
             if not puuid:
@@ -389,21 +395,22 @@ def lol_ingest():
 
             p_liga = _ruta_perfil(platform, puuid, "liga")
             if not p_liga.exists() or forzar:
-                escribir_json(p_liga,
-                              cliente.league_by_puuid(platform, puuid))
+                escribir_json(p_liga, cliente.league_by_puuid(
+                    platform, puuid, owner_key=owner_key))
 
             p_mast = _ruta_perfil(platform, puuid, f"maestria_{cid}")
             if not p_mast.exists() or forzar:
-                escribir_json(p_mast,
-                              cliente.mastery(platform, puuid, cid))
+                escribir_json(p_mast, cliente.mastery(
+                    platform, puuid, cid, owner_key=owner_key))
 
-        for puuid, _tier in iter_puuids(cliente, platform,
-                                        trabajo["tiers"]):
+        for puuid, _tier, owner_key in iter_puuids(cliente, platform,
+                                                   trabajo["tiers"]):
             if len(landeadas) >= cuota:
                 break
 
             for match_id in cliente.match_ids(region, puuid,
-                                              count=PARTIDAS_POR_JUGADOR):
+                                              count=PARTIDAS_POR_JUGADOR,
+                                              owner_key=owner_key):
                 if len(landeadas) >= cuota:
                     break
                 if match_id in descartadas:
@@ -416,7 +423,7 @@ def lol_ingest():
                         reusadas += 1
                     continue
 
-                datos = cliente.match(region, match_id)
+                datos, match_key = cliente.match(region, match_id)
                 if datos is None:
                     continue
 
@@ -433,7 +440,8 @@ def lol_ingest():
                 escribir_json(destino, datos)
 
                 with ThreadPoolExecutor(max_workers=4) as pool:
-                    list(pool.map(perfil_de, participantes))
+                    list(pool.map(
+                        lambda p: perfil_de(p, match_key), participantes))
 
                 landeadas.append(match_id)
                 nuevas += 1

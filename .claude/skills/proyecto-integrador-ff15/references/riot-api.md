@@ -36,6 +36,8 @@ Header de autenticación: `{"X-Riot-Token": key}`. Nunca como query param.
 
 El diseño acepta una lista de keys separadas por coma (una por integrante del grupo) en `conn_password`. El limitador lleva la contabilidad por par **(key, host)**: una `deque` de timestamps por ventana y un cooldown por host disparado por un 429 real. Se elige la primera key con cupo para ese host; si ninguna tiene, se duerme el mínimo necesario.
 
+**Salvedad importante: un `puuid` sólo se puede usar con la key que lo emitió.** Riot lo devuelve encriptado *para esa key puntual*; pedir algo con él usando otra key del pool da `400 Bad Request - Exception decrypting <puuid>`, un error que no sugiere la causa real. Por eso el round-robin de `_tomar_turno` no aplica a los pedidos que llevan un `puuid` en la URL (D, F, G): esos van con `owner_key` fijo — la key que trajo ese `puuid`, ya sea de la semilla (`league_entries`) o del detalle de partida (`match`, para los 10 participantes). El pool sigue repartiendo trabajo entre keys, pero a nivel de "todos los pedidos sobre este jugador/esta partida", no a nivel de request individual. Ver `RiotClient._request` en `riot.py`.
+
 ## Routing: platform vs región continental
 
 Hay **dos familias de hosts** y confundirlas da 404:
@@ -112,6 +114,7 @@ por plataforma:
 | `429` | Leer el header `Retry-After` (default 5 s), poner esa key en cooldown **para ese host**, y seguir con otra key. |
 | `403` | La key está vencida o es inválida. Sacarla del pool. Si se vacía el pool, fallar con un mensaje explícito de que hay que renovar la key. |
 | `404` | Recurso inexistente. Devolver `None`, no reintentar. |
+| `400` con `owner_key` puesto | La key dueña del `puuid` venció o quedó inválida entre medio. No hay otra key que pueda leer ese `puuid`: no tiene sentido reintentar, se salta el pedido. |
 | `5xx` / timeout | Reintentar con backoff. |
 
 ## Trampas conocidas
@@ -131,3 +134,11 @@ Encontradas auditando el prototipo `../FF15`. Todas están corregidas en este pr
 6. **Fuga temporal en `winrate` y `mastery_pts`.** Se consultan **hoy** (F y G), no al momento en que se jugó la partida. Para una partida de hace semanas son valores posteriores al hecho, lo cual tensiona el claim de "sólo variables pre-partida". La API no ofrece histórico, así que no se puede arreglar: se **declara** en el README y en la defensa.
 
 7. **Campeones más nuevos que el snapshot de Data Dragon** devuelven `{}` al buscarlos por id, y contribuyen 0 a todos los agregados de composición sin avisar. Conviene loguear un warning cuando pasa.
+
+8. **Un `puuid` está encriptado por key: usarlo con otra key del pool da 400, no 401/403.** Descubierta corriendo el pipeline con el pool de 7 keys: `land_bronze` fallaba con `HTTP 400` en las seis plataformas al mismo tiempo, sistemático desde el primer pedido, con **todas** las keys — no una sola vencida. La causa: `RiotClient._tomar_turno` rotaba de key en cada request individual sin importar que esa request llevara un `puuid` en la URL, y Riot sólo deja leer un `puuid` con la key que lo emitió. El fix es la afinidad key↔puuid descrita arriba en "Pool de varias keys". La lección para la defensa: un `400` con mensaje `"Exception decrypting"` no es un bug de red ni una key vencida (eso da 401/403) — es una key equivocada para ESE dato puntual.
+
+9. **Mezclar el orden de los tiers NO alcanza para evitar el sesgo de muestreo.** `iter_puuids` hace `rnd.shuffle(tiers)` en cada página justamente para que una corrida cortada no quede con puros jugadores de bronce. No funciona, y hay que saber por qué: una página de escalera trae **205 jugadores** y cada uno rinde hasta `PARTIDAS_POR_JUGADOR` (15) partidas, así que **una sola combinación tier/división da ~3.000 partidas** — la cuota entera de una corrida típica. La corrida corta antes de pasar al segundo tier y el orden mezclado nunca se recorre. Resultado medido el 6/9/2026 sobre 19.145 filas: cada plataforma quedó con un rango casi puro y distinto (NA1 33% SILVER, LA1 39% GRANDMASTER; elo medio de 1.627 a 3.231; desvío interno de 223 a 440). El sesgo no se elimina, se vuelve **aleatorio en vez de determinista**. Consecuencias: el poder predictivo del elo queda subestimado (correlación elo↔duración de −0,25 en la única plataforma con rango amplio, contra −0,01 en la más homogénea), y plataforma queda confundida con elo. El arreglo real es **rotar de tier cada N jugadores dentro de la corrida**, no confiar en el shuffle del orden.
+
+10. **Sumar keys al pool no acelera proporcionalmente.** Es tentador extrapolar linealmente ("una key da X, seis keys dan 6X"), y está mal. Medido: **1.154 partidas/hora con 7 keys** y las 6 plataformas en paralelo, contra una proyección lineal de ~6.400/h. Cinco veces y media menos. El techo no lo pone el cupo de las keys sino la **concurrencia del cliente**: dentro de cada `land_bronze` las partidas se bajan una por una en un bucle secuencial, y sólo los perfiles de cada partida van en paralelo con `ThreadPoolExecutor(max_workers=4)`. Más keys agrandan un cupo que no se llega a consumir. Para planificar una recolección, usar **~1.150 partidas/hora**; para acelerar de verdad, subir la concurrencia, no juntar keys.
+
+11. **El costo por partida baja a medida que crece el bronce.** Los perfiles (`F` y `G`) se cachean por `puuid`, así que cuanto más grande el bronce, más se reusan. Medido en la misma corrida: la plataforma que más lejos llegó terminó en **11,7 pedidos por partida** contra **19,4** de la que menos avanzó, con un promedio global de **16,8**. Al estimar una tanda nueva, el promedio de 16,8 es conservador.

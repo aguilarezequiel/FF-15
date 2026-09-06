@@ -118,11 +118,14 @@ la VI es la guía práctica para ejecutarlo; y la VII prepara la defensa oral.</
 <table>
 <tr><th>Aspecto</th><th>Estado</th></tr>
 <tr><td>Pipeline</td><td>Completo y funcionando. Nueve tareas, todas verificadas en verde con datos reales de la API.</td></tr>
-<tr><td>Corridas exitosas</td><td>Cinco, visibles en el historial de la interfaz de Airflow.</td></tr>
-<tr><td>Bronce acumulado</td><td>204 partidas crudas, 3.620 perfiles de jugador, 22 partidas descartadas. 14&nbsp;MB en disco.</td></tr>
-<tr><td>Dataset (capa plata)</td><td>70 filas × 137 columnas. <strong>Falta volumen:</strong> la consigna pide más de 1.000 filas.</td></tr>
+<tr><td>Corridas</td><td>La recolección grande corrió del 5/9 11:53 al 6/9 09:33 (≈21 h 40 min). La corrida final que produjo el entregable tardó <strong>15 minutos</strong> de punta a punta, porque el bronce ya estaba en disco.</td></tr>
+<tr><td>Bronce acumulado</td><td><strong>19.145</strong> partidas crudas, <strong>290.654</strong> perfiles de jugador, 1.651 partidas descartadas. <strong>1,1&nbsp;GB</strong> en disco (233&nbsp;MB de partidas, 850&nbsp;MB de perfiles).</td></tr>
+<tr><td>Dataset (capa plata)</td><td><strong>19.145 filas × 137 columnas</strong>, 11&nbsp;MB. Clave única, cero nulos, ninguna columna vacía. <strong>Supera 19 veces</strong> el mínimo de 1.000 filas que pide la consigna.</td></tr>
 <tr><td>Calidad de código</td><td>10/10 tests en verde · <code>ruff</code> sin hallazgos · <code>astro dev parse</code> limpio.</td></tr>
-<tr><td>Lo único que falta</td><td>Correr las tandas de recolección hasta el objetivo de 20.000 partidas. Está explicado paso a paso en la parte VI.</td></tr>
+<tr><td>Bug corregido (2026-09-05)</td><td><code>land_bronze</code> fallaba con <code>HTTP 400</code> en las seis plataformas: el pool de keys rotaba de key en cada request individual, y un <code>puuid</code> sólo lo puede leer la key que lo emitió. Fix: afinidad key↔puuid en <code>RiotClient</code> — ver 4.1.</td></tr>
+<tr><td>Incidente superado (2026-09-06)</td><td>La máquina entró en hibernación a las 03:19 con cuatro tareas <code>land_bronze</code> a mitad de camino. Los procesos murieron; <strong>el bronce no perdió un solo archivo</strong>. Airflow relanzó las tareas solo a las 07:16 y el dataset se generó igual. Es la mejor evidencia práctica de por qué el bronce va a disco y es append-only — ver 7.7.</td></tr>
+<tr><td>Limitación conocida</td><td><strong>Sesgo de muestreo por tier.</strong> Cada plataforma quedó con partidas de un rango casi puro y distinto (elo medio de 1.627 en NA1 a 3.231 en LA1). Está medido y declarado en 7.5; no invalida el dataset, pero condiciona qué conclusiones se pueden sacar de él.</td></tr>
+<tr><td>Lo que falta</td><td>Nada bloqueante para la Entrega 1: el dataset está generado y verificado. Queda ensayar la defensa con el reparto de la parte VII.</td></tr>
 </table>
 
 <div class="toc">
@@ -500,9 +503,11 @@ orquestador que usa la industria y el que enseña la materia.</p>
 
 <div class="nota">
   <span class="etiqueta">Un ejemplo concreto de nuestro proyecto</span>
-  <p>Cuando cancelamos una corrida a mitad de camino, las 204 partidas ya descargadas quedaron
-  intactas en disco y la siguiente corrida las reutilizó sin pedirle nada a la API. Con un script
-  monolítico habría que haber empezado de cero. Eso es lo que compra un orquestador bien usado.</p>
+  <p>El 6/9 la máquina entró en hibernación a las 03:19, en medio de una corrida de 14 horas, con cuatro
+  tareas de descarga a mitad de camino. Los procesos murieron en seco. <strong>Las 16.908 partidas ya
+  descargadas quedaron intactas en disco</strong>, el scheduler detectó las tareas huérfanas y las relanzó
+  solo a las 07:16, y el dataset se generó ese mismo día. Con un script monolítico habría que haber
+  empezado de cero. Eso es lo que compra un orquestador bien usado.</p>
 </div>
 
 <h3>4. Apache Airflow: DAG, tarea, operador, hook, provider</h3>
@@ -952,10 +957,13 @@ por los jugadores. Ése recorrido —de un ranking a un dataset de partidas— e
 </div>
 
 <h4>Cuánto cuesta cada partida, medido</h4>
-<p>En nuestra corrida de prueba: <strong>555 pedidos para 30 partidas = 18,5 pedidos por partida</strong>.
-El desglose aproximado es 1 pedido de detalle de partida y ~17 de perfiles y maestrías. Por eso el
-cuello de botella no es <code>match-v5</code> sino los endpoints de plataforma, y por eso importa tanto
+<p>Medido sobre la corrida grande del 5–6/9: <strong>283.522 pedidos para 16.908 partidas = 16,8 pedidos
+por partida</strong>. El desglose es 1 pedido de detalle de partida y ~16 de perfiles y maestrías. Por eso
+el cuello de botella no es <code>match-v5</code> sino los endpoints de plataforma, y por eso importa tanto
 paralelizar por plataforma.</p>
+<p>El número <strong>baja a medida que el bronce crece</strong>, porque los perfiles ya guardados no se
+vuelven a pedir: la plataforma que más lejos llegó (LAN, 3.334 partidas) terminó en <strong>11,7 pedidos
+por partida</strong>, contra 19,4 de la que menos avanzó. La tabla completa está en VI.4.</p>
 
 <p>Ese número mejora con el volumen: un jugador que aparece en varias partidas se consulta una sola
 vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más barata sale cada partida nueva.</p>
@@ -988,14 +996,14 @@ vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más 
 │
 ├── dags/
 │   ├── .airflowignore                    · vacío
-│   └── lol_ingest.py          711 líneas · EL DAG: sólo orquestación
+│   └── lol_ingest.py          719 líneas · EL DAG: sólo orquestación
 │
 ├── include/
 │   ├── lol/                              · LA LÓGICA · sin importar Airflow
 │   │   ├── __init__.py          9 líneas
-│   │   ├── riot.py            345 líneas · cliente, pool de keys, límites
+│   │   ├── riot.py            408 líneas · cliente, pool de keys, límites
 │   │   ├── ddragon.py          88 líneas · catálogo de campeones y hechizos
-│   │   ├── seeds.py            70 líneas · recorrido del ranking
+│   │   ├── seeds.py            77 líneas · recorrido del ranking
 │   │   ├── schema.py          103 líneas · las 137 columnas y sus tipos
 │   │   └── transform.py       191 líneas · JSON crudo → fila
 │   └── output/                           · SALIDAS · gitignoreado
@@ -1009,7 +1017,7 @@ vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más 
 │
 ├── docs/                                 · LA DOCUMENTACIÓN INTEGRAL
 │   ├── documentacion-proyecto.html       · este documento (fuente editable)
-│   ├── documentacion-proyecto.pdf        · este documento (58 páginas)
+│   ├── documentacion-proyecto.pdf        · este documento (63 páginas)
 │   └── generar_pdf.py                    · regenera el PDF con Chrome
 │
 └── Documentacion/                        · material de la cátedra</div>
@@ -1145,7 +1153,7 @@ separadas por coma —una por integrante— y el cliente las usa en paralelo.</p
 
 <h3>4. <code>include/lol/</code> — la lógica del dominio</h3>
 
-<h4>4.1 <code>riot.py</code> · 345 líneas · el cliente de la API</h4>
+<h4>4.1 <code>riot.py</code> · 408 líneas · el cliente de la API</h4>
 
 <p>Es el módulo más complejo del proyecto. Su responsabilidad: hablar con la API de Riot respetando
 los límites, rotando entre varias keys y sin que nadie de afuera tenga que pensar en eso.</p>
@@ -1175,22 +1183,30 @@ PER_TWO_MIN_LIMIT = 100    ; PER_TWO_MIN_WINDOW = 120.0</pre>
 los pedidos hechos por cada par <em>(key, host)</em>, y antes de disparar uno nuevo se verifica que
 haya cupo en las dos ventanas de tiempo.</p>
 
-<pre>def _tomar_turno(self, host: str) -&gt; str:
+<pre>def _tomar_turno(self, host: str, key: str | None = None) -&gt; str:
     """Devuelve una key con cupo para `host`, esperando si hace falta.
 
     No castiga a una key en un host donde sí tiene cupo sólo porque
     está en cooldown en otro: los baldes son independientes.
+
+    Si `key` viene dada, no rota: espera cupo en ESA key puntual. Es
+    el caso de un pedido sobre un puuid (ver más abajo).
     """
     while True:
         ahora = time.time()
         esperas = []
         with self._lock:
-            candidatas = [k for k in self.keys if k not in self._invalidas]
-            if not candidatas:
-                raise RiotKeysExhausted(...)
+            if key is not None:
+                if key in self._invalidas:
+                    raise _KeyDueñaInvalida(key)
+                candidatas = [key]
+            else:
+                candidatas = [k for k in self.keys if k not in self._invalidas]
+                if not candidatas:
+                    raise RiotKeysExhausted(...)
             for _ in range(len(candidatas)):
                 self._idx = (self._idx + 1) % len(candidatas)
-                key = candidatas[self._idx]
+                k = candidatas[self._idx]
                 # ¿está esta key castigada en este host?
                 # ¿cuántos pedidos lleva en los últimos 120 s?
                 # ¿y en el último segundo?
@@ -1206,13 +1222,34 @@ haya cupo en las dos ventanas de tiempo.</p>
   queda igual como red de contención por si Riot aplica un límite que no conocemos.</p>
 </div>
 
+<div class="aviso">
+  <span class="etiqueta">Un <code>puuid</code> sólo lo puede leer la key que lo emitió</span>
+  <p>Riot devuelve cada <code>puuid</code> <strong>encriptado para la key puntual</strong> que hizo esa
+  request. Pedir algo con él usando otra key del pool —aunque esa otra key sea perfectamente válida—
+  da <code>400 Bad Request - Exception decrypting &lt;puuid&gt;</code>, un mensaje que no sugiere la
+  causa real: parece un dato corrupto, no una key equivocada.</p>
+  <p>Por eso <code>_tomar_turno</code> tiene el parámetro <code>key</code>: los pedidos D, F y G (los que
+  llevan un <code>puuid</code> en la URL) <strong>no rotan</strong>, van con la key que trajo ese
+  <code>puuid</code> — la de <code>league_entries</code> para el jugador semilla, o la de <code>match</code>
+  para los 10 participantes de una partida (esos <code>puuid</code> vienen embebidos en el detalle de la
+  partida, encriptados para la key que pidió <em>esa</em> partida, no para la de la semilla). Si esa key
+  venció mientras tanto, no hay fallback posible: se salta el pedido en vez de gastar reintentos contra
+  keys que nunca van a poder leerlo.</p>
+  <p>Se encontró corriendo el pipeline con el pool completo: las seis plataformas fallaban con
+  <code>400</code> desde el primer pedido, con las siete keys por igual. Se confirmó pegándole a la
+  API con la misma URL y distintas keys: una respondía <code>200</code>, las demás
+  <code>400 Exception decrypting</code>. El detalle completo está en las trampas conocidas de
+  <code>.claude/skills/proyecto-integrador-ff15/references/riot-api.md</code>.</p>
+</div>
+
 <p><strong>El manejo de errores</strong>, que traduce cada código HTTP a una acción distinta:</p>
 
 <table>
 <tr><th>Código</th><th>Qué significa</th><th>Qué hace el cliente</th></tr>
-<tr><td><code>200</code></td><td>Todo bien</td><td>Devuelve el JSON.</td></tr>
+<tr><td><code>200</code></td><td>Todo bien</td><td>Devuelve el JSON (y la key que respondió, para poder heredarla en pedidos siguientes sobre el mismo puuid).</td></tr>
 <tr><td><code>429</code></td><td>Demasiados pedidos</td><td>Lee el encabezado <code>Retry-After</code>, castiga esa key <em>en ese host</em> y sigue con otra key.</td></tr>
 <tr><td><code>401</code> / <code>403</code></td><td>Key inválida o vencida</td><td>La saca del pool. Si se vacía el pool, lanza <code>RiotKeysExhausted</code> con un mensaje que dice exactamente qué hacer.</td></tr>
+<tr><td><code>400</code> con key dueña de un puuid</td><td>Esa key venció o quedó inválida entre medio</td><td>No hay otra key que sirva para ese puuid: se salta el pedido en vez de reintentar.</td></tr>
 <tr><td><code>404</code></td><td>No existe</td><td>Devuelve <code>None</code> sin reintentar.</td></tr>
 <tr><td><code>5xx</code> / timeout</td><td>Problema del servidor o de red</td><td>Reintenta con espera creciente.</td></tr>
 </table>
@@ -1253,7 +1290,7 @@ keys sería gastar cupo en algo que no lo necesita.</p>
     una búsqueda lineal por cada uno de los 10 campeones de cada partida.
     """</pre>
 
-<h4>4.3 <code>seeds.py</code> · 70 líneas · el recorrido del ranking</h4>
+<h4>4.3 <code>seeds.py</code> · 77 líneas · el recorrido del ranking</h4>
 
 <p>Un <strong>generador</strong> que va entregando jugadores del ranking. Es un generador y no una lista
 por una razón concreta: la corrida se corta cuando se alcanza la cuota de partidas, no cuando se agota
@@ -1271,15 +1308,20 @@ el ranking. Pedir todas las páginas por adelantado gastaría cupo en jugadores 
             if tier in APEX_TIERS and page &gt; 1:
                 continue                       # su endpoint no pagina
             for division in divisiones:
-                entradas = client.league_entries(platform, tier,
-                                                 division, page)
+                entradas, owner_key = client.league_entries(
+                    platform, tier, division, page)
                 rnd.shuffle(entradas)
                 for e in entradas:
                     puuid = e.get("puuid")
                     if not puuid or puuid in vistos:
                         continue
                     vistos.add(puuid)
-                    yield puuid, tier</pre>
+                    yield puuid, tier, owner_key   # la key dueña del puuid</pre>
+
+<p>El <code>owner_key</code> viaja con cada <code>puuid</code> hasta <code>land_bronze</code>, que lo usa
+para <code>match_ids</code>. Y cuando <code>match()</code> trae el detalle de una partida, la key que
+respondió esa llamada se vuelve la dueña de los <code>puuid</code> de los 10 participantes, para
+<code>league_by_puuid</code>/<code>mastery</code>. Ver el aviso sobre keys y puuids en 4.1.</p>
 
 <h4>4.4 <code>schema.py</code> · 103 líneas · el contrato del dataset</h4>
 
@@ -1385,7 +1427,7 @@ solo pedido.</p>
 
 <h3>5. <code>dags/lol_ingest.py</code> — la orquestación</h3>
 
-<p>711 líneas, pero la mayoría son docstrings: cada tarea explica <em>por qué</em> está donde está.
+<p>719 líneas, pero la mayoría son docstrings: cada tarea explica <em>por qué</em> está donde está.
 Esos textos se renderizan en la interfaz de Airflow y son la chuleta para la defensa oral.</p>
 
 <h4>La declaración del DAG</h4>
@@ -1526,7 +1568,10 @@ Una por plataforma, y <strong>sin red</strong>. Convierte el JSON crudo en filas
   funcionaba. Ahora hace <code>glob</code> sobre <strong>todo el bronce</strong> de su plataforma:</p>
   <pre>rutas = sorted(
     (BRONCE_DIR / "matches" / f"plataforma={platform}").glob("*.json.gz"))</pre>
-  <p>Verificado: con 60 partidas en bronce, una corrida de cuota 10 produce un CSV de 70 filas.</p>
+  <p>Verificado a escala real el 6/9: con <strong>19.133 partidas ya en bronce</strong>, una corrida de
+  cuota 2 por plataforma bajó 12 partidas nuevas y produjo un CSV de <strong>19.145 filas</strong> — el
+  acumulado entero, no las 12 de esa corrida. Es la propiedad que permite regenerar el entregable en
+  15 minutos sin volver a recolectar.</p>
 </div>
 
 <p><strong>7 · <code>consolidate</code></strong> — junta los parciales de las seis plataformas,
@@ -1793,20 +1838,29 @@ mismo idioma que usan los data lakes sobre S3 pero con carpetas en vez de prefij
 borrar una plataforma entera sin tocar las demás, y saber qué contiene un archivo sólo por su ruta.</p>
 
 <h4>Por qué todo está comprimido</h4>
-<p>Los JSON de Riot son texto muy repetitivo y comprimen muchísimo. Con 204 partidas y 3.620 perfiles,
-el bronce ocupa <strong>14&nbsp;MB</strong>. Sin comprimir serían más de 100&nbsp;MB.</p>
+<p>Los JSON de Riot son texto muy repetitivo y comprimen muchísimo. Con 19.145 partidas y 290.654
+perfiles, el bronce ocupa <strong>1,1&nbsp;GB</strong>. Sin comprimir pasaría holgadamente los
+8&nbsp;GB. El detalle de una partida pesa unos 11&nbsp;KB comprimido.</p>
 
 <h4>Estado actual del bronce</h4>
+<p>Medido el 6/9/2026, después de la recolección grande. La columna de partidas cuenta los archivos
+de cada carpeta <code>plataforma=</code>; unas pocas partidas quedan guardadas bajo una plataforma
+distinta a la de su <code>match_id</code>, porque un jugador semilla puede tener partidas jugadas en
+otra región.</p>
 <table>
-<tr><th>Plataforma</th><th>Partidas</th></tr>
-<tr><td><code>la2</code> (LAS)</td><td>93</td></tr>
-<tr><td><code>na1</code> (NA)</td><td>23</td></tr>
-<tr><td><code>br1</code> (BR)</td><td>22</td></tr>
-<tr><td><code>euw1</code> (EUW)</td><td>22</td></tr>
-<tr><td><code>kr</code> (KR)</td><td>22</td></tr>
-<tr><td><code>la1</code> (LAN)</td><td>22</td></tr>
-<tr><td><strong>Total</strong></td><td><strong>204</strong> partidas · 3.620 perfiles · 22 descartadas</td></tr>
+<tr><th>Plataforma</th><th>Partidas</th><th>Perfiles</th></tr>
+<tr><td><code>kr</code> (KR)</td><td>3.430</td><td>52.455</td></tr>
+<tr><td><code>br1</code> (BR)</td><td>3.356</td><td>45.160</td></tr>
+<tr><td><code>la1</code> (LAN)</td><td>3.355</td><td>35.366</td></tr>
+<tr><td><code>la2</code> (LAS)</td><td>3.066</td><td>52.928</td></tr>
+<tr><td><code>na1</code> (NA)</td><td>2.988</td><td>53.128</td></tr>
+<tr><td><code>euw1</code> (EUW)</td><td>2.950</td><td>51.617</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>19.145</strong></td><td><strong>290.654</strong></td></tr>
 </table>
+<p>Más 1.651 partidas descartadas —remakes, partidas de menos de cinco minutos, colas que no son la
+420— anotadas en <code>bronze/descartadas/</code> para no volver a pedirlas nunca. Ese índice es el
+que más cuota ahorra: el detalle de partida es la respuesta más pesada de la API, y sin él cada
+partida basura se volvería a bajar cada vez que otro jugador semilla la menciona.</p>
 
 <h2 class="parte"><span class="n">Parte VI</span>Guía de ejecución</h2>
 
@@ -1890,31 +1944,56 @@ grupo para acortar el tiempo de recolección.</strong></p>
 
 <h3>4. Cómo llegar a 20.000 filas</h3>
 
-<h4>Los números medidos</h4>
+<h4>Los números medidos <em>(corrida real del 5–6/9/2026)</em></h4>
+
+<p>Estos ya no son estimaciones: salen de la corrida grande, con <strong>7 keys en el pool</strong>
+(6 vivas) y las 6 plataformas en paralelo, medidos sobre 16.908 partidas y 283.522 pedidos a Riot.</p>
+
 <table>
-<tr><th>Medición</th><th>Valor</th></tr>
-<tr><td>Pedidos por partida</td><td>18,5 (1 de partida + ~17 de perfiles)</td></tr>
-<tr><td>Ritmo por plataforma</td><td>~178 partidas/hora con una key</td></tr>
-<tr><td>Ritmo con las 6 plataformas</td><td>~1.070 partidas/hora con una key</td></tr>
+<tr><th>Medición</th><th>Valor medido</th></tr>
+<tr><td>Pedidos por partida</td><td><strong>16,8</strong> promedio (1 de partida + ~16 de perfiles)</td></tr>
+<tr><td>Ritmo agregado, 6 plataformas</td><td><strong>~1.154 partidas/hora</strong></td></tr>
+<tr><td>Tiempo real para ~17.000 partidas</td><td><strong>14 h 39 min</strong></td></tr>
+<tr><td>Capa plata sobre 19.145 partidas</td><td><strong>~13 min</strong> (las 6 plataformas en paralelo)</td></tr>
+<tr><td>DAG completo con el bronce ya en disco</td><td><strong>15 min</strong> de punta a punta</td></tr>
 </table>
 
-<p>Estos números <strong>mejoran a medida que el dataset crece</strong>, porque los perfiles de
-jugadores repetidos salen de la caché en vez de la API.</p>
+<p>El costo por partida <strong>baja a medida que el dataset crece</strong>, porque los perfiles de
+jugadores repetidos salen de la caché en vez de la API. Se ve clarísimo comparando las plataformas que
+llegaron al final con las que se cortaron antes:</p>
 
-<h4>Cuánto tarda según cuántas keys tenga el grupo</h4>
 <table>
-<tr><th>Keys</th><th>Ritmo aprox.</th><th>1.500 partidas</th><th>5.000 partidas</th><th>20.000 partidas</th></tr>
-<tr><td>1</td><td>~1.070 /h</td><td>~1,5 h</td><td>~5 h</td><td><strong>~19 h</strong></td></tr>
-<tr><td>2</td><td>~2.100 /h</td><td>~45 min</td><td>~2,5 h</td><td><strong>~9,5 h</strong></td></tr>
-<tr><td>4</td><td>~4.200 /h</td><td>~25 min</td><td>~1,2 h</td><td><strong>~5 h</strong></td></tr>
-<tr><td>6</td><td>~6.400 /h</td><td>~15 min</td><td>~50 min</td><td><strong>~3 h</strong></td></tr>
+<tr><th>Plataforma</th><th>Partidas</th><th>Pedidos</th><th>Pedidos por partida</th></tr>
+<tr><td>LAN</td><td>3.334</td><td>39.097</td><td><strong>11,7</strong></td></tr>
+<tr><td>BR</td><td>3.334</td><td>48.951</td><td>14,7</td></tr>
+<tr><td>EUW</td><td>2.540</td><td>47.633</td><td>18,8</td></tr>
+<tr><td>LAS</td><td>2.610</td><td>49.293</td><td>18,9</td></tr>
+<tr><td>NA</td><td>2.570</td><td>49.556</td><td>19,3</td></tr>
+<tr><td>KR</td><td>2.520</td><td>48.992</td><td><strong>19,4</strong></td></tr>
 </table>
 
 <div class="aviso">
-  <span class="etiqueta">Con una sola key, 20.000 no entra cómodo en la ventana de 24 horas</span>
-  <p>19 horas de recolección contra una key que vive 24 es demasiado justo: cualquier interrupción
-  arruina el intento. <strong>Con dos keys o más, entra sobrado.</strong> Vale mucho la pena que al menos
-  dos integrantes generen la suya.</p>
+  <span class="etiqueta">Cuidado: agregar keys no acelera proporcionalmente</span>
+  <p>Una versión anterior de este documento proyectaba ~6.400 partidas/hora con 6 keys, extrapolando
+  linealmente desde una. <strong>La corrida real dio 1.154/hora con 7 keys</strong> — cinco veces y media
+  menos. La extrapolación lineal no se cumple y planificar con ella lleva a subestimar mucho el tiempo.</p>
+  <p>La explicación más probable, leyendo el código: el techo no lo pone el cupo de las keys sino la
+  <strong>concurrencia del cliente</strong>. Dentro de cada tarea las partidas se bajan una por una en un
+  bucle secuencial, y sólo los perfiles de cada partida van en paralelo, con
+  <code>ThreadPoolExecutor(max_workers=4)</code>. Sumar keys agranda un cupo que no se está llegando a
+  consumir. Si en algún momento hace falta acelerar de verdad, el cambio que rinde es subir la
+  concurrencia, no juntar más keys.</p>
+  <p><strong>Para planificar:</strong> contar con ~1.150 partidas/hora. 20.000 partidas son unas
+  <strong>17 horas</strong> de reloj, y una development key vive 24. Entra, pero sin margen para
+  imprevistos — de ahí la estrategia por tandas de acá abajo.</p>
+</div>
+
+<div class="aviso">
+  <span class="etiqueta">Desactivar la suspensión de la máquina antes de una corrida larga</span>
+  <p>El 6/9 la máquina hibernó a las 03:19 y mató cuatro tareas que llevaban 14 horas corriendo. El bronce
+  sobrevivió intacto y Airflow relanzó las tareas solo, así que no se perdió nada — pero se perdieron horas
+  de reloj contra una key que vence. Antes de largar una tanda de varias horas, desactivar suspensión e
+  hibernación en la configuración de energía de Windows.</p>
 </div>
 
 <h4>La estrategia recomendada: por tandas</h4>
@@ -2134,14 +2213,19 @@ nulos, cuál es la columna objetivo. Todo eso está en las secciones 2 y 3 que s
 Conviene tenerlo abierto.</p>
 
 <table>
-<tr><th>Criterio</th><th>Qué tiene que dar</th><th>Cómo se verifica</th></tr>
-<tr><td><strong>Clave sin duplicados</strong></td><td><code>True</code></td><td><code>df["match_id"].is_unique</code></td></tr>
-<tr><td><strong>Volumen suficiente</strong></td><td>más de 1.000 filas</td><td><code>len(df)</code></td></tr>
-<tr><td><strong>Ancho suficiente</strong></td><td>5 o más columnas útiles</td><td><code>df.shape</code> → 137</td></tr>
-<tr><td><strong>Mezcla de tipos</strong></td><td>numéricas y categóricas</td><td><code>df.dtypes.value_counts()</code> → 108 enteras, 20 flotantes, 11 de texto</td></tr>
-<tr><td><strong>Nulos conocidos</strong></td><td>saber cuáles y por qué</td><td><code>df.isna().mean().sort_values(ascending=False)</code></td></tr>
-<tr><td><strong>Sin columnas vacías</strong></td><td>ninguna al 100 %</td><td><code>df.columns[df.isna().all()]</code> → vacío</td></tr>
+<tr><th>Criterio</th><th>Qué tiene que dar</th><th>Cómo se verifica</th><th>Resultado del 6/9</th></tr>
+<tr><td><strong>Clave sin duplicados</strong></td><td><code>True</code></td><td><code>df["match_id"].is_unique</code></td><td><strong>True</strong></td></tr>
+<tr><td><strong>Volumen suficiente</strong></td><td>más de 1.000 filas</td><td><code>len(df)</code></td><td><strong>19.145</strong></td></tr>
+<tr><td><strong>Ancho suficiente</strong></td><td>5 o más columnas útiles</td><td><code>df.shape</code></td><td><strong>137</strong></td></tr>
+<tr><td><strong>Mezcla de tipos</strong></td><td>numéricas y categóricas</td><td><code>df.dtypes.value_counts()</code></td><td><strong>106</strong> enteras, <strong>20</strong> flotantes, <strong>11</strong> de texto</td></tr>
+<tr><td><strong>Nulos conocidos</strong></td><td>saber cuáles y por qué</td><td><code>df.isna().mean().sort_values(ascending=False)</code></td><td><strong>ninguno</strong>, en ninguna columna</td></tr>
+<tr><td><strong>Sin columnas vacías</strong></td><td>ninguna al 100 %</td><td><code>df.columns[df.isna().all()]</code></td><td><strong>vacío</strong></td></tr>
 </table>
+
+<p>Y la columna objetivo, que es lo primero que se pregunta después de los seis criterios:
+<code>game_duration_s</code> tiene media <strong>1.748 s</strong> (29 min 8 s), mediana <strong>1.751 s</strong>,
+desvío 424 s y rango de <strong>301 a 3.963 s</strong>. Distribución centrada y sin colas absurdas —el
+mínimo de 301 s es el piso que impone <code>DURACION_MINIMA_S</code> al descartar remakes.</p>
 
 <div class="clave">
   <span class="etiqueta">La clave primaria es el criterio que más pesa</span>
@@ -2209,8 +2293,9 @@ Conviene tenerlo abierto.</p>
   reconstruir una fila —el detalle de la partida, la entrada de ranking de cada jugador y su maestría—
   más el catálogo de campeones. Por eso la capa plata se reconstruye <strong>100 % sin red</strong>.</p>
   <p>La prueba concreta: si mañana descubrimos que veníamos interpretando mal una columna, corregimos
-  <code>transform.py</code> y reprocesamos los 14&nbsp;MB que ya están en disco, <strong>sin gastar un
-  solo pedido a Riot</strong>. Con 20.000 partidas, eso son horas de descarga ahorradas.</p>
+  <code>transform.py</code> y reprocesamos los <strong>1,1&nbsp;GB</strong> que ya están en disco,
+  <strong>sin gastar un solo pedido a Riot</strong>. Son ~13 minutos de reproceso contra las <strong>14 h
+  39 min</strong> que costó bajarlos.</p>
 </div>
 
 <h3>4. La confesión sobre tidy</h3>
@@ -2269,15 +2354,58 @@ el problema que tiene el dataset de la cátedra.</p>
 </div>
 
 <div class="aviso">
-  <span class="etiqueta">3 · El sesgo de muestreo</span>
-  <p>Los jugadores se muestrean recorriendo el ranking, pero de cada partida entran los diez
-  participantes sin importar su rango. La distribución de rangos del dataset <strong>no es</strong> la de
-  la semilla. Como el emparejamiento junta gente de nivel parecido no distorsiona mucho, pero es una
+  <span class="etiqueta">3 · El sesgo de muestreo por tier <em>(medido el 6/9/2026)</em></span>
+  <p>Es la limitación más importante del dataset y la que hay que saber explicar. <strong>Cada
+  plataforma quedó con partidas de un rango casi puro, y cada una de un rango distinto.</strong></p>
+
+  <table>
+  <tr><th>Plataforma</th><th>Rangos dominantes</th><th>Elo medio</th><th>Desvío</th></tr>
+  <tr><td><code>la1</code> (LAN)</td><td>GRANDMASTER 39% · MASTER 23% · DIAMOND 21%</td><td>3.231</td><td>293</td></tr>
+  <tr><td><code>br1</code> (BR)</td><td>DIAMOND 49% · GRANDMASTER 22% · MASTER 14%</td><td>3.036</td><td>262</td></tr>
+  <tr><td><code>euw1</code> (EUW)</td><td>EMERALD 48% · DIAMOND 33%</td><td>2.585</td><td>223</td></tr>
+  <tr><td><code>kr</code> (KR)</td><td>SILVER 29% · BRONZE 26% · <strong>CHALLENGER 25%</strong></td><td>2.254</td><td><strong>1.293</strong></td></tr>
+  <tr><td><code>la2</code> (LAS)</td><td>GOLD 37% · PLATINUM 32%</td><td>2.178</td><td>440</td></tr>
+  <tr><td><code>na1</code> (NA)</td><td>SILVER 33% · BRONZE 29%</td><td>1.627</td><td>342</td></tr>
+  </table>
+
+  <p><strong>Por qué pasa.</strong> <code>iter_puuids</code> mezcla el orden de los tiers justamente para
+  evitar un sesgo, pero el shuffle no alcanza: una página de escalera trae <strong>205 jugadores</strong> y
+  cada uno rinde hasta 15 partidas, así que <strong>una sola combinación tier/división da unas 3.000
+  partidas</strong> — la cuota entera de la corrida. La corrida corta antes de llegar al segundo tier y el
+  orden mezclado nunca se recorre. Los logs lo muestran directo: la corrida de KR del 5/9 entró por
+  <code>BRONZE I</code> y <code>BRONZE II</code> y no tocó nada más; al reintentarse tras la hibernación
+  entró por <code>CHALLENGER I</code>. Por eso KR es la única plataforma bimodal, y por eso su desvío
+  (1.293) triplica al de las demás.</p>
+
+  <p><strong>Qué implica.</strong> Dos cosas concretas, y conviene decirlas antes de que las pregunten:</p>
+  <ul>
+    <li><strong>El poder predictivo del elo está subestimado.</strong> Dentro de cada plataforma casi no
+    varía, así que el modelo tiene poco de dónde aprender. La correlación elo↔duración es <code>−0,16</code>
+    global, pero <code>−0,25</code> en KR —la única con rango amplio— y apenas <code>−0,01</code> en NA1,
+    donde todos los jugadores tienen prácticamente el mismo rango. La señal aparece donde hay variación y
+    desaparece donde no la hay: es la firma del sesgo, no una propiedad del juego.</li>
+    <li><strong>Plataforma y elo están confundidos.</strong> En NA las partidas duran en promedio 1.826 s y
+    en BR 1.687 s, pero eso <em>no</em> es un efecto de la región: es que NA quedó lleno de plata/bronce y BR
+    de diamante. Atribuirlo al servidor sería una conclusión falsa, y es justo el error que la materia
+    señala como «el modelo aprende el sesgo de recolección en vez de la señal».</li>
+  </ul>
+
+  <p><strong>Cómo se arregla</strong> (fuera del alcance de la Entrega 1): rotar de tier cada N jugadores
+  dentro de la corrida, en vez de confiar en que el shuffle del orden alcance. El bronce ya bajado se
+  conserva, así que sumar tiers faltantes no obliga a rehacer nada.</p>
+</div>
+
+<div class="aviso">
+  <span class="etiqueta">4 · La semilla no es la muestra</span>
+  <p>Aparte de lo anterior: los jugadores se muestrean recorriendo el ranking, pero de cada partida entran
+  los diez participantes sin importar su rango. La distribución de rangos del dataset <strong>no es</strong>
+  la de la semilla. Como el emparejamiento junta gente de nivel parecido no distorsiona mucho —de hecho es
+  lo que hace que el sesgo del punto 3 se propague de la semilla a la partida entera—, pero es una
   diferencia real entre cómo elegimos y qué terminamos midiendo.</p>
 </div>
 
 <div class="aviso">
-  <span class="etiqueta">4 · El umbral de <code>is_main</code></span>
+  <span class="etiqueta">5 · El umbral de <code>is_main</code></span>
   <p>50.000 puntos de maestría es un corte elegido por el grupo, sin análisis de sensibilidad.
   <code>champ_mastery_pts</code> está igual en el dataset, así que en la Unidad 3 se puede dejar que el
   modelo encuentre el corte en vez de imponerlo.</p>
@@ -2338,9 +2466,41 @@ las partes indicadas. Todos deberían poder responder las cinco preguntas de la 
   <span class="q">¿Por qué eligieron Airflow y no un script de Python?</span>
   <p>Porque la corrida dura horas y necesita sobrevivir a interrupciones. Airflow nos da reintentos por
   tarea, logs separados, paralelismo entre las seis plataformas, estado visible y la posibilidad de
-  retomar sin repetir lo hecho. Cuando cancelamos una corrida a mitad de camino, las 204 partidas ya
-  descargadas quedaron intactas y la siguiente las reutilizó. Con un script monolítico habría que
-  empezar de cero.</p>
+  retomar sin repetir lo hecho. Con un script monolítico habría que empezar de cero.</p>
+  <p><strong>Y lo probamos sin querer.</strong> El 6/9 a las 03:19 la máquina entró en hibernación con
+  cuatro tareas <code>land_bronze</code> a mitad de camino (entre 2.520 y 2.610 partidas de 3.334 cada
+  una). Los procesos murieron en seco —los logs se cortan sin traceback—. <strong>No se perdió un solo
+  archivo del bronce.</strong> A las 07:16 el scheduler detectó las tareas huérfanas y las relanzó solo,
+  sin que nadie tocara nada. El dataset se generó igual ese mismo día. Es la mejor defensa de la
+  arquitectura: el estado vive en disco, no en memoria ni en XCom.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Qué pasa si corren el DAG de nuevo? ¿Vuelve a bajar todo?</span>
+  <p>No. <code>land_bronze</code> chequea <code>destino.exists()</code> antes de cada pedido: una partida
+  que ya está en disco <strong>no se vuelve a pedir jamás</strong>, ni en esa corrida ni en las que vengan.
+  Y <code>refine_silver</code> reprocesa <em>todo</em> el bronce con un <code>glob</code>, no sólo lo que
+  bajó esa corrida, así que el dataset se reconstruye entero sobre el acumulado.</p>
+  <p><strong>La precisión que hay que hacer</strong>, porque es fácil decirlo mal: una corrida nueva
+  <em>no completa</em> la anterior, la <em>amplía</em>. Como cada corrida entra a la escalera por un tier
+  distinto (ver limitación 3 en 7.5), en la práctica casi no reencuentra las partidas viejas: sale a
+  buscar jugadores nuevos y baja partidas nuevas. En el reintento del 6/9 el contador marcó
+  <code>0 reusadas</code> con 3.000 partidas de esa misma plataforma ya en disco. No es un fallo del
+  chequeo —es que las partidas viejas nunca vuelven a mencionarse—, pero significa que la cuota de una
+  corrida se mide sobre lo que <em>esa</em> corrida junta, no sobre el total acumulado.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿La muestra es representativa? ¿Cómo eligieron las partidas?</span>
+  <p><strong>No es representativa, y lo sabemos medido.</strong> Riot no publica un listado de partidas:
+  publica un ranking de jugadores. Así que el camino es escalera → jugador semilla → sus últimas 15
+  partidas. El problema es que una página de escalera trae 205 jugadores y eso alcanza para llenar la
+  cuota entera de una corrida, así que cada plataforma quedó con partidas de un rango casi puro: NA1 con
+  33% SILVER y 29% BRONZE, LA1 con 39% GRANDMASTER. El elo medio va de 1.627 a 3.231 según el servidor.</p>
+  <p>Está desarrollado con la tabla completa, la causa y las dos consecuencias en la limitación 3 de la
+  sección 5. La respuesta corta para la defensa: <em>«el dataset es una muestra de conveniencia sesgada
+  por tier; lo medimos, lo declaramos, y sabemos cómo se corrige —rotando de tier dentro de la corrida en
+  vez de confiar en el shuffle del orden»</em>.</p>
 </div>
 
 <div class="pregunta">
@@ -2355,7 +2515,8 @@ las partes indicadas. Todos deberían poder responder las cinco preguntas de la 
   <span class="q">¿Por qué seis tareas de descarga en vez de una?</span>
   <p>Porque Riot aplica los límites <strong>por región</strong>: cada plataforma tiene su propio cupo.
   Seis tareas en paralelo multiplican por seis la velocidad en los endpoints de perfil y maestría,
-  que son el cuello de botella real: medimos 18,5 pedidos por partida, de los cuales ~17 son perfiles.</p>
+  que son el cuello de botella real: medimos <strong>16,8 pedidos por partida</strong> sobre 16.908
+  partidas, de los cuales ~16 son perfiles.</p>
 </div>
 
 <div class="pregunta">
@@ -2510,13 +2671,22 @@ las partes indicadas. Todos deberían poder responder las cinco preguntas de la 
 <h3>Lo que falta para cerrar la Entrega 1</h3>
 <table>
 <tr><th></th><th>Tarea</th><th>Quién</th></tr>
-<tr><td>1</td><td>Que al menos dos integrantes generen su API key de Riot y las peguen separadas por coma.</td><td>El grupo</td></tr>
-<tr><td>2</td><td>Correr las tandas de recolección hasta llegar a 20.000 partidas (parte VI.4).</td><td>Quien opera</td></tr>
-<tr><td>3</td><td>Verificar el reporte de calidad y que el CSV supere las 1.000 filas.</td><td>Quien opera</td></tr>
-<tr><td>4</td><td>Que todo el grupo lea este documento y repase la parte VII.</td><td>Todos</td></tr>
+<tr><td><s>1</s></td><td><s>Que al menos dos integrantes generen su API key de Riot.</s> <strong>Hecho:</strong> hay 7 keys en el pool.</td><td>El grupo</td></tr>
+<tr><td><s>2</s></td><td><s>Correr las tandas de recolección.</s> <strong>Hecho el 6/9:</strong> 19.145 partidas en bronce.</td><td>Quien opera</td></tr>
+<tr><td><s>3</s></td><td><s>Verificar el reporte de calidad y que el CSV supere las 1.000 filas.</s> <strong>Hecho:</strong> 19.145 filas × 137 columnas, clave única, cero nulos.</td><td>Quien opera</td></tr>
+<tr><td>4</td><td>Que todo el grupo lea este documento y repase la parte VII. <strong>Prestar atención a la limitación 3 (sesgo por tier)</strong>: es lo más probable que pregunten y lo que peor queda si nadie sabe responderlo.</td><td>Todos</td></tr>
 <tr><td>5</td><td>Completar los nombres en la tabla de reparto (VII.6) y hacer un simulacro.</td><td>El grupo</td></tr>
-<tr><td>6</td><td>Regenerar la key el mismo día de la entrega y verificar que Airflow levanta.</td><td>Quien lleva la notebook</td></tr>
+<tr><td>6</td><td>Regenerar la key el mismo día de la entrega y verificar que Airflow levanta. <strong>No hace falta volver a recolectar</strong>: el bronce está en disco y una corrida con <code>partidas_objetivo</code> bajo regenera el CSV entero en ~15 minutos.</td><td>Quien lleva la notebook</td></tr>
 </table>
+
+<div class="clave">
+  <span class="etiqueta">El entregable ya existe</span>
+  <p>El dataset está en <code>include/output/lol_2026-09-06.csv</code> y el reporte en
+  <code>include/output/reports/calidad.md</code>. Lo que queda es de preparación de la defensa, no de
+  pipeline. Si el día de la entrega hay que mostrar una corrida en vivo, conviene disparar una con
+  <code>partidas_objetivo</code> chico: termina en minutos y produce el mismo CSV completo, porque
+  <code>refine_silver</code> reprocesa todo el bronce acumulado.</p>
+</div>
 
 <h3>Hacia dónde sigue el proyecto</h3>
 
@@ -2528,7 +2698,7 @@ tienen su lugar natural en las entregas siguientes:</p>
 <tr>
   <td><strong>2 · Exploración</strong><br>16/09</td>
   <td>Explorar el dataset, formular hipótesis y encontrar hallazgos.</td>
-  <td>Evaluar si conviene una columna <code>es_unranked</code> explícita. Ver qué proporción de filas tiene <code>roles_inferidos &gt; 0</code>. Analizar la distribución de la duración y buscar qué variables se le correlacionan.</td>
+  <td>Evaluar si conviene una columna <code>es_unranked</code> explícita. Ver qué proporción de filas tiene <code>roles_inferidos &gt; 0</code> (son 17 de 19.145). Analizar la distribución de la duración y buscar qué variables se le correlacionan. <strong>Y cuantificar el sesgo por tier de la limitación 3</strong>: es el primer hallazgo exploratorio que ya tenemos medido y el que más condiciona todo lo que venga después.</td>
 </tr>
 <tr>
   <td><strong>3 · Modelado</strong><br>14/10</td>

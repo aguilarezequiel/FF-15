@@ -80,6 +80,15 @@ class RiotKeysExhausted(RuntimeError):
     """
 
 
+class _KeyDueñaInvalida(Exception):
+    """Señal interna: la key dueña de un puuid ya no sirve.
+
+    No se propaga fuera de `_request`: significa "saltear este pedido",
+    no "se acabaron las keys", porque las otras keys del pool siguen
+    perfectamente vivas para todo lo demás.
+    """
+
+
 class RiotClient:
     """Cliente con pool de keys y limitador por (key, host).
 
@@ -122,24 +131,33 @@ class RiotClient:
     def _host_de(url: str) -> str:
         return urlparse(url).netloc
 
-    def _tomar_turno(self, host: str) -> str:
+    def _tomar_turno(self, host: str, key: str | None = None) -> str:
         """Devuelve una key con cupo para `host`, esperando si hace falta.
 
         No castiga a una key en un host donde sí tiene cupo sólo porque
         está en cooldown en otro: los baldes son independientes.
+
+        Si `key` viene dada, no rota: espera cupo en ESA key puntual. Es
+        el caso de un pedido sobre un `puuid`, que sólo se puede resolver
+        con la key que lo emitió (ver `_KeyDueñaInvalida` más abajo).
         """
         while True:
             ahora = time.time()
             esperas = []
 
             with self._lock:
-                candidatas = [k for k in self.keys if k not in self._invalidas]
-                if not candidatas:
-                    raise RiotKeysExhausted(
-                        "Todas las API keys del pool están vencidas o son "
-                        "inválidas. Las development keys duran 24 hs: "
-                        "regenerala en https://developer.riotgames.com y "
-                        "actualizá la Connection `riot_api`.")
+                if key is not None:
+                    if key in self._invalidas:
+                        raise _KeyDueñaInvalida(key)
+                    candidatas = [key]
+                else:
+                    candidatas = [k for k in self.keys if k not in self._invalidas]
+                    if not candidatas:
+                        raise RiotKeysExhausted(
+                            "Todas las API keys del pool están vencidas o son "
+                            "inválidas. Las development keys duran 24 hs: "
+                            "regenerala en https://developer.riotgames.com y "
+                            "actualizá la Connection `riot_api`.")
 
                 for _ in range(len(candidatas)):
                     self._idx = (self._idx + 1) % len(candidatas)
@@ -179,10 +197,32 @@ class RiotClient:
     # ------------------------------------------------------------- request
 
     def _request(self, url: str, params: dict | None = None,
-                 max_retries: int = 10):
+                 max_retries: int = 10, owner_key: str | None = None
+                 ) -> tuple[dict | list | None, str | None]:
+        """Hace el GET y devuelve `(datos, key_que_respondió)`.
+
+        Devolver la key usada es lo que le permite a quien llama (sobre
+        todo `league_entries` y `match`) marcar de quién es un `puuid`:
+        Riot lo devuelve encriptado *para esa key puntual*, y pedir algo
+        con él usando otra key distinta da `400 Bad Request - Exception
+        decrypting`, no un error que sugiera la causa real. Ver
+        `owner_key` acá abajo y en los endpoints que lo reciben.
+
+        Si `owner_key` viene dada, el pedido no rota de key: sólo esa
+        key puede leer ese `puuid`. Si esa key vale venció, no hay
+        fallback posible — se salta el pedido en vez de gastar
+        reintentos contra una key que nunca va a servir para esto.
+        """
         host = self._host_de(url)
         for intento in range(max_retries):
-            key = self._tomar_turno(host)
+            try:
+                key = self._tomar_turno(host, key=owner_key)
+            except _KeyDueñaInvalida:
+                log.warning("Key ...%s (dueña de este puuid) venció o es "
+                            "inválida; no hay otra key que pueda leerlo. "
+                            "Se salta %s.", owner_key[-6:], host)
+                return None, None
+
             try:
                 r = requests.get(url, headers={"X-Riot-Token": key},
                                  params=params, timeout=self.timeout)
@@ -196,7 +236,7 @@ class RiotClient:
                 self.pedidas += 1
 
             if r.status_code == 200:
-                return r.json()
+                return r.json(), key
 
             if r.status_code == 429:
                 espera = int(r.headers.get("Retry-After", 5))
@@ -215,14 +255,14 @@ class RiotClient:
                 continue
 
             if r.status_code == 404:
-                return None
+                return None, key
 
             log.warning("HTTP %s en %s. Reintento %s.",
                         r.status_code, host, intento + 1)
             time.sleep(0.5 * (intento + 1))
 
         log.warning("Se agotaron los reintentos para %s", url)
-        return None
+        return None, None
 
     # ----------------------------------------------------------- endpoints
 
@@ -234,46 +274,69 @@ class RiotClient:
         """
         url = (f"https://{platform}.api.riotgames.com/lol/league/v4/"
                f"challengerleagues/by-queue/RANKED_SOLO_5x5")
-        return self._request(url) is not None
+        data, _ = self._request(url)
+        return data is not None
 
-    def league_entries(self, platform: str, tier: str,
-                       division: str = "I", page: int = 1) -> list[dict]:
+    def league_entries(self, platform: str, tier: str, division: str = "I",
+                       page: int = 1) -> tuple[list[dict], str | None]:
         """Escalera de la cola solo/duo. Es la semilla de jugadores.
 
         Los tiers apex usan otro endpoint, que devuelve la liga completa y
         no pagina. Devolver [] cuando se pide page > 1 evita re-recorrer
         la misma lista de challengers una y otra vez.
+
+        Devuelve también la key que respondió: cada `puuid` de la lista
+        viene encriptado para ESA key puntual, y hay que reusarla en todo
+        pedido posterior sobre ese jugador (`match_ids`, `league_by_puuid`,
+        `mastery`) — con otra key, Riot tira `400 Bad Request - Exception
+        decrypting`. Ver `_request`.
         """
         tier = tier.upper()
         if tier in APEX_TIERS:
             if page > 1:
-                return []
+                return [], None
             url = (f"https://{platform}.api.riotgames.com/lol/league/v4/"
                    f"{tier.lower()}leagues/by-queue/RANKED_SOLO_5x5")
-            data = self._request(url)
-            return data.get("entries", []) if data else []
+            data, key = self._request(url)
+            return (data.get("entries", []) if data else []), key
 
         url = (f"https://{platform}.api.riotgames.com/lol/league/v4/entries/"
                f"RANKED_SOLO_5x5/{tier}/{division}")
-        data = self._request(url, params={"page": page})
-        return data if isinstance(data, list) else []
+        data, key = self._request(url, params={"page": page})
+        return (data if isinstance(data, list) else []), key
 
     def match_ids(self, region: str, puuid: str, count: int = 15,
-                  start: int = 0) -> list[str]:
-        """Ids de las últimas partidas clasificatorias del jugador."""
+                  start: int = 0, owner_key: str | None = None) -> list[str]:
+        """Ids de las últimas partidas clasificatorias del jugador.
+
+        `owner_key` es la key que emitió este `puuid` (la de
+        `league_entries` o la de `match`, según de dónde haya salido). Sin
+        ella el pool rotaría de key y Riot rechazaría el pedido: ver
+        `_request`.
+        """
         url = (f"https://{region}.api.riotgames.com/lol/match/v5/matches/"
                f"by-puuid/{puuid}/ids")
         params = {"count": count, "start": start,
                   "queue": QUEUE_SOLO_DUO, "type": "ranked"}
-        return self._request(url, params=params) or []
+        data, _ = self._request(url, params=params, owner_key=owner_key)
+        return data or []
 
-    def match(self, region: str, match_id: str) -> dict | None:
-        """Detalle completo de una partida. Es la respuesta más pesada."""
+    def match(self, region: str, match_id: str
+              ) -> tuple[dict | None, str | None]:
+        """Detalle completo de una partida. Es la respuesta más pesada.
+
+        Devuelve también la key que respondió: los `puuid` de los 10
+        participantes vienen embebidos en esta respuesta, encriptados
+        para ESA key, no para la que se usó para llegar al `match_id`
+        (que no necesita key dueña porque no es un dato encriptado). Hay
+        que reusarla para `league_by_puuid`/`mastery` de esos jugadores.
+        """
         url = (f"https://{region}.api.riotgames.com/lol/match/v5/matches/"
                f"{match_id}")
         return self._request(url)
 
-    def league_by_puuid(self, platform: str, puuid: str) -> dict | None:
+    def league_by_puuid(self, platform: str, puuid: str,
+                        owner_key: str | None = None) -> dict | None:
         """Entradas de liga del jugador, crudas. Cacheado por puuid."""
         clave = f"{platform}:{puuid}"
         with self._lock:
@@ -281,13 +344,13 @@ class RiotClient:
                 return self._cache_liga[clave]
         url = (f"https://{platform}.api.riotgames.com/lol/league/v4/entries/"
                f"by-puuid/{puuid}")
-        data = self._request(url)
+        data, _ = self._request(url, owner_key=owner_key)
         with self._lock:
             self._cache_liga[clave] = data
         return data
 
-    def mastery(self, platform: str, puuid: str,
-                champion_id: int) -> dict | None:
+    def mastery(self, platform: str, puuid: str, champion_id: int,
+                owner_key: str | None = None) -> dict | None:
         """Maestría del jugador con ese campeón, cruda. Cacheado."""
         clave = f"{platform}:{puuid}:{champion_id}"
         with self._lock:
@@ -296,7 +359,7 @@ class RiotClient:
         url = (f"https://{platform}.api.riotgames.com/lol/champion-mastery/"
                f"v4/champion-masteries/by-puuid/{puuid}/by-champion/"
                f"{champion_id}")
-        data = self._request(url)
+        data, _ = self._request(url, owner_key=owner_key)
         with self._lock:
             self._cache_maestria[clave] = data
         return data

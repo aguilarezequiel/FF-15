@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FF-15 · Informe: el sesgo de muestreo por tier</title>
+<style>
+@page { size: A4; margin: 20mm 18mm 18mm 18mm; }
+:root{
+  --tinta:#16191d; --suave:#4a5158; --linea:#d8dde2; --fondo:#f6f8fa;
+  --acento:#0b5fa5; --alerta:#a3341f;
+}
+*{box-sizing:border-box}
+body{font-family:"Charter","Georgia","Times New Roman",serif;color:var(--tinta);
+  font-size:10.5pt; line-height:1.55; margin:0;}
+h1,h2,h3,h4{font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;line-height:1.25;
+  color:var(--tinta); page-break-after:avoid;}
+h1{font-size:23pt;margin:0 0 6pt;letter-spacing:-.4pt}
+h2{font-size:16pt;margin:22pt 0 8pt;padding-bottom:4pt;border-bottom:2px solid var(--acento)}
+h3{font-size:12.5pt;margin:16pt 0 5pt;color:var(--acento)}
+h4{font-size:10.5pt;margin:12pt 0 4pt;text-transform:uppercase;letter-spacing:.6pt;color:var(--suave)}
+p{margin:0 0 8pt;text-align:justify}
+ul,ol{margin:0 0 9pt;padding-left:18pt}
+li{margin-bottom:4pt}
+code{font-family:"Cascadia Mono","Consolas","DejaVu Sans Mono",monospace;font-size:9pt;
+  background:var(--fondo);padding:1px 3px;border-radius:3px;border:1px solid var(--linea)}
+pre{font-family:"Cascadia Mono","Consolas","DejaVu Sans Mono",monospace;font-size:8.2pt;
+  line-height:1.45;background:var(--fondo);border:1px solid var(--linea);border-left:3px solid var(--acento);
+  padding:8pt 10pt;white-space:pre-wrap;word-wrap:break-word;
+  border-radius:3px;margin:0 0 10pt;page-break-inside:avoid}
+pre code{background:none;border:none;padding:0;font-size:inherit}
+table{width:100%;border-collapse:collapse;margin:0 0 11pt;font-size:9.2pt;page-break-inside:avoid}
+th{background:var(--fondo);text-align:left;font-family:"Segoe UI",Arial,sans-serif;
+  font-size:8.8pt;text-transform:uppercase;letter-spacing:.4pt;color:var(--suave);
+  padding:5pt 6pt;border-bottom:1.5px solid var(--acento)}
+td{padding:5pt 6pt;border-bottom:1px solid var(--linea);vertical-align:top}
+tr:last-child td{border-bottom:none}
+.portada{height:245mm;display:flex;flex-direction:column;justify-content:center;
+  page-break-after:always;text-align:center}
+.portada .materia{font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;letter-spacing:2.5pt;
+  text-transform:uppercase;color:var(--suave);margin-bottom:14pt}
+.portada h1{font-size:30pt;margin-bottom:10pt}
+.portada .sub{font-size:13pt;color:var(--suave);font-style:italic;margin-bottom:26pt;
+  max-width:135mm;margin-left:auto;margin-right:auto;text-align:center}
+.portada .meta{font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;color:var(--suave);line-height:1.9}
+.parte{page-break-before:always;border-top:4px solid var(--acento);padding-top:10pt;margin-top:0}
+.parte .n{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;letter-spacing:2pt;
+  text-transform:uppercase;color:var(--acento);display:block;margin-bottom:2pt}
+.nota,.aviso,.clave{padding:8pt 11pt;margin:0 0 11pt;border-radius:4px;font-size:9.6pt;page-break-inside:avoid}
+.nota{background:#eef4fa;border-left:3px solid var(--acento)}
+.aviso{background:#fdf2ee;border-left:3px solid var(--alerta)}
+.clave{background:#f2f7ee;border-left:3px solid #4a7c2f}
+.nota p:last-child,.aviso p:last-child,.clave p:last-child{margin-bottom:0}
+.etiqueta{font-family:"Segoe UI",Arial,sans-serif;font-size:8.5pt;font-weight:600;
+  text-transform:uppercase;letter-spacing:.7pt;display:block;margin-bottom:3pt}
+.nota .etiqueta{color:var(--acento)} .aviso .etiqueta{color:var(--alerta)} .clave .etiqueta{color:#4a7c2f}
+.toc{font-family:"Segoe UI",Arial,sans-serif;font-size:9.5pt}
+.toc ol{list-style:none;padding-left:0}
+.toc>ol>li{margin:9pt 0 3pt;font-weight:600;border-bottom:1px solid var(--linea);padding-bottom:3pt}
+.toc ol ol{padding-left:14pt;margin-top:3pt}
+.toc ol ol li{font-weight:400;margin:2pt 0;color:var(--suave)}
+.grafo{font-family:"Cascadia Mono","Consolas",monospace;font-size:8pt;line-height:1.5;
+  background:#fff;border:1.5px solid var(--acento);padding:10pt;border-radius:4px;
+  margin-bottom:11pt;white-space:pre-wrap}
+.pregunta{background:var(--fondo);border:1px solid var(--linea);border-radius:4px;
+  padding:9pt 11pt;margin:0 0 11pt;page-break-inside:avoid}
+.pregunta .q{font-family:"Segoe UI",Arial,sans-serif;font-weight:600;font-size:10pt;
+  color:var(--acento);margin-bottom:5pt;display:block}
+.pregunta p:last-child{margin-bottom:0}
+.ok{color:#2d6a1f;font-weight:600} .no{color:var(--alerta);font-weight:600}
+.pie{margin-top:20pt;padding-top:8pt;border-top:1px solid var(--linea);
+  font-size:8.5pt;color:var(--suave);font-family:"Segoe UI",Arial,sans-serif}
+.opcion{border:1.5px solid var(--linea);border-radius:5px;padding:10pt 12pt;margin:0 0 12pt;
+  page-break-inside:avoid}
+.opcion h4{margin-top:0;color:var(--acento);font-size:11pt;text-transform:none;letter-spacing:0}
+.opcion .veredicto{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;font-weight:600;
+  display:inline-block;padding:2pt 7pt;border-radius:10px;margin-bottom:6pt}
+.v-si{background:#e6f2e0;color:#2d6a1f} .v-no{background:#fbe9e3;color:var(--alerta)}
+.v-quiza{background:#fdf3e0;color:#8a5a10}
+.barra{font-family:"Cascadia Mono","Consolas",monospace;font-size:8.5pt;white-space:pre}
+</style>
+</head>
+<body>
+
+<div class="portada">
+  <div class="materia">UTN FRM · Ingeniería en Sistemas de Información · Ciencia de Datos 2026</div>
+  <h1>El sesgo de muestreo por tier</h1>
+  <div class="sub">Qué encontramos en el dataset, si afecta al análisis que queremos hacer,
+  y qué opciones tenemos para decidir</div>
+  <div class="meta">
+    Proyecto Integrador · Comisión 5K09 · Grupo 5K09-02<br>
+    Informe complementario a <code>documentacion-proyecto.pdf</code><br>
+    6 de septiembre de 2026<br>
+    Medido sobre <strong>lol_2026-09-06.csv</strong> — 19.145 filas × 137 columnas
+  </div>
+</div>
+
+<h2>Resumen en 30 segundos</h2>
+
+<div class="clave">
+  <span class="etiqueta">Lo que hay que saber si no se lee nada más</span>
+  <p><strong>1. Encontramos un problema:</strong> las partidas de cada servidor salieron casi todas de
+  jugadores del mismo nivel. NA quedó lleno de plata/bronce, LAN de grandmaster. No fue a propósito.</p>
+  <p><strong>2. La buena noticia:</strong> el análisis que teníamos pensado —ver si el elo predice la
+  duración— <strong>sigue siendo válido</strong>. Lo verificamos: el efecto del elo no desaparece cuando
+  se quita el efecto del servidor.</p>
+  <p><strong>3. El costo real:</strong> el sesgo hace que el elo parezca predecir <em>menos</em> de lo que
+  probablemente predice. Nos juega en contra, no a favor. No infla resultados.</p>
+  <p><strong>4. Lo que hay que decidir:</strong> si dejamos el dataset como está declarando el sesgo
+  (barato, defendible), si agregamos una columna para poder controlarlo (una línea de código), o si
+  volvemos a recolectar para emparejar la muestra (caro, y quedan tres días).</p>
+</div>
+
+<div class="toc">
+<h2>Contenido</h2>
+<ol>
+  <li>Parte I · Qué encontramos
+    <ol>
+      <li>Cómo se consigue una partida</li>
+      <li>Dónde se rompe</li>
+      <li>La evidencia en los datos</li>
+      <li>Por qué KR es la prueba</li>
+    </ol>
+  </li>
+  <li>Parte II · ¿Arruina nuestro análisis?
+    <ol>
+      <li>La pregunta correcta</li>
+      <li>La prueba: sacar el servidor del medio</li>
+      <li>Los dos matices</li>
+      <li>Lo que el sesgo sí nos cuesta</li>
+    </ol>
+  </li>
+  <li>Parte III · Las opciones
+    <ol>
+      <li>Opción A · Declararlo y seguir</li>
+      <li>Opción B · Agregar la columna de plataforma</li>
+      <li>Opción C · Rebalancear la muestra</li>
+      <li>Recomendación</li>
+    </ol>
+  </li>
+  <li>Anexo · Los números crudos</li>
+</ol>
+</div>
+
+<h2 class="parte"><span class="n">Parte I</span>Qué encontramos</h2>
+
+<h3>1. Cómo se consigue una partida</h3>
+
+<p>Para entender el problema hay que entender primero cómo llegamos a los datos, porque el problema
+está justamente ahí.</p>
+
+<p><strong>Riot no permite pedir partidas.</strong> No existe un endpoint que diga «dame 20.000 partidas
+recientes». Lo único que Riot publica es un <strong>ranking de jugadores</strong>, ordenado por nivel:
+hierro, bronce, plata, oro, platino, esmeralda, diamante, master, grandmaster y challenger.</p>
+
+<p>Entonces el único camino posible es este:</p>
+
+<div class="grafo">elegir un NIVEL de la escalera  (bronce, oro, diamante…)
+        │
+        ▼
+obtener los JUGADORES de ese nivel   ← 205 por página
+        │
+        ▼
+a cada jugador, pedirle SUS ÚLTIMAS PARTIDAS   ← 15 por jugador
+        │
+        ▼
+bajar el detalle de cada partida    → BRONCE</div>
+
+<p>Nuestro código elige el nivel de arranque <strong>al azar</strong>, y lo hace a propósito. La idea era
+buena: si arrancáramos siempre por hierro, toda corrida que se cortara antes de terminar nos dejaría un
+dataset de puros jugadores malos. Mezclando el orden, en teoría cada corrida toca niveles distintos y la
+muestra queda pareja.</p>
+
+<h3>2. Dónde se rompe</h3>
+
+<p>La cuenta que nadie hizo:</p>
+
+<div class="aviso">
+  <span class="etiqueta">El número que rompe todo</span>
+  <p>Cada nivel tiene <strong>205 jugadores</strong> disponibles por página, y a cada jugador le pedimos
+  <strong>15 partidas</strong>.</p>
+  <p style="text-align:center;font-size:12pt;margin:10pt 0">
+  <strong>205 × 15 ≈ 3.000 partidas de un solo nivel</strong></p>
+  <p>Y la cuota de nuestra corrida era de <strong>3.334 partidas por servidor</strong>. Prácticamente lo
+  mismo.</p>
+</div>
+
+<p>El resultado es que <strong>la corrida llena su cupo dentro del primer nivel que le tocó, y termina
+antes de pasar al segundo</strong>. El orden mezclado que tanto nos preocupaba nunca llega a recorrerse:
+se mezcla una lista que se abandona después del primer elemento.</p>
+
+<p>Una analogía: es como querer encuestar a todo el país, agarrar un barrio al azar, y descubrir que con
+ese solo barrio ya completaste el cupo de encuestas. Que el barrio sea distinto cada vez no arregla nada
+— seguís teniendo un solo barrio por encuesta.</p>
+
+<div class="nota">
+  <span class="etiqueta">La conclusión precisa</span>
+  <p>Mezclar el orden <strong>no elimina el sesgo: lo vuelve aleatorio en vez de predecible</strong>.
+  Antes sabíamos que íbamos a tener puro bronce. Ahora no sabemos qué vamos a tener, pero seguimos
+  teniendo un solo nivel por servidor. En algunos sentidos es peor, porque es más difícil de notar.</p>
+</div>
+
+<h3>3. La evidencia en los datos</h3>
+
+<p>Esto no es teoría. Así quedó repartido el nivel de los jugadores en las 19.145 filas del dataset:</p>
+
+<table>
+<tr><th>Servidor</th><th>Partidas</th><th>Niveles dominantes</th><th>Elo medio</th></tr>
+<tr><td><code>la1</code> (LAN)</td><td>3.355</td><td>GRANDMASTER 39% · MASTER 23% · DIAMOND 21%</td><td>3.231</td></tr>
+<tr><td><code>br1</code> (BR)</td><td>3.356</td><td>DIAMOND 49% · GRANDMASTER 22% · MASTER 14%</td><td>3.036</td></tr>
+<tr><td><code>euw1</code> (EUW)</td><td>2.950</td><td>EMERALD 48% · DIAMOND 33%</td><td>2.585</td></tr>
+<tr><td><code>kr</code> (KR)</td><td>3.430</td><td>SILVER 29% · BRONZE 26% · <strong>CHALLENGER 25%</strong></td><td>2.254</td></tr>
+<tr><td><code>la2</code> (LAS)</td><td>3.066</td><td>GOLD 37% · PLATINUM 32%</td><td>2.178</td></tr>
+<tr><td><code>na1</code> (NA)</td><td>2.988</td><td>SILVER 33% · BRONZE 29%</td><td>1.627</td></tr>
+</table>
+
+<p>El elo medio va de <strong>1.627 en NA a 3.231 en LAN</strong>: el doble. Eso no refleja ninguna
+diferencia real entre servidores — refleja en qué escalón de la escalera arrancó cada corrida.</p>
+
+<p>Y no es que dentro de cada servidor haya variedad. Mirando dónde cae el 80% central de las partidas:</p>
+
+<div class="barra">  LAN    ████                    elo 2931 → 3590     franja de   660
+  BR     ████                    elo 2771 → 3306     franja de   535
+  EUW    ███                     elo 2326 → 2828     franja de   502
+  NA     ██████                  elo 1321 → 2200     franja de   879
+  LAS    █████████               elo 1847 → 3113     franja de 1266
+  KR     ██████████████████████  elo 1316 → 4496     franja de 3180</div>
+
+<p>Cinco de los seis servidores tienen a casi todas sus partidas apretadas en una franja angosta de
+nivel. Sólo KR está bien repartido — y por una razón muy puntual.</p>
+
+<h3>4. Por qué KR es la prueba</h3>
+
+<p>KR es el único servidor que quedó con jugadores de todos los niveles mezclados, y eso <strong>confirma
+el mecanismo</strong> en vez de contradecirlo.</p>
+
+<p>Los registros de la corrida muestran exactamente por dónde entró cada tarea a la escalera:</p>
+
+<table>
+<tr><th>Servidor</th><th>Primer intento (5/9)</th><th>Segundo intento, tras la hibernación (6/9)</th></tr>
+<tr><td>KR</td><td><code>BRONZE I</code>, <code>BRONZE II</code></td><td><code>CHALLENGER I</code></td></tr>
+<tr><td>NA</td><td><code>BRONZE I</code>, <code>BRONZE II</code></td><td><code>PLATINUM I</code></td></tr>
+<tr><td>EUW</td><td><code>EMERALD I</code></td><td><code>PLATINUM I</code></td></tr>
+<tr><td>LAS</td><td><code>GOLD I</code></td><td><code>MASTER I</code></td></tr>
+</table>
+
+<p>Una o dos páginas de escalera por intento. Nada más. Y KR tuvo la casualidad de entrar por
+<strong>los dos extremos opuestos</strong>: bronce la primera vez, challenger la segunda. Los dos
+intentos quedaron acumulados en el mismo servidor, y por eso es el único con dos «jorobas».</p>
+
+<div class="clave">
+  <span class="etiqueta">Un accidente que resultó útil</span>
+  <p>KR terminó siendo, sin querer, la única muestra bien repartida que tenemos. Como se verá en la
+  Parte II, es el servidor donde mejor se puede medir el efecto del elo — justamente porque es el único
+  donde el elo varía de verdad. La hibernación que nos costó horas nos dejó, de rebote, el mejor dato
+  del dataset.</p>
+</div>
+
+<h2 class="parte"><span class="n">Parte II</span>¿Arruina nuestro análisis?</h2>
+
+<h3>1. La pregunta correcta</h3>
+
+<p>La pregunta del proyecto es si se puede predecir la duración de una partida a partir de las
+características de los jugadores, los campeones y las condiciones iniciales. <strong>No tenemos pensado
+analizar si el servidor influye en la duración.</strong> Queremos mirar el nivel de los jugadores.</p>
+
+<p>Entonces la pregunta concreta es: <em>si no usamos el servidor como variable, ¿el sesgo nos afecta
+igual?</em></p>
+
+<p>La respuesta corta es <span class="ok">sí, el análisis sigue siendo válido</span>, pero por una razón
+que hay que poder explicar — y con dos matices que conviene conocer antes de la defensa.</p>
+
+<h3>2. La prueba: sacar el servidor del medio</h3>
+
+<p>El riesgo que había que descartar era éste: que cuando creemos estar midiendo «el elo predice la
+duración», en realidad estemos midiendo «los servidores son distintos entre sí». Como cada servidor tiene
+su propio nivel de elo, las dos cosas están pegadas y podrían confundirse.</p>
+
+<p>La forma de saberlo es <strong>quitarle a cada partida el promedio de su servidor</strong> y ver si el
+efecto del elo sobrevive. Si el efecto era en realidad del servidor, al hacer esto se desvanece. Si es
+del elo, se mantiene.</p>
+
+<table>
+<tr><th>Medición</th><th>Correlación elo ↔ duración</th><th>Qué significa</th></tr>
+<tr><td>Cruda, como está el dataset</td><td><strong>−0,161</strong></td><td>Mezcla el efecto del elo con las diferencias entre servidores.</td></tr>
+<tr><td><strong>Quitando el efecto del servidor</strong></td><td><strong class="ok">−0,132</strong></td><td>El efecto limpio del elo. <strong>No desaparece.</strong></td></tr>
+<tr><td>Sólo entre servidores (6 promedios)</td><td>−0,682</td><td>Fuerte, pero son 6 puntos: no es evidencia de nada por sí solo.</td></tr>
+</table>
+
+<p>De −0,161 a −0,132. <strong>El efecto del elo se mantiene casi entero.</strong> No era un espejismo del
+servidor.</p>
+
+<p>Y hay una segunda confirmación, más fuerte todavía: el efecto va en <strong>la misma dirección en los
+seis servidores</strong>, sin una sola excepción. Más elo, partidas más cortas. Un artefacto no se
+comporta así de consistente.</p>
+
+<div class="clave">
+  <span class="etiqueta">Conclusión de la Parte II</span>
+  <p>El plan de analizar el elo en lugar del servidor <strong>es correcto y los datos lo respaldan</strong>.
+  El sesgo no invalida la relación entre nivel de jugador y duración de partida.</p>
+</div>
+
+<h3>3. Los dos matices</h3>
+
+<h4>Matiz 1 · El número crudo está levemente inflado</h4>
+
+<p>Si informamos <strong>−0,161</strong> y decimos «el elo explica la duración», una parte de ese número
+no viene del elo sino de que estamos comparando servidores distintos entre sí. El número honesto es
+<strong>−0,132</strong>.</p>
+
+<p>La diferencia es chica, pero existe, y es la clase de detalle sobre la que se pregunta. Conviene
+informar el número controlado y saber explicar por qué es el correcto.</p>
+
+<h4>Matiz 2 · Estamos subestimando el elo, no sobreestimándolo</h4>
+
+<p>Este es el matiz importante, y es contraintuitivo: <strong>el sesgo nos perjudica, no nos favorece</strong>.</p>
+
+<p>Para medir si el nivel del jugador afecta la duración hace falta tener jugadores de niveles distintos.
+Si todos son parecidos, no hay nada que medir. Y eso es exactamente lo que pasa en cinco de nuestros seis
+servidores.</p>
+
+<p>Se ve clarísimo al comparar el efecto del elo servidor por servidor:</p>
+
+<table>
+<tr><th>Servidor</th><th>Ancho de la franja de elo</th><th>Efecto del elo</th></tr>
+<tr><td><code>kr</code> (KR)</td><td><strong>3.180</strong> — bien repartido</td><td><strong class="ok">−0,254</strong></td></tr>
+<tr><td><code>la2</code> (LAS)</td><td>1.266</td><td>−0,124</td></tr>
+<tr><td><code>la1</code> (LAN)</td><td>660</td><td>−0,089</td></tr>
+<tr><td><code>euw1</code> (EUW)</td><td>502</td><td>−0,077</td></tr>
+<tr><td><code>br1</code> (BR)</td><td>535</td><td>−0,023</td></tr>
+<tr><td><code>na1</code> (NA)</td><td>879</td><td>−0,014</td></tr>
+</table>
+
+<p>El patrón es transparente: <strong>cuanto más repartido está el elo, más fuerte aparece su
+efecto</strong>. En KR, el único servidor con jugadores de todos los niveles, el efecto es
+<strong>−0,254</strong>: casi el doble del promedio controlado. En NA, donde son todos parecidos, es
+prácticamente cero.</p>
+
+<div class="nota">
+  <span class="etiqueta">Cómo se dice esto en la defensa</span>
+  <p><em>«El efecto del elo aparece donde hay variación de elo y desaparece donde no la hay. Eso es la
+  firma de nuestro sesgo de recolección, no una propiedad del juego. Nuestro dataset subestima el poder
+  predictivo del nivel de jugador; con una muestra pareja, esperaríamos un efecto más cercano al que
+  medimos en KR.»</em></p>
+</div>
+
+<h3>4. Lo que el sesgo sí nos cuesta</h3>
+
+<p>Ordenado de mayor a menor importancia:</p>
+
+<ol>
+  <li><strong>El modelo va a rendir peor de lo que podría.</strong> Con poca variación de elo hay poca
+  señal de la que aprender. Es el costo principal y es real, pero se traduce en un modelo modesto, no en
+  un modelo falso.</li>
+  <li><strong>No podemos afirmar nada sobre servidores.</strong> Si alguien mira los datos y concluye que
+  «en NA las partidas duran más que en BR» (y el número dice eso: 1.826 s contra 1.687 s), estaría
+  equivocado: no es el servidor, es que NA quedó lleno de jugadores de nivel bajo. Como no pensábamos
+  analizar el servidor, no nos afecta — <strong>pero hay que saber responderlo si lo preguntan</strong>.</li>
+  <li><strong>La extrapolación es frágil.</strong> El modelo va a conocer bien seis «islas» de elo y poco
+  del terreno intermedio. Predecir sobre un nivel poco representado es menos confiable.</li>
+</ol>
+
+<h2 class="parte"><span class="n">Parte III</span>Las opciones</h2>
+
+<p>Tres caminos posibles. No son excluyentes: B se puede hacer además de A.</p>
+
+<div class="opcion">
+  <h4>Opción A · Declarar el sesgo y seguir</h4>
+  <span class="veredicto v-si">Ya está hecho</span>
+  <p><strong>Qué implica:</strong> dejar el dataset exactamente como está y documentar el sesgo con sus
+  números, sus causas y sus consecuencias. Ya quedó escrito en la limitación 3 del documento integral,
+  en el banco de preguntas de la defensa y en el docstring de <code>seeds.py</code>.</p>
+  <p><strong>Costo:</strong> ninguno, ya está.</p>
+  <p><strong>A favor:</strong> es lo que la materia espera. Detectar, medir y declarar un sesgo propio es
+  mejor nota que no tenerlo, porque demuestra criterio. El dataset cumple todos los requisitos de la
+  Entrega 1: 19.145 filas, clave única, cero nulos, 137 columnas.</p>
+  <p><strong>En contra:</strong> el modelo de la Unidad 3 va a rendir por debajo de su potencial.</p>
+</div>
+
+<div class="opcion">
+  <h4>Opción B · Agregar la columna de plataforma</h4>
+  <span class="veredicto v-si">Recomendada, y cuesta una línea</span>
+  <p><strong>El problema concreto:</strong> el dataset <strong>no tiene columna de servidor</strong>. Sin
+  ella no se puede controlar el efecto que describimos en la Parte II — ni siquiera para neutralizarlo.</p>
+  <p><strong>La solución</strong> es que el dato ya está adentro del <code>match_id</code>, que trae el
+  servidor como prefijo (<code>KR_8364526977</code>, <code>NA1_5635719422</code>):</p>
+  <pre>df["plataforma"] = df["match_id"].str.split("_").str[0]</pre>
+  <p><strong>Costo:</strong> una línea en la Unidad 2, sin tocar el pipeline. O una columna nueva en
+  <code>transform.py</code> si se quiere que salga del CSV directamente — eso sí requiere decidirlo y
+  reprocesar la capa plata (unos 13 minutos, sin gastar API).</p>
+  <p><strong>La distinción que hay que tener clara:</strong> agregar esta columna <strong>no es analizar
+  el servidor</strong>. Es lo contrario — es neutralizarlo para que no ensucie el efecto del elo. Seguimos
+  analizando el nivel de los jugadores; la plataforma entra sólo como control.</p>
+</div>
+
+<div class="opcion">
+  <h4>Opción C · Rebalancear la muestra</h4>
+  <span class="veredicto v-no">No para la Entrega 1</span>
+  <p><strong>Qué implica:</strong> lanzar corridas nuevas apuntadas a los niveles que faltan en cada
+  servidor, hasta emparejar la distribución.</p>
+  <p><strong>Costo:</strong> alto. Al ritmo medido de ~1.150 partidas/hora, emparejar seis servidores son
+  varias jornadas de descarga, con keys que vencen cada 24 horas y una máquina que no puede suspenderse.
+  Faltan tres días para la entrega.</p>
+  <p><strong>Además:</strong> el código actual no permite elegir el nivel de arranque, así que primero
+  habría que modificar <code>iter_puuids</code> para rotar de tier — un cambio de lógica en el corazón de
+  la recolección, a tres días de la defensa.</p>
+  <p><strong>Cuándo sí:</strong> tiene todo el sentido antes de la <strong>Unidad 3 (modelado, 14/10)</strong>,
+  que es cuando el sesgo empieza a costar de verdad. Hay más de un mes, y el bronce ya bajado se conserva:
+  sumar niveles faltantes no obliga a rehacer nada.</p>
+</div>
+
+<h3>Recomendación</h3>
+
+<div class="clave">
+  <span class="etiqueta">Lo que haríamos</span>
+  <p><strong>Para el miércoles: A + B.</strong> El sesgo ya está documentado (A) y agregar la columna de
+  plataforma cuesta una línea (B). Con eso el dataset queda entregable, el sesgo declarado, y el análisis
+  del elo se puede hacer bien desde la Unidad 2.</p>
+  <p><strong>Para octubre: evaluar C.</strong> Antes del modelado conviene emparejar la muestra, con
+  tiempo y con <code>iter_puuids</code> arreglado. Ahí es donde el sesgo realmente cuesta puntos, y ahí
+  hay margen para hacerlo bien.</p>
+</div>
+
+<h3>Las preguntas que pueden hacer, con la respuesta lista</h3>
+
+<div class="pregunta">
+  <span class="q">¿Su muestra es representativa?</span>
+  <p><strong>No, y lo sabemos medido.</strong> Es una muestra de conveniencia sesgada por nivel de jugador:
+  cada servidor quedó con partidas de un rango casi puro, con elo medio de 1.627 a 3.231. La causa es que
+  una página de escalera da 205 jugadores y eso alcanza para llenar la cuota entera de una corrida, así
+  que nunca se pasa al segundo nivel. Se corrige rotando de tier durante la descarga.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">Entonces sus conclusiones sobre el elo no valen.</span>
+  <p><strong>Sí valen, y lo verificamos.</strong> Si el efecto del elo fuera en realidad un efecto del
+  servidor, al controlar por servidor tendría que desaparecer. Pasa de −0,161 a −0,132: se mantiene. Y va
+  en la misma dirección en los seis servidores. Lo que sí hace el sesgo es <em>subestimar</em> el efecto,
+  no inventarlo: en KR, el único servidor con niveles mezclados, el efecto llega a −0,254.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">¿Por qué en NA las partidas duran más que en BR?</span>
+  <p><strong>No duran más por ser NA.</strong> Es que NA quedó lleno de jugadores de plata y bronce, y BR
+  de diamante. Estamos viendo el efecto del nivel de los jugadores, no del servidor. Es un ejemplo directo
+  de la confusión que introduce nuestro sesgo de muestreo, y por eso no sacamos conclusiones por región.</p>
+</div>
+
+<h2 class="parte"><span class="n">Anexo</span>Los números crudos</h2>
+
+<p>Todo lo de este informe sale de <code>include/output/lol_2026-09-06.csv</code> (19.145 filas × 137
+columnas) y de los registros de la corrida del 5–6/9/2026. El elo de una partida es el promedio de las
+diez columnas <code>*_player_elo</code>.</p>
+
+<h4>Elo y duración por servidor</h4>
+<table>
+<tr><th>Servidor</th><th>Partidas</th><th>Elo medio</th><th>Desvío del elo</th><th>Duración media</th><th>Efecto del elo</th></tr>
+<tr><td><code>br1</code></td><td>3.333</td><td>3.036</td><td>262</td><td>1.687 s</td><td>−0,023</td></tr>
+<tr><td><code>euw1</code></td><td>2.950</td><td>2.585</td><td>223</td><td>1.743 s</td><td>−0,077</td></tr>
+<tr><td><code>kr</code></td><td>3.430</td><td>2.254</td><td><strong>1.293</strong></td><td>1.689 s</td><td><strong>−0,254</strong></td></tr>
+<tr><td><code>la1</code></td><td>3.355</td><td>3.231</td><td>293</td><td>1.722 s</td><td>−0,089</td></tr>
+<tr><td><code>la2</code></td><td>3.066</td><td>2.178</td><td>440</td><td>1.837 s</td><td>−0,124</td></tr>
+<tr><td><code>na1</code></td><td>3.011</td><td>1.627</td><td>342</td><td>1.826 s</td><td>−0,014</td></tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">Por qué los conteos no coinciden con la Parte I</span>
+  <p>En esta tabla el servidor se deduce del prefijo del <code>match_id</code>; en la Parte I se cuentan
+  los archivos de cada carpeta <code>plataforma=</code>. Difieren en unas pocas decenas porque un jugador
+  semilla puede tener partidas jugadas en otra región, que quedan guardadas bajo la carpeta del servidor
+  por el que se llegó a él. El total es el mismo: 19.145.</p>
+</div>
+
+<h4>Correlaciones entre elo y duración</h4>
+<table>
+<tr><th>Forma de medirla</th><th>Valor</th></tr>
+<tr><td>Cruda, sobre las 19.145 filas</td><td>−0,1608</td></tr>
+<tr><td>Controlando por servidor (correlación parcial)</td><td><strong>−0,1321</strong></td></tr>
+<tr><td>Entre los promedios de los 6 servidores</td><td>−0,6824</td></tr>
+</table>
+
+<h4>Concentración del elo: el 80% central de las partidas</h4>
+<table>
+<tr><th>Servidor</th><th>Percentil 10</th><th>Percentil 90</th><th>Ancho de la franja</th></tr>
+<tr><td><code>kr</code></td><td>1.316</td><td>4.496</td><td><strong>3.180</strong></td></tr>
+<tr><td><code>la2</code></td><td>1.847</td><td>3.113</td><td>1.266</td></tr>
+<tr><td><code>na1</code></td><td>1.321</td><td>2.200</td><td>879</td></tr>
+<tr><td><code>la1</code></td><td>2.931</td><td>3.590</td><td>660</td></tr>
+<tr><td><code>br1</code></td><td>2.771</td><td>3.306</td><td>535</td></tr>
+<tr><td><code>euw1</code></td><td>2.326</td><td>2.828</td><td>502</td></tr>
+</table>
+
+<h4>Cómo se calcula el elo</h4>
+<p>Es una construcción nuestra, no un dato de Riot — Riot no publica el MMR. La fórmula está en
+<code>include/lol/riot.py</code>:</p>
+<pre>estimated_elo = base_del_tier + bonus_de_division + (puntos_de_liga × 0,5)
+
+IRON 800 · BRONZE 1100 · SILVER 1400 · GOLD 1700 · PLATINUM 2000
+EMERALD 2300 · DIAMOND 2600 · MASTER 2900 · GRANDMASTER 3200 · CHALLENGER 3500
+bonus de división:  IV 0 · III 75 · II 150 · I 225</pre>
+<p>Un jugador sin ranking clasificatorio recibe 1.500 por defecto. Esto es relevante para leer las tablas:
+parte de la concentración de elo en los servidores de nivel bajo viene de ese valor por defecto.</p>
+
+<div class="pie">
+  FF-15 · Proyecto Integrador de Ciencia de Datos · UTN FRM · Comisión 5K09 · Grupo 5K09-02<br>
+  Informe complementario a <code>docs/documentacion-proyecto.pdf</code> · 6 de septiembre de 2026<br>
+  Se regenera con <code>python docs/generar_pdf.py informe-sesgo-muestreo.html</code>
+</div>
+
+</body>
+</html>
