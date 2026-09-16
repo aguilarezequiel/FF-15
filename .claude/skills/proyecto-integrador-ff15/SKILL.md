@@ -40,6 +40,7 @@ FF-15/
 ├── dags/lol_ingest.py     · la definición del flujo, y nada más
 ├── include/lol/           · toda la lógica pesada, SIN un solo import de Airflow
 ├── include/output/        · bronce, plata y entregables — gitignoreado
+├── notebooks/             · el análisis de las Unidades 2+, una carpeta por entrega
 ├── docs/                  · documentación integral del proyecto (HTML fuente + PDF)
 ├── tests/                 · astro dev pytest
 └── Documentacion/         · material de la cátedra (fuente de verdad de las consignas)
@@ -58,6 +59,16 @@ astro dev parse          # chequeo rápido de errores de parseo
 astro dev pytest         # tests de integridad del DAG
 astro dev logs -f        # logs de los contenedores
 astro dev stop           # apaga sin borrar
+```
+
+El análisis vive en un entorno aparte, para no engordar la imagen de Airflow:
+
+```bash
+python -m venv .venv
+.venv\Scripts\pip install -r notebooks/requirements.txt
+.venv\Scripts\jupyter lab
+# volver a ejecutar el notebook entero, con las salidas guardadas:
+.venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-2/eda_entrega2.ipynb
 ```
 
 Editar un `.py` de `dags/` o de `include/` **no** necesita restart: el dag-processor lo recoge solo en unos segundos.
@@ -120,6 +131,7 @@ Leerlas cuando la tarea lo pida — no hace falta cargarlas todas de entrada.
 | `references/airflow-catedra.md` | Antes de escribir o tocar un DAG. Imports de Airflow 3, argumentos del `@dag`, mapeo dinámico, sensores, branching, errores frecuentes. |
 | `references/riot-api.md` | Al tocar `include/lol/riot.py`, `seeds.py` o `ddragon.py`. Endpoints, routing, rate limits, rotación de keys y las trampas conocidas. |
 | `references/dataset-schema.md` | Al tocar `schema.py` o `transform.py`, o al explicar una columna. Las 137 columnas y cómo se deriva cada una. |
+| `references/eda-hipotesis.md` | Al escribir análisis, hipótesis o gráficos. El semáforo con sus cortes, las seis casillas, las tres plantillas, los tres movimientos, el chequeo de fuga y el estilo de la cátedra. |
 
 ## Mantener esto vivo
 

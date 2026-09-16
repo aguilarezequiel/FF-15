@@ -11,7 +11,8 @@
 | Clave primaria | `match_id` |
 | Columna objetivo | `game_duration_s` — segundos, continua → regresión |
 | Stack | Apache Airflow 3.3 · Astro Runtime 3.3-4 · Astro CLI · Docker |
-| Entrega 1 | miércoles 9/9, franja 14:55 – 15:15 |
+| Entrega 1 | miércoles 9/9, franja 14:55 – 15:15 — **presentada** |
+| Entrega 2 | miércoles 23/9, la clase completa · 20 min con el docente, en privado |
 
 ---
 
@@ -81,20 +82,32 @@ Están explicadas con su porqué en `.claude/skills/proyecto-integrador-ff15/SKI
 dags/lol_ingest.py    · el flujo, y nada más
 include/lol/          · toda la lógica pesada, testeable sin Airflow
 include/output/       · bronce, plata y entregables (gitignoreado)
+notebooks/            · el análisis de las Unidades 2+, una carpeta por entrega
 tests/                · astro dev pytest
 docs/                 · la documentación integral del proyecto (HTML + PDF)
 Documentacion/        · material de la cátedra — fuente de verdad de las consignas
 .claude/skills/       · la skill del proyecto, versionada para todo el grupo
 ```
 
+El notebook de análisis corre en un **venv aparte** (`notebooks/requirements.txt`),
+no en la imagen de Astro: son dos entornos con dos propósitos. Detalles en
+`notebooks/README.md`.
+
 ## Comandos
 
 ```bash
-astro dev start      # UI en localhost:8080 (admin/admin)
+astro dev start      # UI en localhost:8081 (admin/admin)
 astro dev restart    # sólo si tocaste requirements.txt, packages.txt o Dockerfile
 astro dev parse      # chequeo de parseo
 astro dev pytest     # tests de integridad
 astro dev logs -f
+```
+
+```bash
+python -m venv .venv                                    # el entorno del análisis
+.venv\Scripts\pip install -r notebooks/requirements.txt
+.venv\Scripts\jupyter lab
+.venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-2/eda_entrega2.ipynb
 ```
 
 ## Antes de cada entrega
@@ -109,6 +122,20 @@ df.columns[df.isna().all()]                     # vacío
 ```
 
 Y tener listas las respuestas a: qué es una fila, cuál es la columna objetivo, por qué hay nulos donde hay, qué pasa si se corre de nuevo, dónde está el bronce, y dónde el dataset se aparta de tidy.
+
+### Y para la Entrega 2, además
+
+El notebook tiene que estar **ejecutado, con las salidas guardadas y sin una sola celda en error**. Se verifica corriéndolo entero, no abriéndolo:
+
+```bash
+.venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-2/eda_entrega2.ipynb
+```
+
+Los siete números que la consigna mide sola: `df.shape`, `df.dtypes.value_counts()`, `df.isna().mean()`, `df.columns[df.nunique() <= 1]`, duplicados de la clave, distribución del objetivo y `skew()` ordenado.
+
+Y lo que no mide ningún script: cuál es la variable objetivo y cómo está distribuida, por qué hay nulos donde hay, **qué hipótesis salió mal y qué se hizo con eso**, qué columna se descartó por fuga y en qué momento se completa en la realidad, y qué quedó inconcluso.
+
+El método —el semáforo con sus cortes, las seis casillas de una ficha, las tres plantillas, los tres movimientos con tope de dos, el chequeo de fuga— está en `.claude/skills/proyecto-integrador-ff15/references/eda-hipotesis.md`. **Los cortes no se inventan ni se ajustan**: son los de la cátedra.
 
 ## Contexto útil
 

@@ -32,7 +32,7 @@ cp airflow_settings.example.yaml airflow_settings.yaml
 astro dev start
 ```
 
-Airflow queda en <http://localhost:8080> (usuario `admin`, contraseña `admin`). Desde ahí se dispara `lol_ingest` con **Trigger DAG w/ config**.
+Airflow queda en <http://localhost:8081> (usuario `admin`, contraseña `admin`). Desde ahí se dispara `lol_ingest` con **Trigger DAG w/ config**.
 
 `airflow_settings.yaml` está en `.gitignore` porque contiene la key. Nunca se versiona, y la key no aparece en ningún `.py`.
 
@@ -86,7 +86,7 @@ wait_for_riot → check_key ─┬→ fetch_ddragon ──┐
 
 ```
 include/output/bronze/
-├── ddragon/version=16.16.1/{champion,summoner}.json.gz
+├── ddragon/version=16.17.1/{champion,summoner}.json.gz
 ├── matches/plataforma=la2/LA2_1617259431.json.gz
 ├── players/plataforma=la2/puuid=.../{liga.json.gz, maestria_875.json.gz}
 └── descartadas/plataforma=la2.txt
@@ -179,6 +179,35 @@ Sin esta columna el error existía igual, pero era invisible.
 
 ---
 
+## El análisis exploratorio (Entrega 2)
+
+El EDA vive en **[`notebooks/entrega-2/eda_entrega2.ipynb`](notebooks/entrega-2/eda_entrega2.ipynb)**,
+ejecutado y con las salidas guardadas. Recorre las seis fases de la teórica,
+resuelve ocho fichas de hipótesis con las seis casillas del TP2 y termina en la
+tabla de columnas candidatas.
+
+```bash
+python -m venv .venv
+.venv\Scripts\pip install -r notebooks/requirements.txt
+.venv\Scripts\jupyter lab
+```
+
+Corre en un venv aparte, no en la imagen de Astro, y lee el CSV congelado que
+viaja al lado (`notebooks/entrega-2/datos/`), así que **no hace falta levantar
+Airflow para reproducirlo**. Los detalles están en
+[`notebooks/README.md`](notebooks/README.md).
+
+Lo que el análisis dejó decidido, en tres líneas:
+
+- **Ninguna columna de condiciones iniciales predice la duración.** La más
+  fuerte, el elo medio de la partida, correlaciona −0,161 y explica el 2,6 % de
+  la varianza. Las ocho fichas dieron rojo.
+- **El objetivo es simétrico** (asimetría −0,039), no necesita transformarse, y
+  tiene un escalón de 714 partidas en los 900 segundos: el minuto 15, cuando el
+  juego habilita la rendición.
+- **Salen 24 columnas** con un número detrás, y los 34 agregados de equipo se
+  colapsan en 17 sumas porque los rótulos `t1`/`t2` son arbitrarios.
+
 ## Probar
 
 ```bash
@@ -191,7 +220,7 @@ ruff check .        # estilo
 
 Para entender el proyecto entero —la teoría de la materia, el recorrido archivo por archivo,
 la guía de ejecución y la preparación de la defensa— está
-**[`docs/documentacion-proyecto.pdf`](docs/documentacion-proyecto.pdf)** (63 páginas).
+**[`docs/documentacion-proyecto.pdf`](docs/documentacion-proyecto.pdf)** (76 páginas).
 
 Se edita en `docs/documentacion-proyecto.html` y se regenera con `python docs/generar_pdf.py`.
 Es un documento vivo: cada avance del proyecto se refleja ahí, agregando lo nuevo y borrando
@@ -208,7 +237,11 @@ include/lol/          · toda la lógica pesada, sin un solo import de Airflow
   ├── schema.py       · las 137 columnas, tipos y reglas de admisión
   └── transform.py    · payload crudo → fila (puro)
 include/output/       · bronce, plata y entregables (gitignoreado)
+notebooks/            · el análisis de las Unidades 2+
+  ├── requirements.txt      · el stack de análisis, en un venv aparte
+  └── entrega-2/            · el EDA, ya ejecutado, con el CSV congelado al lado
 tests/                · astro dev pytest
+docs/                 · la documentación integral (HTML fuente + PDF)
 Documentacion/        · material de la cátedra
 ```
 

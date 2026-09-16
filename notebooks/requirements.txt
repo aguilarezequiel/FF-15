@@ -1,0 +1,21 @@
+# Stack de análisis de las Unidades 2+ · se instala en un venv APARTE de la
+# imagen de Airflow (`python -m venv .venv`), para no engordar el contenedor
+# del pipeline con paquetes que sólo usa el notebook.
+#
+# Versiones pinneadas exactas, no `>=`: entre pandas 2 y pandas 3 cambia el
+# dtype de las columnas de texto (`object` → `StringDtype`), y el perfil del
+# dataset que se defiende en la entrega tiene que coincidir con la salida que
+# quedó guardada en el .ipynb.
+#
+# No hay seaborn ni scipy a propósito: la cátedra usa matplotlib crudo, y el
+# semáforo de tamaños de efecto reemplaza a los tests de significancia.
+
+pandas==3.0.5
+numpy==2.5.2
+matplotlib==3.11.2
+scipy==1.18.1
+
+jupyterlab==4.6.3
+ipykernel==7.3.0
+nbconvert==7.17.1
+nbformat==5.11.1
