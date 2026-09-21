@@ -128,11 +128,11 @@ la de la Entrega 2, con el análisis exploratorio y las ocho hipótesis.</p>
 <tr><td>Bug corregido (2026-09-05)</td><td><code>land_bronze</code> fallaba con <code>HTTP 400</code> en las seis plataformas: el pool de keys rotaba de key en cada request individual, y un <code>puuid</code> sólo lo puede leer la key que lo emitió. Fix: afinidad key↔puuid en <code>RiotClient</code> — ver 4.1.</td></tr>
 <tr><td>Incidente superado (2026-09-06)</td><td>La máquina entró en hibernación a las 03:19 con cuatro tareas <code>land_bronze</code> a mitad de camino. Los procesos murieron; <strong>el bronce no perdió un solo archivo</strong>. Airflow relanzó las tareas solo a las 07:16 y el dataset se generó igual. Es la mejor evidencia práctica de por qué el bronce va a disco y es append-only — ver 7.7.</td></tr>
 <tr><td>Limitación conocida</td><td><strong>Sesgo de muestreo por tier.</strong> Cada plataforma quedó con partidas de un rango casi puro y distinto (elo medio de 1.627 en NA1 a 3.231 en LA1). Está medido y declarado en 7.5; no invalida el dataset, pero condiciona qué conclusiones se pueden sacar de él.</td></tr>
-<tr><td>Análisis exploratorio</td><td><strong>Completo.</strong> <code>notebooks/entrega-2/eda_entrega2.ipynb</code>, 169 celdas, ejecutado sin errores y con las salidas guardadas: las seis fases de la teórica, ocho fichas de hipótesis y la tabla de columnas candidatas. Corre en un venv aparte y lee el CSV congelado que viaja al lado, sin necesidad de levantar Airflow.</td></tr>
-<tr><td>El hallazgo de la Entrega 2</td><td><strong>Ninguna columna de condiciones iniciales predice la duración.</strong> La más asociada al objetivo —el elo medio de la partida— da Pearson −0,161 y explica el <strong>2,6 %</strong> de su varianza. Las ocho fichas cayeron en zona roja. Ver 8.4.</td></tr>
+<tr><td>Análisis exploratorio</td><td><strong>Completo.</strong> <code>notebooks/entrega-2/eda_entrega2.ipynb</code>, 174 celdas, ejecutado sin errores y con las salidas guardadas: las seis fases de la teórica, ocho fichas de hipótesis y la tabla de columnas candidatas. Corre en un venv aparte y lee el CSV congelado que viaja al lado, sin necesidad de levantar Airflow.</td></tr>
+<tr><td>El hallazgo de la Entrega 2</td><td><strong>Ninguna columna de condiciones iniciales predice la duración.</strong> La más asociada al objetivo —el elo medio de la partida— da Pearson −0,161 y explica el <strong>2,6 %</strong> de su varianza. <strong>Las cuatro fichas que miden contra el objetivo cayeron en rojo</strong>; las cuatro que dieron verde miden columnas entre sí, no contra la duración. Ver 8.4.</td></tr>
 <tr><td>Perfil del objetivo</td><td>Asimetría <strong>−0,039</strong> y curtosis 0,579: simétrico, <strong>no necesita transformarse</strong>. Sin desbalance —la banda más poblada, 25 a 30 minutos, es el 29,9 %—. Truncado a izquierda en 300 s por el filtro de remakes, y con un escalón de <strong>714 partidas</strong> en los 900 s: el minuto 15, cuando el juego habilita la rendición. Ver 8.2.</td></tr>
-<tr><td>Decisiones de columna tomadas</td><td>Salen <strong>24 columnas</strong> con un número detrás: los dos <code>count_flash</code> (H5), los diez <code>is_main</code> y los dos <code>mains_count</code> (H7), y los diez <code>champ_name</code> por redundar con <code>champ_id</code>. Y los 34 agregados de equipo se colapsan en <strong>17 sumas</strong> (H8). Ver 8.5.</td></tr>
-<tr><td>Decisión que se cerró</td><td>La columna <code>es_unranked</code> que quedaba pendiente en 5.5 <strong>no hace falta</strong> para este objetivo: las partidas con jugadores imputados duran 38 segundos más, separación 0,067, zona roja. Ver 8.3, H6.</td></tr>
+<tr><td>Decisiones de columna tomadas</td><td>Salen <strong>40 columnas</strong> con un número detrás: los diez <code>player_winrate</code> (H4), los diez <code>is_main</code> y los dos <code>mains_count</code> (H7), los cuatro <code>avg_defense</code> y <code>avg_magic</code> (H6), los dos <code>total_base_armor</code> (H3), los dos <code>count_flash</code> (H5) y los diez <code>champ_name</code> por redundar con <code>champ_id</code>. De las 34 columnas de agregados de equipo quedan 24, y H8 las colapsa en <strong>12 sumas</strong>. Ver 8.5.</td></tr>
+<tr><td>Decisión que se cerró</td><td>La columna <code>es_unranked</code> que quedaba pendiente en 5.5 <strong>no hace falta</strong> para este objetivo: las partidas con jugadores imputados duran 38 segundos más, separación 0,067, zona roja. Se cerró sin ficha propia, en la sección 9 del notebook. Ver 8.5.</td></tr>
 <tr><td>Lo que falta</td><td>Nada bloqueante para la Entrega 2. Queda ensayar la defensa con el reparto de 8.6, y resolver los cuatro pendientes de 8.7 —entre ellos, verificar contra el bronce las 26 partidas con 9 o 10 jugadores de elo imputado.</td></tr>
 </table>
 
@@ -1171,7 +1171,7 @@ vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más 
 ├── notebooks/                            · EL ANÁLISIS (Unidades 2+)
 │   ├── requirements.txt                  · el stack de análisis, versiones exactas
 │   └── entrega-2/
-│       ├── eda_entrega2.ipynb  169 celdas · el EDA, ejecutado
+│       ├── eda_entrega2.ipynb  174 celdas · el EDA, ejecutado
 │       └── datos/lol_2026-09-06.csv      · el CSV congelado, versionado
 │
 ├── tests/dags/
@@ -2001,8 +2001,9 @@ transformarse</strong>.</p>
 <p>Tiene dos irregularidades que hay que declarar. Está <strong>truncado a izquierda en 300
 segundos</strong> por el filtro de remakes —una decisión nuestra, ver 5.3—, y tiene un
 <strong>escalón en los 900 segundos</strong>: del minuto 14 al 15 hay 27 partidas y del 15 al 16
-hay 714, porque a los quince minutos exactos el juego habilita la votación de rendición. Los cuatro
-valores de duración más repetidos del dataset son 911, 912, 913 y 916 segundos. El objetivo, por lo
+hay 714, porque a los quince minutos exactos el juego habilita la votación de rendición. De los diez
+valores de duración más repetidos del dataset, seis caen entre los 911 y los 918 segundos, y 911 y
+912 son los dos primeros de la lista. El objetivo, por lo
 tanto, <strong>no es del todo continuo</strong>: tiene una acumulación de masa del 3,7 % en un punto
 que ningún modelo de regresión suave va a reproducir.</p>
 
@@ -2841,7 +2842,7 @@ Entrega 2 cambia la pregunta: <strong>¿sabemos qué tiene adentro, y podemos de
 cada decisión que tomamos sobre él?</strong> Es la entrega que decide con qué se llega a modelar:
 todo lo que sale de acá es la materia prima de la Entrega 3.</p>
 
-<p>El entregable es <strong><code>notebooks/entrega-2/eda_entrega2.ipynb</code></strong>: 169 celdas,
+<p>El entregable es <strong><code>notebooks/entrega-2/eda_entrega2.ipynb</code></strong>: 174 celdas,
 ejecutado de arriba a abajo sin errores y con las salidas guardadas. Recorre las seis fases de la
 teórica, resuelve <strong>ocho fichas</strong> de hipótesis con las seis casillas del TP2 y termina
 en la tabla de columnas candidatas.</p>
@@ -2911,8 +2912,8 @@ bronce. Lo que hay que saber decir de memoria:</p>
 
 <div class="clave">
   <p><strong>El objetivo tiene un escalón en los 900 segundos.</strong> Del minuto 14 al 15 hay 27
-  partidas; del 15 al 16 hay 714. Los cuatro valores de duración más repetidos del dataset son 911,
-  912, 913 y 916 segundos.</p>
+  partidas; del 15 al 16 hay 714. De los diez valores de duración más repetidos del dataset, seis
+  caen entre los 911 y los 918 segundos, y 911 y 912 son los dos primeros de la lista.</p>
   <p>La explicación es una regla del juego: <strong>a los quince minutos exactos se habilita la
   votación de rendición</strong>. Las partidas que ya estaban decididas se terminan en cuanto el
   juego lo permite. No es un error de datos: es el fenómeno, y sirve además de control de calidad
@@ -2922,8 +2923,13 @@ bronce. Lo que hay que saber decir de memoria:</p>
 
 <h3>3. Las ocho fichas de hipótesis</h3>
 
-<p>La consigna pide cuatro; se hicieron ocho, cuatro de cada pregunta. Todas están resueltas con las
-seis casillas, su número, su zona y su gráfico en la sección 8 del notebook.</p>
+<p>La consigna pide cuatro; se hicieron ocho: tres de la pregunta <em>qué queremos responder</em> y
+cinco de <em>qué queremos predecir</em>. Todas están resueltas con las seis casillas, su número, su
+zona y su gráfico en la sección 8 del notebook.</p>
+
+<p><strong>Cuatro terminan en verde y cuatro en rojo, y el corte no es casual:</strong> las que miden
+una columna contra <em>la duración</em> dan rojo, y las que miden una columna contra <em>otra
+columna</em> dan verde. Es el hallazgo del análisis, y está explicado en 8.4.</p>
 
 <table>
 <tr><th>Ficha</th><th>Pregunta</th><th>Plantilla</th><th>Medida</th><th>Zona</th><th>Decisión</th></tr>
@@ -2942,18 +2948,18 @@ seis casillas, su número, su zona y su gráfico en la sección 8 del notebook.<
   <td><strong>Refutada</strong>, y con el signo al revés del esperado. Es la que más contradice lo que el grupo daba por sabido.</td>
 </tr>
 <tr>
-  <td><strong>H3</strong> · El desbalance de elo entre los equipos la acorta</td>
+  <td><strong>H3</strong> · Los campeones de rango largo son de armadura baja</td>
   <td>responder</td><td>asociación</td>
-  <td>Pearson <strong>−0,064</strong> · medianas por quintil de 1.771 a 1.710 s</td>
-  <td class="no">rojo</td>
-  <td><strong>Refutada en magnitud, confirmada en dirección.</strong> El efecto es ordenado y son 61 segundos.</td>
+  <td>Pearson <strong>−0,672</strong> · armadura mediana de 312 a 280 entre el primer y el último octil de alcance</td>
+  <td class="ok">verde</td>
+  <td><strong>Confirmada.</strong> Es una regularidad de diseño del juego. Sale <code>total_base_armor</code>: 2 columnas.</td>
 </tr>
 <tr>
-  <td><strong>H4</strong> · El gap de maestría en un carril cambia la duración</td>
-  <td>responder</td><td>asociación ×5</td>
-  <td>Pearson de <strong>−0,036 a −0,000</strong> en los cinco carriles</td>
-  <td class="no">rojo</td>
-  <td><strong>Refutada en las dos partes.</strong> Las cinco columnas <code>gap_mastery_*</code> no entran.</td>
+  <td><strong>H4</strong> · El elo y el winrate son la misma columna</td>
+  <td>predecir</td><td>asociación</td>
+  <td>Pearson <strong>0,711</strong> · winrate mediano de 0,478 a 0,537 entre el primer y el último decil de elo</td>
+  <td class="ok">verde</td>
+  <td><strong>Confirmada.</strong> Salen los diez <code>player_winrate</code>: duplican a <code>player_elo</code>, que conserva más señal y tiene un reparo de fuga menor.</td>
 </tr>
 <tr>
   <td><strong>H5</strong> · <code>count_flash</code> no aporta información</td>
@@ -2963,42 +2969,53 @@ seis casillas, su número, su zona y su gráfico en la sección 8 del notebook.<
   <td><strong>Confirmada.</strong> Los dos <code>count_flash</code> salen, con el mismo criterio que <code>count_smite</code> pero con dos números en vez de un argumento.</td>
 </tr>
 <tr>
-  <td><strong>H6</strong> · Hace falta una bandera <code>es_unranked</code></td>
+  <td><strong>H6</strong> · <code>avg_defense</code> es <code>num_tanks</code> escrito de otra forma</td>
   <td>predecir</td><td>comparación</td>
-  <td>separación <strong>0,067</strong> · 38 s de diferencia sobre 615 partidas</td>
-  <td class="no">rojo</td>
-  <td><strong>Refutada.</strong> Cierra la decisión que 5.5 dejaba abierta: la imputación 1500 / 0,50 queda como está.</td>
+  <td>η² <strong>0,319</strong> · el mismo par con magos da 0,310</td>
+  <td class="ok">verde</td>
+  <td><strong>Confirmada.</strong> Salen <code>avg_defense</code> y <code>avg_magic</code>: 4 columnas. Quedan las interpretables, <code>num_tanks</code> y <code>num_mages</code>.</td>
 </tr>
 <tr>
-  <td><strong>H7</strong> · <code>is_main</code> no agrega nada sobre <code>champ_mastery_pts</code></td>
-  <td>predecir</td><td>asociación ×2</td>
-  <td>continua <strong>−0,049</strong> contra binarizada <strong>−0,008</strong></td>
-  <td class="no">rojo</td>
-  <td><strong>Confirmada.</strong> Salen los diez <code>is_main</code> y los dos <code>mains_count</code>: 12 columnas.</td>
+  <td><strong>H7</strong> · La maestría binarizada pierde el orden de magnitud</td>
+  <td>predecir</td><td>asociación</td>
+  <td>Pearson <strong>0,471 → 0,769</strong> tras un movimiento de escala · brecha 0,078</td>
+  <td class="ok">amarillo → verde</td>
+  <td><strong>Confirmada.</strong> Salen los diez <code>is_main</code> y los dos <code>mains_count</code>: 12 columnas. <code>champ_mastery_pts</code> entra en logaritmo <em>por jugador</em>.</td>
 </tr>
 <tr>
   <td><strong>H8</strong> · La partición t1/t2 duplica la información</td>
   <td>predecir</td><td>asociación</td>
   <td>|corr(t1) − corr(t2)| promedio <strong>0,0126</strong> · la suma gana en 11 de 17</td>
   <td class="no">rojo</td>
-  <td><strong>Confirmada.</strong> Los 34 agregados de equipo se colapsan en 17 sumas. Es la ficha que más cambia la Entrega 3.</td>
+  <td><strong>Confirmada.</strong> Las 34 columnas de agregados de equipo, ya recortadas a 24 por H3, H5, H6 y H7, se colapsan en <strong>12 sumas</strong>. Es la ficha que más cambia la Entrega 3.</td>
 </tr>
 </table>
 
-<p><strong>Cinco refutadas, tres confirmadas, ninguna inconclusa, y las ocho en rojo</strong> —que en
-seis casos significa «no hay efecto» y en dos, H5 y H8, es exactamente lo que la afirmación
-predecía—. La consigna pedía al menos una refutada o inconclusa y al menos una de cada pregunta:
-las dos condiciones se cumplen con holgura.</p>
+<p><strong>Dos refutadas y seis confirmadas, ninguna inconclusa; cuatro en verde y cuatro en
+rojo.</strong> En H5 y H8 el rojo <em>es</em> la confirmación: las dos afirmaban que no habría
+efecto. La consigna pedía al menos una refutada o inconclusa y al menos una de cada pregunta: las
+dos condiciones se cumplen.</p>
+
+<div class="aviso">
+  <span class="etiqueta">El verde no significa que hayamos encontrado una feature buena</span>
+  <p>Ninguna de las cuatro fichas verdes mide contra el objetivo, y hay que decirlo antes de que lo
+  pregunten. Miden <strong>columnas entre sí</strong>, y lo que encuentran es redundancia: pares de
+  columnas que cuentan la misma cosa dos veces. Esa es una decisión de modelado tan concreta como la
+  otra —saca <strong>28 columnas</strong> del dataset, cada una con su número— pero no cambia el
+  hallazgo de 8.4, que sigue siendo que ninguna columna predice la duración.</p>
+</div>
 
 <div class="nota">
-  <span class="etiqueta">Ninguna ficha usó un movimiento, y eso no es pereza</span>
-  <p>El semáforo sólo habilita movimientos en <strong>amarillo</strong>, y ninguno de los ocho números
-  cayó ahí. Las dos veces que igual se midió algo más —controlar el servidor en H1, el logaritmo en
-  H4— están escritas en el notebook como lo que son: la verificación de una expectativa que teníamos,
-  no un intento de rescatar un resultado. La segunda, además, estaba contraindicada por la brecha
-  antes de calcularla.</p>
-  <p>Insistir sobre un rojo es cazar resultados. La cátedra lo muestra como anti-patrón y nosotros lo
-  respetamos.</p>
+  <span class="etiqueta">Una sola ficha usó un movimiento, y es la única que cayó en amarillo</span>
+  <p>El semáforo sólo habilita movimientos en <strong>amarillo</strong>, y de los ocho números sólo
+  el de H7 cayó ahí: Pearson 0,471 con la brecha en 0,078. El movimiento que correspondía lo dijo la
+  brecha —<em>cambiar la escala</em>— y el resultado pasó a 0,769, verde, con uno solo de los dos
+  movimientos que permite el tope.</p>
+  <p>Las otras siete terminaron en verde o en rojo, que son los dos colores que cierran. Las dos
+  veces que igual se midió algo más —controlar el servidor en H1, el control de η² en H6— están
+  escritas en el notebook como lo que son: la verificación de una objeción previsible, no un intento
+  de rescatar un resultado. Insistir sobre un rojo es cazar resultados, y la cátedra lo muestra como
+  anti-patrón.</p>
 </div>
 
 <h4>Las dos fichas que más se van a preguntar</h4>
@@ -3010,14 +3027,24 @@ dataset, dos respuestas opuestas. La que vale es la primera: cada punto de la se
 entero, no una partida, y con seis puntos eso puede ser casualidad. Es la manifestación numérica del
 sesgo por tier que la Entrega 1 ya había declarado como limitación.</p>
 
-<p><strong>H6 y el proxy imperfecto.</strong> La imputación no se puede identificar con certeza desde
-el CSV, porque el pipeline no guardó ninguna bandera y los dos valores que usó le pasan también a
-jugadores reales: un SILVER III con 50 LP da exactamente 1500. El proxy es exigir
-<code>elo == 1500</code> <strong>y</strong> <code>winrate == 0.50</code> a la vez, y eso descarta 111
-falsos positivos de las 1.055 celdas que el elo solo habría marcado. El resultado —rojo— cierra la
-decisión, con dos salvedades escritas: el proxy es imperfecto, y la conclusión vale
-<strong>para este objetivo</strong>; si en la Unidad 4 se quisiera predecir quién gana, habría que
-rehacerla.</p>
+<p><strong>H6 y la elección de la medida.</strong> Es la pregunta más filosa de las ocho, porque
+sobre las mismas dos columnas <strong>η² da 0,319 —verde— y Pearson da 0,565 —amarillo—</strong>, y
+elegir la medida después de ver los dos números sería hacer trampa. La respuesta: la medida la trae
+la <em>forma</em> de la afirmación, no la conveniencia. «La defensa media difiere entre partidas con
+distinta cantidad de tanques» es una comparación entre grupos, y la comparación entre varios grupos
+se mide con η². <code>tanques_total</code> es un conteo de once niveles: se lee como grupo, no como
+magnitud. Los dos números están a la vista en el notebook, no escondido el que no convenía.</p>
+
+<p>Y la objeción que sigue —que η² sube con la cantidad de grupos— está contestada con un control en
+la misma ficha: la <em>misma</em> categoría de once niveles, aplicada a la duración, da 0,001, y
+aplicada al alcance medio da 0,129. Si η² midiera el azar de tener muchos grupos, las tres cifras
+serían parecidas.</p>
+
+<p><strong>H7 y dónde se aplica el logaritmo.</strong> El movimiento no es sólo «tomar logaritmo»:
+es tomarlo <strong>jugador por jugador antes de promediar</strong>, porque así se construye la
+bandera con la que se compara. Hecho sobre el promedio ya calculado, el número llega a 0,582 y se
+queda en amarillo; hecho por jugador, llega a 0,769. Las dos versiones están medidas en el notebook,
+una al lado de la otra.</p>
 
 <h3>4. El hallazgo que atraviesa las ocho</h3>
 
@@ -3065,24 +3092,47 @@ consigna critica— y la suma verificada: las 137 columnas del esquema están to
 
 <table>
 <tr><th>Columnas</th><th>Cuántas</th><th>Por qué salen</th></tr>
-<tr><td><code>{t1,t2}_count_flash</code></td><td>2</td><td>H5: valor modal 0,838 y Pearson −0,014. Mismo criterio que <code>count_smite</code>.</td></tr>
-<tr><td><code>{t1,t2}_{5 pos}_is_main</code></td><td>10</td><td>H7: la binarización en 50.000 pierde cinco sextos de la señal de la columna continua.</td></tr>
+<tr><td><code>{t1,t2}_{5 pos}_player_winrate</code></td><td>10</td><td>H4: correlaciona 0,711 con <code>player_elo</code> agregado, que conserva más señal contra el objetivo (−0,161 contra −0,120) y tiene un reparo de fuga menor.</td></tr>
+<tr><td><code>{t1,t2}_{5 pos}_is_main</code></td><td>10</td><td>H7: con la escala correcta la bandera y la continua coinciden en 0,769, y la que tira información es la bandera —su umbral marca al 67,9 % de los jugadores—.</td></tr>
 <tr><td><code>{t1,t2}_mains_count</code></td><td>2</td><td>H7: es la suma de los <code>is_main</code>, que ya salieron.</td></tr>
+<tr><td><code>{t1,t2}_avg_defense</code> y <code>_avg_magic</code></td><td>4</td><td>H6: η² 0,319 y 0,310 contra <code>num_tanks</code> y <code>num_mages</code>. Entre dos columnas que miden lo mismo se queda la interpretable.</td></tr>
+<tr><td><code>{t1,t2}_total_base_armor</code></td><td>2</td><td>H3: −0,672 con el alcance medio y 0,529 con la vida base. Es el centro de las dos redundancias del bloque a la vez.</td></tr>
+<tr><td><code>{t1,t2}_count_flash</code></td><td>2</td><td>H5: valor modal 0,838 y Pearson −0,014. Mismo criterio que <code>count_smite</code>.</td></tr>
 <tr><td><code>{t1,t2}_{5 pos}_champ_name</code></td><td>10</td><td>Mapea 1 a 1 con <code>champ_id</code> —173 y 173— así que es la misma columna escrita dos veces.</td></tr>
-<tr><td><strong>Total</strong></td><td><strong>24</strong></td><td></td></tr>
+<tr><td><strong>Total</strong></td><td><strong>40</strong></td><td></td></tr>
 </table>
 
-<p>Y los <strong>34 agregados de equipo se colapsan en 17 sumas</strong> por H8: «cuántos magos hay
-en la partida» es una variable del juego; «cuántos magos tiene el equipo al que Riot le puso el
-número 100» no lo es. El mismo argumento aplica al bloque B, multiplicado por cinco, y queda como
-recomendación: las 100 columnas de jugador piden agregarse por partida antes de entrar a un
-modelo.</p>
+<p>Y el bloque C se colapsa por H8: «cuántos magos hay en la partida» es una variable del juego;
+«cuántos magos tiene el equipo al que Riot le puso el número 100» no lo es. La aritmética hay que
+hacerla junto con las otras cuatro fichas que sacan columnas, porque se pisan: de los 17 agregados
+salen cinco por su cuenta —<code>mains_count</code> por H7, <code>avg_defense</code> y
+<code>avg_magic</code> por H6, <code>total_base_armor</code> por H3 y <code>count_flash</code> por
+H5—, así que <strong>las 34 columnas quedan en 24 y H8 las colapsa en 12 sumas</strong>. El mismo
+argumento aplica al bloque B, multiplicado por cinco, y queda como recomendación: las 100 columnas
+de jugador piden agregarse por partida antes de entrar a un modelo.</p>
+
+<h4>La decisión que se cerró sin ficha</h4>
+
+<p>La bandera <code>es_unranked</code> que 5.5 dejaba pendiente <strong>no hace falta</strong> para
+este objetivo. Las 615 partidas con jugadores de elo imputado —el 3,2 % del dataset— duran una
+mediana de 1.788 segundos contra 1.750 del resto: <strong>separación 0,067, rojo</strong>. Se mide
+en la sección 9 del notebook, no en una ficha, porque es una decisión de una sola medida.</p>
+
+<p>Con dos salvedades. El proxy es imperfecto: la imputación no se puede identificar con certeza
+desde el CSV —un SILVER III con 50 LP también da elo 1500— así que se exige <code>elo == 1500</code>
+<strong>y</strong> <code>winrate == 0.50</code> a la vez, lo que descarta 111 falsos positivos de las
+1.055 celdas que el elo solo habría marcado. Y la conclusión vale <strong>para este objetivo</strong>:
+si en la Unidad 4 se quisiera predecir quién gana, habría que rehacerla. El pipeline ya calcula
+<code>es_unranked</code> en <code>include/lol/riot.py</code> pero no lo escribe al CSV: es una
+columna de una línea si alguna vez hace falta el dato exacto.</p>
 
 <h4>Lo que entra transformado</h4>
 
 <ul>
-  <li><code>champ_mastery_pts</code> entra agregada y <strong>en escala logarítmica</strong>: es la
-  única familia con cola larga real, asimetría 4,67.</li>
+  <li><code>champ_mastery_pts</code> entra agregada y <strong>en escala logarítmica aplicada por
+  jugador antes de promediar</strong>, que es la forma que midió H7 y no otra: tomar el logaritmo del
+  promedio ya calculado deja la asociación en 0,582 en vez de 0,769. Es la única familia con cola
+  larga real, asimetría 4,80 por jugador.</li>
   <li><code>champ_id</code>, <code>sum1</code>, <code>sum2</code> y los dos <code>rune_*</code> son
   <strong>códigos nominales guardados como enteros</strong>. Entran sólo con codificación categórica
   o no entran: si van como números, el modelo va a interpretar una distancia donde sólo hay una
@@ -3110,7 +3160,9 @@ predecir»:</p>
   jugador ganó en esa misma partida ya están sumados en la maestría.</p>
   <p>No filtra la duración —saber que alguien ganó no dice cuánto duró— pero no es el valor que
   existiría al arrancar. Puesto en producción, el pipeline tendría que leer las tres cosas antes del
-  primer minuto. Entran, con la salvedad escrita en la tabla.</p>
+  primer minuto. El winrate es el más comprometido de los tres —cuenta el resultado de esa partida
+  como una victoria o una derrota entera, no diluida— y <strong>ya sale por H4</strong>, así que ese
+  reparo se achica solo. Los otros dos entran, con la salvedad escrita en la tabla.</p>
 </div>
 
 <div class="aviso">
@@ -3149,7 +3201,7 @@ predecir»:</p>
 <tr><th>Pregunta</th><th>Respuesta corta</th></tr>
 <tr><td>Cuál es la variable objetivo y cómo está distribuida</td><td><code>game_duration_s</code>, continua, en segundos. Media 1.748, mediana 1.751, asimetría −0,039: simétrica y sin desbalance. Truncada en 300 s y con un escalón de 714 partidas en 900 s.</td></tr>
 <tr><td>Por qué hay nulos donde hay nulos</td><td>No hay nulos, y ésa es la respuesta larga: los faltantes se convirtieron en valores por defecto aguas arriba —1500, 0,50, 0—. Es una tercera categoría además de los faltantes reales y los estructurales, y afecta al 0,55 % de las celdas de jugador.</td></tr>
-<tr><td>Qué hipótesis salió mal y qué se hizo con eso</td><td>Cinco de las ocho. La más interesante es H2: estábamos convencidos de que los tanques alargaban la partida y dio −0,008. La conclusión se escribió como salió, y `num_tanks` sigue en la tabla de candidatas —no se descarta una columna porque una hipótesis sobre ella falle—.</td></tr>
+<tr><td>Qué hipótesis salió mal y qué se hizo con eso</td><td>Dos de las ocho, H1 y H2. La más interesante es H2: estábamos convencidos de que los tanques alargaban la partida y dio −0,008. La conclusión se escribió como salió, y <code>num_tanks</code> sigue en la tabla de candidatas —no se descarta una columna porque una hipótesis sobre ella falle—. También salió distinto de lo esperado H7, que esperábamos verde de entrada y arrancó amarillo.</td></tr>
 <tr><td>Qué columna se descartó por fuga</td><td>Ninguna, y es una respuesta con contenido: el esquema es estrictamente de condiciones iniciales. Lo que sí hay son dos reparos declarados, en 8.5.</td></tr>
 <tr><td>Qué quedó inconcluso</td><td>Los cuatro puntos de 8.7.</td></tr>
 </table>
@@ -3165,9 +3217,9 @@ predecir»:</p>
   tanda de consultas a League-V4 que falló para toda la partida y cayó al valor por defecto. No se
   verificó: hace falta el bronce de la corrida grande, que está en la máquina de otro integrante.
   <strong>Es el pendiente más concreto y el más fácil de cerrar.</strong></li>
-  <li><strong>Si los valores previos a la partida cambian algo.</strong> Los dos reparos de fuga de
-  8.5 se resolverían leyendo elo, winrate y maestría antes del arranque, y eso requiere cambiar el
-  pipeline y volver a recolectar.</li>
+  <li><strong>Si los valores previos a la partida cambian algo.</strong> Los reparos de fuga de 8.5
+  se resolverían leyendo el elo y la maestría antes del arranque, y eso requiere cambiar el pipeline
+  y volver a recolectar.</li>
   <li><strong>La composición de campeones.</strong> Es la única dirección que mostró estructura clara
   y quedó como candidata a novena ficha, sin resolver.</li>
 </ol>
@@ -3177,7 +3229,10 @@ predecir»:</p>
 <table>
 <tr><th>Pregunta</th><th>Respuesta</th></tr>
 <tr><td>«El objetivo es continuo, ¿cómo hiciste el <code>value_counts</code> que pide la consigna?»</td><td>No aplica: <code>game_duration_s</code> toma 2.180 valores distintos. El sustituto honesto es agrupar en bandas de minutos, que es donde la pregunta «¿hay una clase que se come todo?» recupera sentido. La banda más poblada es el 29,9 %.</td></tr>
-<tr><td>«¿Por qué ninguna hipótesis usó un movimiento?»</td><td>Porque el semáforo sólo los habilita en amarillo y las ocho dieron rojo. Insistir sobre un rojo es cazar resultados.</td></tr>
+<tr><td>«¿Por qué sólo una hipótesis usó un movimiento?»</td><td>Porque el semáforo sólo los habilita en amarillo, y de los ocho números sólo el de H7 cayó ahí. Verde y rojo cierran la hipótesis; insistir sobre un rojo es cazar resultados.</td></tr>
+<tr><td>«Las cuatro verdes no miden contra el objetivo. ¿No es hacer trampa?»</td><td>No, y es la distinción que ordena la entrega. La consigna pide dos clases de hipótesis: las que responden algo del dominio y las que <strong>deciden sobre una columna del modelo</strong>. Las segundas no necesitan pasar por la duración: una columna que duplica a otra sale del modelo aunque las dos sean igual de inútiles para predecir. Lo que sí sería trampa es presentar un 0,711 entre el elo y el winrate como si fuera señal contra el objetivo, y en ninguna parte se hace.</td></tr>
+<tr><td>«En H6 el η² da verde y Pearson amarillo. ¿Elegiste la que te convenía?»</td><td>La medida la fija la forma de la afirmación antes de medir: «difiere entre grupos» es una comparación y se mide con η². Los dos números están a la vista en la ficha, y hay un control que descarta la objeción de que η² se infle con once grupos: la misma categoría contra la duración da 0,001.</td></tr>
+<tr><td>«H3 y H6 salieron de mirar la matriz de correlación. ¿No rompe la regla del orden?»</td><td>No: la regla prohíbe usar <em>el resultado que estás por calcular</em>, no lo que la exploración ya mostró. La fase 6 de la teórica dice justamente que el EDA tiene que generar preguntas nuevas. Las dos fichas lo declaran en su primera casilla, y lo que agregan es la decisión: medir a nivel de partida y resolver cuál columna sale.</td></tr>
 <tr><td>«¿Trece millones de puntos de maestría no te parece raro?»</td><td>Sí, y por eso lo verificamos contra el bronce: 200 celdas comparadas contra el <code>championPoints</code> crudo, 200 coincidencias exactas. Es un <em>one-trick</em> real, no un bug de suma.</td></tr>
 <tr><td>«Si nada correlaciona, ¿el proyecto no sirve?»</td><td>Correlación mide una columna a la vez y de forma monótona. Lo que sabemos es que no hay una feature obvia; si hay señal está en combinaciones, y eso lo decide el modelo. Además ahora tenemos el rival contra el que medirlo: la media constante, 1.748 segundos.</td></tr>
 <tr><td>«¿Por qué ocho fichas si la consigna pide cuatro?»</td><td>Porque cuatro de las ocho deciden columnas y las cuatro decisiones cambian el dataset de la Entrega 3. Recortar a cuatro habría dejado columnas adentro sin un número que lo justifique.</td></tr>
@@ -3264,7 +3319,7 @@ predecir»:</p>
 <h3>Lo que falta para cerrar la Entrega 2</h3>
 <table>
 <tr><th></th><th>Tarea</th><th>Quién</th></tr>
-<tr><td><s>1</s></td><td><s>Armar el notebook con las seis fases, las fichas y la tabla de candidatas.</s> <strong>Hecho:</strong> 169 celdas, ejecutado sin errores, ocho fichas.</td><td>Quien analiza</td></tr>
+<tr><td><s>1</s></td><td><s>Armar el notebook con las seis fases, las fichas y la tabla de candidatas.</s> <strong>Hecho:</strong> 174 celdas, ejecutado sin errores, ocho fichas.</td><td>Quien analiza</td></tr>
 <tr><td>2</td><td>Que <strong>todo el grupo</strong> lea la parte VIII y pueda recorrer <strong>cualquiera</strong> de las ocho fichas. El docente elige dos al azar y pregunta a integrantes puntuales.</td><td>Todos</td></tr>
 <tr><td>3</td><td>Tener claro el hallazgo de 8.4 y sus dos precisiones. Es lo que más se va a preguntar y lo que peor queda si se contesta «no dio nada» sin el número.</td><td>Todos</td></tr>
 <tr><td>4</td><td>Pedirle a quien tiene el bronce grande que verifique las 26 partidas con 9 o 10 jugadores imputados (pendiente 2 de 8.7). Es el único pendiente que se puede cerrar antes del 23/9.</td><td>Quien tiene el bronce</td></tr>
@@ -3315,7 +3370,7 @@ tienen su lugar natural en las entregas siguientes:</p>
 <tr>
   <td><strong>3 · Modelado</strong><br>14/10</td>
   <td>Comparar modelos de regresión sobre <code>game_duration_s</code> y medir su desempeño.</td>
-  <td>La Entrega 2 dejó el terreno preparado: <strong>salen 24 columnas</strong> con un número detrás y los 34 agregados de equipo se colapsan en 17 sumas (8.5). Las dos preguntas que estaban anotadas acá ya tienen respuesta parcial —<code>is_main</code> sale, y <code>player_elo</code> entra aunque sea débil— y aparecen tres nuevas: si la señal está en las <strong>combinaciones</strong> de columnas y no en ninguna sola (8.4), cómo tratar el <strong>escalón de los 900 segundos</strong>, y cómo ganarle al rival que dejó medido el análisis: <strong>predecir 1.748 segundos siempre</strong>.</td>
+  <td>La Entrega 2 dejó el terreno preparado: <strong>salen 40 columnas</strong> con un número detrás y las 34 columnas de agregados de equipo quedan en 12 sumas (8.5). Las dos preguntas que estaban anotadas acá ya tienen respuesta parcial —<code>is_main</code> sale, y <code>player_elo</code> entra aunque sea débil— y aparecen tres nuevas: si la señal está en las <strong>combinaciones</strong> de columnas y no en ninguna sola (8.4), cómo tratar el <strong>escalón de los 900 segundos</strong>, y cómo ganarle al rival que dejó medido el análisis: <strong>predecir 1.748 segundos siempre</strong>.</td>
 </tr>
 <tr>
   <td><strong>4 · Visualización</strong><br>04/11</td>

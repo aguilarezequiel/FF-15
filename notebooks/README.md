@@ -67,5 +67,18 @@ coincidir con la salida que quedó guardada en el `.ipynb`.
 `asociacion()` de la cátedra llama a `Series.corr(method="spearman")`, y pandas
 delega ese cálculo en `scipy.stats.spearmanr`.
 
+### Hace falta Python 3.12 o más nuevo
+
+Dos de los pines lo exigen: `numpy==2.5.2` y `scipy==1.18.1` no publican rueda
+para 3.11, así que en una máquina con Python 3.11 el `pip install` corta con
+*«No matching distribution found»*.
+
+Si no hay más remedio que usar 3.11, el pin que **no** se puede aflojar es
+`pandas==3.0.5`, que sí instala ahí y es el que decide el dtype de las columnas
+de texto que aparece en las salidas guardadas. `numpy` y `scipy` caen a 2.4.6 y
+1.17.1, y los números del notebook no cambian: ninguna de las medidas del
+semáforo depende de esas versiones. Es una salida de emergencia, no la forma
+recomendada de correrlo.
+
 No hay `seaborn`: la cátedra usa matplotlib crudo, sin `sns.set` ni
 `plt.style.use`, con dos colores fijos (`#009086` y `#B5402C`).

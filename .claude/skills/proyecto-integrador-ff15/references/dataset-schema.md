@@ -104,7 +104,38 @@ Esto es lo que hay que saber contestar en la defensa:
 | `perks` ausente en el payload | `_rune_primary` / `_rune_sub` en `0` |
 | Campeón más nuevo que el snapshot de Data Dragon | Aporta 0 a todos los agregados de composición del equipo. Se loguea un warning. |
 
-La decisión de imputar con defaults en vez de dejar `NaN` es deliberada y hay que poder justificarla: un jugador sin ranked **es** un jugador de habilidad desconocida, y 1500 / 0.50 codifica "promedio, sin información". Vale la pena discutir en la Unidad 2 si conviene agregar una bandera `_es_unranked` en vez de esconder el caso dentro del valor.
+La decisión de imputar con defaults en vez de dejar `NaN` es deliberada y hay que poder justificarla: un jugador sin ranked **es** un jugador de habilidad desconocida, y 1500 / 0.50 codifica "promedio, sin información". La Unidad 2 cerró esa discusión: la bandera `_es_unranked` **no hace falta** para predecir la duración. Las 615 partidas con jugadores imputados duran una mediana de 1.788 segundos contra 1.750 del resto —separación 0,067, zona roja—, así que la imputación con 1500 / 0,50 queda como está. Dos salvedades: el proxy para detectarla es imperfecto (`_player_elo == 1500` también le pasa a un SILVER III con 50 LP, así que hay que exigir además `_player_winrate == 0.50`), y la conclusión vale **para este objetivo**. `resumen_liga()` en `include/lol/riot.py` ya calcula `es_unranked`, pero `transform.py` no lo escribe al CSV: si alguna vez hace falta el dato exacto, es una columna de una línea.
+
+
+## Qué columnas salen después de la Entrega 2, y con qué número
+
+El esquema del pipeline **no cambió** —el CSV sigue teniendo las 137 columnas—, pero el análisis
+exploratorio decidió cuáles de ellas no entran al modelo de la Unidad 3. Cada decisión tiene una
+ficha de hipótesis detrás, en `notebooks/entrega-2/eda_entrega2.ipynb`:
+
+| Columnas | Cuántas | Ficha | El número |
+|---|---|---|---|
+| `_player_winrate` | 10 | H4 | 0,711 con `player_elo` agregado; el elo conserva más señal contra el objetivo (−0,161 contra −0,120) y tiene un reparo de fuga menor |
+| `_is_main` | 10 | H7 | con la escala correcta coincide 0,769 con la continua, y el umbral de 50.000 marca al 67,9 % de los jugadores |
+| `_mains_count` | 2 | H7 | es la suma de los `_is_main` |
+| `_avg_defense` y `_avg_magic` | 4 | H6 | η² 0,319 y 0,310 contra `_num_tanks` y `_num_mages` |
+| `_total_base_armor` | 2 | H3 | −0,672 con `_avg_attackrange` y 0,529 con `_total_base_hp`: es el centro de dos redundancias |
+| `_count_flash` | 2 | H5 | valor modal 0,838 y Pearson −0,014 |
+| `_champ_name` | 10 | — | mapea 1 a 1 con `_champ_id` (173 y 173) |
+
+Y dos transformaciones que hay que respetar al escribir el modelado:
+
+- **`_champ_mastery_pts` entra en logaritmo aplicado por jugador *antes* de promediar.** No es lo
+  mismo que el logaritmo del promedio: medido contra `mains_count`, el promedio del logaritmo da
+  0,769 y el logaritmo del promedio 0,582.
+- **Los agregados de equipo entran como suma `t1 + t2`, no por equipo** (H8). Los rótulos `t1` y
+  `t2` son los `teamId` 100 y 200, que Riot asigna sin criterio: la diferencia entre la correlación
+  de una mitad y la de la otra es 0,013 en promedio. De las 34 columnas quedan 24 tras los recortes
+  de arriba, y se colapsan en **12 sumas**.
+
+**El hallazgo de fondo, que hay que saber decir:** ninguna columna de condiciones iniciales predice
+la duración. La más asociada al objetivo es `elo_partida` con Pearson −0,161, que explica el 2,6 %
+de la varianza. Las cuatro fichas verdes miden **columnas entre sí**, no contra el objetivo.
 
 ## Lo que NO está en el dataset
 
