@@ -1,0 +1,1186 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FF-15 · Guión de la defensa · Entrega 1</title>
+<style>
+@page { size: A4; margin: 18mm 16mm 16mm 16mm; }
+:root{
+  --tinta:#16191d; --suave:#4a5158; --linea:#d8dde2; --fondo:#f6f8fa;
+  --acento:#0b5fa5; --alerta:#a3341f; --verde:#4a7c2f;
+}
+*{box-sizing:border-box}
+body{font-family:"Charter","Georgia","Times New Roman",serif;color:var(--tinta);
+  font-size:10.5pt; line-height:1.55; margin:0;}
+h1,h2,h3,h4{font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;line-height:1.25;
+  color:var(--tinta); page-break-after:avoid;}
+h1{font-size:23pt;margin:0 0 6pt;letter-spacing:-.4pt}
+h2{font-size:16pt;margin:22pt 0 8pt;padding-bottom:4pt;border-bottom:2px solid var(--acento)}
+h3{font-size:12.5pt;margin:16pt 0 5pt;color:var(--acento)}
+h4{font-size:10.5pt;margin:12pt 0 4pt;text-transform:uppercase;letter-spacing:.6pt;color:var(--suave)}
+p{margin:0 0 8pt;text-align:justify}
+ul,ol{margin:0 0 9pt;padding-left:18pt}
+li{margin-bottom:4pt}
+code{font-family:"Cascadia Mono","Consolas","DejaVu Sans Mono",monospace;font-size:9pt;
+  background:var(--fondo);padding:1px 3px;border-radius:3px;border:1px solid var(--linea)}
+pre{font-family:"Cascadia Mono","Consolas","DejaVu Sans Mono",monospace;font-size:8.2pt;
+  line-height:1.45;background:var(--fondo);border:1px solid var(--linea);border-left:3px solid var(--acento);
+  padding:8pt 10pt;white-space:pre-wrap;word-wrap:break-word;
+  border-radius:3px;margin:0 0 10pt;page-break-inside:avoid}
+pre code{background:none;border:none;padding:0;font-size:inherit}
+table{width:100%;border-collapse:collapse;margin:0 0 11pt;font-size:9.2pt;page-break-inside:avoid}
+th{background:var(--fondo);text-align:left;font-family:"Segoe UI",Arial,sans-serif;
+  font-size:8.8pt;text-transform:uppercase;letter-spacing:.4pt;color:var(--suave);
+  padding:5pt 6pt;border-bottom:1.5px solid var(--acento)}
+td{padding:5pt 6pt;border-bottom:1px solid var(--linea);vertical-align:top}
+tr:last-child td{border-bottom:none}
+
+.portada{height:245mm;display:flex;flex-direction:column;justify-content:center;
+  page-break-after:always;text-align:center}
+.portada .materia{font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;letter-spacing:2.5pt;
+  text-transform:uppercase;color:var(--suave);margin-bottom:14pt}
+.portada h1{font-size:30pt;margin-bottom:10pt}
+.portada .sub{font-size:13pt;color:var(--suave);font-style:italic;margin-bottom:26pt;
+  max-width:135mm;margin-left:auto;margin-right:auto;text-align:center}
+.portada .meta{font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;color:var(--suave);line-height:1.9}
+.portada .equipo{font-family:"Segoe UI",Arial,sans-serif;font-size:10.5pt;color:var(--tinta);
+  line-height:1.8;margin-top:20pt;border-top:1px solid var(--linea);
+  border-bottom:1px solid var(--linea);padding:12pt 0;max-width:110mm;margin-left:auto;margin-right:auto}
+
+.seccion{page-break-before:always;border-top:4px solid var(--acento);padding-top:10pt;margin-top:0}
+.seccion .n{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;letter-spacing:2pt;
+  text-transform:uppercase;color:var(--acento);display:block;margin-bottom:2pt}
+
+.nota,.aviso,.clave{padding:8pt 11pt;margin:0 0 11pt;border-radius:4px;font-size:9.6pt;page-break-inside:avoid}
+.nota{background:#eef4fa;border-left:3px solid var(--acento)}
+.aviso{background:#fdf2ee;border-left:3px solid var(--alerta)}
+.clave{background:#f2f7ee;border-left:3px solid var(--verde)}
+.nota p:last-child,.aviso p:last-child,.clave p:last-child{margin-bottom:0}
+.etiqueta{font-family:"Segoe UI",Arial,sans-serif;font-size:8.5pt;font-weight:600;
+  text-transform:uppercase;letter-spacing:.7pt;display:block;margin-bottom:3pt}
+.nota .etiqueta{color:var(--acento)} .aviso .etiqueta{color:var(--alerta)} .clave .etiqueta{color:var(--verde)}
+
+/* --- Bloques de turno --- */
+.turno{border:1.5px solid var(--acento);border-radius:5px;margin:0 0 14pt;
+  page-break-inside:avoid;overflow:hidden}
+.turno > .cab{background:var(--acento);color:#fff;padding:6pt 10pt;
+  font-family:"Segoe UI",Arial,sans-serif;display:flex;justify-content:space-between;align-items:baseline}
+.turno > .cab .quien{font-size:12.5pt;font-weight:600;letter-spacing:-.2pt}
+.turno > .cab .reloj{font-size:10pt;font-family:"Cascadia Mono","Consolas",monospace;opacity:.95}
+.turno > .cuerpo{padding:9pt 11pt}
+.turno .tema{font-family:"Segoe UI",Arial,sans-serif;font-size:9.5pt;color:var(--suave);
+  margin:0 0 8pt;padding-bottom:6pt;border-bottom:1px solid var(--linea)}
+.pantalla{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;background:#fff;
+  border:1px dashed var(--linea);border-radius:3px;padding:6pt 9pt;margin:0 0 9pt;color:var(--suave)}
+.pantalla b{color:var(--tinta)}
+.decir{background:#fffdf5;border-left:3px solid #c9a227;padding:9pt 12pt;margin:0 0 9pt;
+  border-radius:0 4px 4px 0}
+.decir p{margin:0 0 7pt;text-align:left}
+.decir p:last-child{margin-bottom:0}
+.decir .etiqueta{color:#8a6d10}
+.pase{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;color:var(--verde);
+  font-weight:600;margin:0;padding-top:5pt;border-top:1px solid var(--linea)}
+.anclas{font-size:9.2pt;margin:0 0 9pt}
+.anclas ul{margin:0;padding-left:16pt}
+.anclas li{margin-bottom:2pt}
+
+/* --- Preguntas --- */
+.pregunta{background:var(--fondo);border:1px solid var(--linea);border-radius:4px;
+  padding:8pt 11pt;margin:0 0 9pt;page-break-inside:avoid}
+.pregunta .q{font-family:"Segoe UI",Arial,sans-serif;font-weight:600;font-size:10pt;
+  color:var(--acento);margin-bottom:5pt;display:block}
+.pregunta p{margin-bottom:6pt}
+.pregunta p:last-child{margin-bottom:0}
+.duenio{font-family:"Segoe UI",Arial,sans-serif;font-size:8pt;text-transform:uppercase;
+  letter-spacing:.5pt;color:var(--suave);float:right;font-weight:600;
+  background:#fff;border:1px solid var(--linea);border-radius:10px;padding:1pt 7pt;margin-left:8pt}
+.corta{font-weight:600}
+.mas{font-size:9.3pt;color:var(--suave);border-top:1px dotted var(--linea);padding-top:5pt;margin-top:5pt}
+.mas b{color:var(--tinta)}
+
+.ok{color:#2d6a1f;font-weight:600} .no{color:var(--alerta);font-weight:600}
+.pie{margin-top:20pt;padding-top:8pt;border-top:1px solid var(--linea);
+  font-size:8.5pt;color:var(--suave);font-family:"Segoe UI",Arial,sans-serif}
+
+.ficha{border:2px solid var(--tinta);border-radius:5px;padding:12pt 14pt;margin-bottom:12pt}
+.ficha h3{margin-top:0}
+.ficha table{font-size:9.5pt;margin-bottom:0}
+.ficha td:first-child{width:46%;color:var(--suave)}
+.ficha td:last-child{font-family:"Segoe UI",Arial,sans-serif;font-weight:600}
+
+.linea-tiempo{border:1px solid var(--linea);border-radius:4px;overflow:hidden;
+  display:flex;margin:0 0 12pt;font-family:"Segoe UI",Arial,sans-serif;font-size:8.2pt;text-align:center}
+.linea-tiempo div{padding:7pt 3pt;border-right:1px solid #fff;color:#fff;line-height:1.35}
+.linea-tiempo div:last-child{border-right:none}
+.lt1{background:#0b5fa5;flex:2.33} .lt2{background:#1d74bd;flex:2.33}
+.lt3{background:#2f89d3;flex:2.33} .lt4{background:#4a9edd;flex:2.33}
+.lt5{background:#6cb2e5;flex:2.33} .lt6{background:#a3341f;flex:6}
+.lt7{background:#6b7178;flex:2}
+.linea-tiempo b{display:block;font-size:9pt}
+</style>
+</head>
+<body>
+
+<div class="portada">
+  <div class="materia">UTN FRM · Ingeniería en Sistemas de Información · Ciencia de Datos 2026</div>
+  <h1>Guión de la defensa</h1>
+  <div class="sub">Entrega 1 · Ingeniería de datos · Veinte minutos, cinco voces,
+  una sola pregunta de fondo: ¿tenemos un pipeline que produce el dataset sin que nadie lo toque a mano?</div>
+  <div class="equipo">
+    <strong>Grupo 5K09-02</strong><br>
+    Ezequiel Aguilar · Matías Telo · Anthony Cochachin<br>
+    Rodrigo Viluron · Facundo Aracena
+  </div>
+  <div class="meta">
+    Proyecto <strong>FF-15</strong> — predicción de la duración de una partida de League of Legends<br>
+    Exposición: miércoles 9 de septiembre, 14:55 – 15:15<br>
+    Documento de apoyo: <code>docs/documentacion-proyecto.pdf</code>
+  </div>
+</div>
+
+<!-- ================================================================= -->
+<h2 class="seccion"><span class="n">Sección 1</span>Cómo usar este guión</h2>
+
+<p>Este documento existe por una sola razón: <strong>la nota es individual y las preguntas van
+dirigidas</strong>. La consigna lo dice sin vueltas — «que hable uno solo es el error más caro».
+Así que los doce minutos de exposición están repartidos en cinco turnos de duración casi idéntica,
+y cada turno tiene el texto escrito de lo que hay que decir.</p>
+
+<p>El guión no se lee en voz alta el día de la entrega. Se ensaya hasta que se puede
+decir mirando la pantalla, no el papel. Lo que está escrito es el <em>piso</em>: el contenido
+que sí o sí tiene que salir de esa boca en ese minuto. Cómo se dice es de cada uno.</p>
+
+<h3>Las cuatro reglas del guión</h3>
+
+<table>
+<tr><th style="width:26%">Regla</th><th>Por qué</th></tr>
+<tr><td><strong>Nadie interrumpe el turno de otro</strong></td>
+<td>Si a alguien se le escapa un dato, el que sigue lo retoma en su turno.
+Interrumpir para corregir a un compañero delante del docente hace que el grupo se vea desarmado,
+y come tiempo que no se recupera.</td></tr>
+<tr><td><strong>El turno se cierra con el pase</strong></td>
+<td>Cada bloque termina con una frase que nombra al siguiente. Es lo que hace que la
+exposición se vea coreografiada y no improvisada, y evita el silencio incómodo entre turnos.</td></tr>
+<tr><td><strong>El reparto vale para exponer, no para saber</strong></td>
+<td>Los doce minutos están repartidos. Las respuestas <strong>no</strong>. En los minutos 12 a 18
+el docente elige a quién le pregunta qué, y la pregunta sobre la extracción le puede caer
+a quien escribió la transformación. La sección 6 es la parte que todos tienen que saber igual.</td></tr>
+<tr><td><strong>Si te toca y no sabés, decilo y devolvé algo</strong></td>
+<td>«Eso lo trabajó Rodrigo, pero lo que sí te puedo decir es…» y decís lo que sabés.
+Nunca inventar: un dato inventado se descubre en la repregunta siguiente y arrastra
+la nota de todo el bloque. Ver la sección 5.</td></tr>
+</table>
+
+<div class="clave">
+  <span class="etiqueta">La frase que resume la entrega</span>
+  <p>Si el docente se lleva una sola idea, que sea ésta: <strong>«El dato crudo está en disco,
+  el pipeline lo reconstruye entero sin tocar la red, y todo lo que decidimos está medido
+  y declarado — incluso lo que nos salió mal.»</strong> Cada uno de los cinco turnos empuja
+  esa idea desde un ángulo distinto.</p>
+</div>
+
+<!-- ================================================================= -->
+<h2 class="seccion"><span class="n">Sección 2</span>Antes de entrar al aula</h2>
+
+<p>La consigna es explícita sobre lo que no hay que hacer: llegar sin el entorno levantado y
+correr el pipeline en vivo. Las dos cosas se comen la mitad de los veinte minutos.</p>
+
+<h3>La noche anterior (martes 8)</h3>
+<table>
+<tr><th style="width:5%"></th><th>Qué</th><th style="width:24%">Quién</th></tr>
+<tr><td>☐</td><td>Probar que <code>astro dev start</code> levanta sin errores en la notebook que se lleva.</td><td>Quien opera</td></tr>
+<tr><td>☐</td><td>Verificar que la corrida en verde del 6/9 sigue visible en el historial del DAG.</td><td>Quien opera</td></tr>
+<tr><td>☐</td><td>Confirmar que <code>include/output/lol_2026-09-06.csv</code> está en disco (11 MB) y abre.</td><td>Quien opera</td></tr>
+<tr><td>☐</td><td>Simulacro completo: los cinco turnos cronometrados, y después los demás preguntan del banco de la sección 8.</td><td>Todos</td></tr>
+<tr><td>☐</td><td>Desactivar suspensión e hibernación en la configuración de energía de Windows.</td><td>Quien opera</td></tr>
+</table>
+
+<h3>El mismo día, quince minutos antes</h3>
+<table>
+<tr><th style="width:5%"></th><th>Qué</th><th style="width:24%">Detalle</th></tr>
+<tr><td>☐</td><td>Regenerar la API key de Riot en el portal y actualizarla en <code>airflow_settings.yaml</code>.</td><td>Vence cada 24 h</td></tr>
+<tr><td>☐</td><td><code>astro dev restart</code> y esperar a que la interfaz responda.</td><td>Localhost:8080</td></tr>
+<tr><td>☐</td><td>Dejar <strong>tres pestañas abiertas</strong> en el navegador, en este orden.</td><td>Ver abajo</td></tr>
+<tr><td>☐</td><td>Silenciar notificaciones de Windows y poner el brillo al máximo.</td><td>Se proyecta</td></tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">Las tres pestañas, en orden</span>
+  <p><strong>1.</strong> Airflow en la vista <em>Graph</em> de la corrida en verde del 6/9, con las seis
+  instancias de <code>land_bronze</code> desplegadas. &nbsp;
+  <strong>2.</strong> El archivo <code>include/output/reports/calidad.md</code>. &nbsp;
+  <strong>3.</strong> El CSV <code>lol_2026-09-06.csv</code> abierto (Excel o el visor que sea),
+  con la primera fila visible y las columnas <code>match_id</code> y <code>game_duration_s</code> a la vista.</p>
+  <p>La cuarta pestaña opcional, por si preguntan por el bronce: el explorador de archivos
+  parado en <code>include/output/bronze/matches/plataforma=kr/</code>.</p>
+</div>
+
+<div class="aviso">
+  <span class="etiqueta">Si el docente pide ver una corrida en vivo</span>
+  <p>Se dispara con <code>partidas_objetivo</code> chico — 10 o 20. Termina en minutos y produce
+  <strong>el mismo CSV completo de 19.145 filas</strong>, porque <code>refine_silver</code> reprocesa
+  todo el bronce acumulado, no sólo lo que bajó esa corrida. Es una demostración fuerte y barata:
+  conviene tenerla preparada, pero <em>además</em> de la corrida ya hecha, nunca en lugar de ella.</p>
+</div>
+
+<!-- ================================================================= -->
+<h2 class="seccion"><span class="n">Sección 3</span>El reparto de un vistazo</h2>
+
+<div class="linea-tiempo">
+  <div class="lt1"><b>Ezequiel</b>0:00–2:20</div>
+  <div class="lt2"><b>Matías</b>2:20–4:40</div>
+  <div class="lt3"><b>Anthony</b>4:40–7:00</div>
+  <div class="lt4"><b>Rodrigo</b>7:00–9:20</div>
+  <div class="lt5"><b>Facundo</b>9:20–11:40</div>
+  <div class="lt6"><b>Preguntas dirigidas</b>12:00–18:00</div>
+  <div class="lt7"><b>Devolución</b>18–20</div>
+</div>
+
+<table>
+<tr><th style="width:19%">Quién</th><th style="width:12%">Reloj</th><th>Qué expone</th><th style="width:17%">Bloque de la consigna</th></tr>
+<tr><td><strong>Ezequiel Aguilar</strong></td><td>0:00 – 2:20</td>
+<td>La pregunta del proyecto, qué es una fila, la fuente, y cómo se llega de un ranking de jugadores a un dataset de partidas.</td>
+<td>«De qué se trata»</td></tr>
+<tr><td><strong>Matías Telo</strong></td><td>2:20 – 4:40</td>
+<td>El grafo en verde y las tareas 1 a 4: el sensor, el cortocircuito, el catálogo y el reparto de cuota.</td>
+<td rowspan="2">«La corrida»</td></tr>
+<tr><td><strong>Anthony Cochachin</strong></td><td>4:40 – 7:00</td>
+<td>La tarea 5, <code>land_bronze</code>: la capa bronce, el filtro previo, el append-only y el pool de keys.</td></tr>
+<tr><td><strong>Rodrigo Viluron</strong></td><td>7:00 – 9:20</td>
+<td>Las tareas 6 a 9: la transformación sin red, la deduplicación, la validación dura y el reporte de calidad.</td>
+<td rowspan="2">«El dataset»</td></tr>
+<tr><td><strong>Facundo Aracena</strong></td><td>9:20 – 11:40</td>
+<td>El CSV abierto: los seis criterios con sus números, la columna objetivo, los nulos, la confesión de tidy y el sesgo declarado.</td></tr>
+<tr><td colspan="2"><em>11:40 – 12:00</em></td><td colspan="2"><em>Colchón. Si se fue de tiempo, se recupera acá.
+Si sobra, Ezequiel cierra con una frase y abre las preguntas.</em></td></tr>
+</table>
+
+<p>Cada turno son <strong>2 minutos 20</strong>, salvo el colchón. Son unas 300 palabras habladas a
+ritmo tranquilo: alcanza para lo que está escrito y para señalar la pantalla, no para improvisar
+de más. <strong>Cronometrar el simulacro es lo único que garantiza que los cinco entren.</strong></p>
+
+<h3>Además del turno, cada uno tiene un área</h3>
+
+<p>El área es de quién se espera que sepa <em>más</em> sobre ese tema en las preguntas dirigidas.
+No es exclusiva: es una prioridad de lectura de la documentación integral.</p>
+
+<table>
+<tr><th style="width:19%">Quién</th><th>Área que domina</th><th style="width:22%">Qué leer del documento integral</th></tr>
+<tr><td><strong>Ezequiel</strong></td><td>La fuente y el proyecto. La API de Riot, los límites, el vencimiento de la key,
+las dos familias de hosts, los siete endpoints, el recorrido de semilla a dataset. También es quien opera la notebook.</td>
+<td>Partes I y III completas · VI</td></tr>
+<tr><td><strong>Matías</strong></td><td>La orquestación. Qué es un DAG, sensores, cortocircuito, <code>trigger_rule</code>,
+mapeo dinámico, XCom, por qué Airflow y no un script.</td>
+<td>Parte II completa · IV.5</td></tr>
+<tr><td><strong>Anthony</strong></td><td>La extracción y el bronce. <code>riot.py</code> y <code>seeds.py</code>: el pool de keys,
+el limitador proactivo, la afinidad key↔puuid, el modelo medallón, el particionado en disco.</td>
+<td>III · IV.3 · IV.4.1 · IV.4.3 · V.6</td></tr>
+<tr><td><strong>Rodrigo</strong></td><td>La transformación. <code>transform.py</code> y <code>schema.py</code>: los filtros de admisión,
+la corrección de milisegundos, la asignación de carriles, cómo se generan las 137 columnas, los tests.</td>
+<td>IV.4.4 · IV.4.5 · IV.6 · V.2 · V.3</td></tr>
+<tr><td><strong>Facundo</strong></td><td>El dataset y sus límites. Los seis criterios medibles, las variables derivadas,
+los nulos imputados, tidy, y las cinco limitaciones declaradas — sobre todo el sesgo por tier.</td>
+<td>V completa · VII.2 a VII.5</td></tr>
+</table>
+
+<!-- ================================================================= -->
+<h2 class="seccion"><span class="n">Sección 4</span>El guión, minuto a minuto</h2>
+
+<p>Lo que está sobre fondo amarillo es <strong>el texto para decir</strong>. Está escrito para
+leerse en voz alta y sonar hablado, no escrito. Lo de abajo son los datos que sostienen ese texto,
+por si el docente frena en el medio.</p>
+
+<!-- ---------------- TURNO 1 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">1 · Ezequiel Aguilar</span><span class="reloj">0:00 → 2:20</span></div>
+  <div class="cuerpo">
+    <p class="tema">De qué se trata · la pregunta, la fila, la fuente y el recorrido</p>
+    <div class="pantalla"><b>En pantalla:</b> nada todavía, o Airflow ya abierto de fondo.
+    Este bloque se dice mirando al docente, no a la pantalla. Sin filminas — la consigna lo pide así.</div>
+
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>Buenas. Somos el grupo 5K09-02. Nuestra pregunta es si se puede predecir cuánto va a durar
+      una partida de <em>League of Legends</em> sabiendo únicamente lo que se conoce antes de que
+      arranque: quiénes juegan, con qué campeones y con qué hechizos. La fuente es la API oficial de
+      Riot Games, más Data Dragon, que es el catálogo público del juego.</p>
+      <p>Una fila de nuestro dataset es <strong>una partida clasificatoria Solo/Duo de la Season 16</strong>,
+      identificada por su <code>match_id</code>. Y la columna que queremos predecir es
+      <code>game_duration_s</code>: la duración en segundos. Es un número continuo, así que es un
+      problema de regresión.</p>
+      <p>Hay una cosa de la fuente que conviene decir de entrada porque condiciona todo el diseño:
+      Riot no publica un listado de partidas. Publica un ranking de jugadores. Entonces el camino es
+      entrar por la escalera de un servidor, sacar jugadores semilla, pedirle a cada uno sus últimas
+      quince partidas clasificatorias, y de cada partida bajar el detalle completo más el perfil de
+      los diez que jugaron. Medimos cuánto cuesta eso: <strong>16,8 pedidos a la API por partida</strong>.
+      Uno es la partida, los otros dieciséis son los perfiles.</p>
+      <p>Y hay dos características de la API que explican por qué el pipeline está armado como está.
+      La <em>development key</em> vence cada 24 horas, y los límites de pedidos se aplican
+      <strong>por región, no globalmente</strong>. Lo primero es la razón por la que el DAG se dispara
+      a mano y no está programado. Lo segundo es la razón por la que hay seis tareas de descarga en
+      paralelo, una por servidor.</p>
+      <p>El resultado de todo eso es un CSV de <strong>19.145 partidas por 137 columnas</strong>.
+      Matías les cuenta cómo arranca el pipeline.</p>
+    </div>
+
+    <div class="anclas"><strong>Los datos de este bloque, por si frenan acá:</strong>
+    <ul>
+      <li>Cola 420 = Ranked Solo/Duo. Es la única que recolectamos, para que todas las partidas sean comparables.</li>
+      <li>Seis plataformas: <code>la1</code> (LAN), <code>la2</code> (LAS), <code>br1</code>, <code>na1</code>, <code>euw1</code>, <code>kr</code>.</li>
+      <li>Los endpoints de partidas viven en hosts continentales (<em>americas</em>, <em>europe</em>, <em>asia</em>);
+      los de ranking, perfil y maestría, en el host de la plataforma.</li>
+      <li>Data Dragon es un CDN público: no pide key y no tiene límite de pedidos.</li>
+    </ul></div>
+
+    <p class="pase">→ Pase: «Matías les cuenta cómo arranca el pipeline.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 2 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">2 · Matías Telo</span><span class="reloj">2:20 → 4:40</span></div>
+  <div class="cuerpo">
+    <p class="tema">La corrida en verde · tareas 1 a 4 del grafo</p>
+    <div class="pantalla"><b>En pantalla:</b> pestaña 1 — vista <em>Graph</em> de la corrida del 6/9,
+    todas las tareas en verde. Señalar cada tarea con el cursor mientras se la nombra.</div>
+
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>Ésta es la corrida del 6 de septiembre, completa y en verde. El DAG se llama
+      <code>lol_ingest</code> y tiene nueve tareas. Voy con las cuatro primeras.</p>
+      <p>La primera es <code>wait_for_riot</code>, y es un <strong>sensor</strong>: una tarea que espera
+      algo que no controlamos. Comprueba que la API responda y que la key sirva. Sondea cada dos minutos
+      hasta media hora, en modo <em>reschedule</em>, que quiere decir que libera el worker entre sondeo
+      y sondeo en vez de ocuparlo durmiendo. Está primero a propósito: la recolección puede durar horas,
+      y enterarnos a la hora seis de que la key venció sería el peor resultado posible.</p>
+      <p>Y distingue dos fallas que se arreglan distinto. Si Riot está caído, esperar sirve, así que
+      espera. Si ninguna key del pool es válida, esperar no arregla nada, así que corta en el acto.
+      Lo probamos: con una key inválida esta tarea resuelve en <strong>tres segundos</strong> en vez de
+      sondear treinta minutos.</p>
+      <p>La segunda es <code>check_key</code>, el <strong>cortocircuito</strong>. Si el sensor no
+      consiguió respuesta, devuelve falso, todo lo que está abajo queda salteado y la corrida termina
+      bien, no fallada. Tiene una particularidad que vale la pena marcar: corre con
+      <code>trigger_rule=ALL_DONE</code>, porque la tarea de arriba puede haber quedado en <em>skipped</em>,
+      y con la regla por defecto esta tarea no se ejecutaría nunca justo cuando más falta hace.</p>
+      <p>La tercera es <code>fetch_ddragon</code>: baja el catálogo de campeones y hechizos del CDN
+      público. Se guarda crudo y <strong>particionado por versión</strong>, porque los campeones cambian
+      entre parches y una partida vieja tiene que poder reinterpretarse con el catálogo que le tocaba.</p>
+      <p>Y la cuarta es <code>plan_plataformas</code>, que reparte el objetivo de partidas entre los seis
+      servidores. Se reparte por adelantado porque cada tarea mapeada corre en su propio proceso: no hay
+      un contador compartido en memoria como tendría un script monolítico. Anthony sigue con la tarea
+      que baja los datos.</p>
+    </div>
+
+    <div class="anclas"><strong>Los datos de este bloque:</strong>
+    <ul>
+      <li>El grafo: <code>wait_for_riot → check_key → { fetch_ddragon , plan_plataformas → land_bronze[6] } → refine_silver[6] → consolidate → validate → save</code>.</li>
+      <li><code>schedule=None</code>, <code>catchup=False</code>, <code>max_active_tasks=6</code>.</li>
+      <li>Cuatro parámetros de corrida: <code>partidas_objetivo</code>, <code>plataformas</code>, <code>tiers</code>, <code>forzar</code>.</li>
+      <li>El sensor usa <code>soft_fail=True</code>: agotar el tiempo deja la tarea <em>salteada</em>, no <em>fallada</em>.
+      Que Riot no responda no es un error de nuestro pipeline.</li>
+    </ul></div>
+
+    <p class="pase">→ Pase: «Anthony sigue con la tarea que baja los datos.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 3 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">3 · Anthony Cochachin</span><span class="reloj">4:40 → 7:00</span></div>
+  <div class="cuerpo">
+    <p class="tema"><code>land_bronze</code> · la capa bronce, el filtro previo y el pool de keys</p>
+    <div class="pantalla"><b>En pantalla:</b> misma vista <em>Graph</em>, con <code>land_bronze</code>
+    desplegado en sus seis instancias (aparecen con el nombre de la plataforma: LAS, NA, BR, KR, EUW, LAN).
+    Si hay tiempo, abrir el log de una y mostrar el contador de partidas.</div>
+
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>Ésta es <code>land_bronze</code>, y son seis: una por plataforma, con <strong>mapeo dinámico
+      de tareas</strong>. Es la única tarea de todo el DAG que toca la red. No parsea, no limpia, no
+      valida: guarda el JSON tal como vino de Riot y anota dónde quedó. Eso es la <strong>capa bronce</strong>
+      del modelo medallón.</p>
+      <p>Hay tres detalles del diseño que vale la pena marcar.</p>
+      <p>El primero es el <strong>orden de las operaciones</strong>. Bajamos el detalle de la partida y
+      ahí mismo aplicamos los filtros de admisión: que sea Season 16, que dure más de cinco minutos, y
+      que tenga diez participantes, cinco y cinco. Recién si pasa salimos a pedir los perfiles de los
+      diez jugadores. Filtrar antes ahorra unos dieciséis pedidos por cada partida que igual se iba a
+      tirar. Y la partida descartada queda anotada en un índice en disco: <strong>no se vuelve a bajar
+      nunca</strong>, ni en esta corrida ni en las que vengan. Tenemos 1.651 anotadas ahí.</p>
+      <p>El segundo es que <strong>el bronce es append-only</strong>. Antes de cada pedido se chequea si
+      el archivo ya está en disco; una partida que ya bajamos no se vuelve a pedir jamás. Y la escritura
+      es atómica: se escribe a un temporal y se renombra, así una tarea cortada a la mitad no deja un
+      archivo truncado que reviente el parseo después.</p>
+      <p>El tercero es el <strong>pool de keys</strong>. La <em>Connection</em> de Airflow acepta varias
+      keys separadas por coma, una por integrante, y el cliente reparte los pedidos entre ellas llevando
+      la cuenta por par key-servidor. Acá tuvimos el bug más caro del proyecto: las seis plataformas
+      fallaban con HTTP 400 desde el primer pedido. Resulta que Riot encripta cada identificador de
+      jugador <strong>para la key puntual que lo pidió</strong>, así que si otra key del pool lo usa da
+      error 400, con un mensaje que parece un dato corrupto y no una key equivocada. Lo resolvimos
+      haciendo que cada identificador viaje junto con su key dueña.</p>
+      <p>Hoy el bronce son <strong>19.145 partidas y 290.654 perfiles: 1,1 GB comprimido</strong> en disco.
+      Rodrigo sigue con la transformación.</p>
+    </div>
+
+    <div class="anclas"><strong>Los datos de este bloque:</strong>
+    <ul>
+      <li>Bronce particionado estilo Hive: <code>bronze/matches/plataforma=kr/KR_1234.json.gz</code>,
+      <code>bronze/players/plataforma=kr/puuid=…/</code>, <code>bronze/ddragon/version=16.17.1/</code>.</li>
+      <li>Todo comprimido con gzip: sin comprimir pasaría holgadamente los 8 GB. Una partida pesa ~11 KB comprimida.</li>
+      <li>Límites de la development key: 20 pedidos por segundo y 100 cada 2 minutos, <em>por key y por host</em>.</li>
+      <li>El limitador es <strong>proactivo</strong>: calcula si hay cupo antes de disparar, en vez de esperar
+      el 429. El 429 queda como red de contención.</li>
+      <li>Ritmo real medido: ~1.154 partidas/hora con las seis plataformas en paralelo. 14 h 39 min para ~17.000 partidas.</li>
+    </ul></div>
+
+    <p class="pase">→ Pase: «Rodrigo sigue con la transformación.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 4 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">4 · Rodrigo Viluron</span><span class="reloj">7:00 → 9:20</span></div>
+  <div class="cuerpo">
+    <p class="tema">De bronce a plata · tareas 6 a 9 y el reporte de calidad</p>
+    <div class="pantalla"><b>En pantalla:</b> se sigue en el grafo hasta nombrar <code>save</code>,
+    y en la última frase se pasa a la <strong>pestaña 2</strong>: <code>reports/calidad.md</code>.</div>
+
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>De acá para abajo el pipeline <strong>no toca la red</strong>: lee del disco.</p>
+      <p><code>refine_silver</code> también son seis, una por plataforma, y convierte el JSON crudo en
+      filas tipadas. Toda la lógica de transformación es pura: no toca red, no toca Airflow, y se puede
+      testear sola. Eso tiene una consecuencia muy concreta: si mañana descubrimos que veníamos
+      interpretando mal una columna, corregimos el transformador y reprocesamos el 1,1 GB que ya está en
+      disco. Son <strong>trece minutos de reproceso contra las catorce horas y media</strong> que costó
+      bajarlo.</p>
+      <p>Un ejemplo real de por qué eso importa. Riot cambió el criterio del campo
+      <code>gameDuration</code> alrededor del parche 11.20: algunas partidas lo devuelven en segundos y
+      las anteriores en milisegundos. Mezclar las dos unidades en la columna objetivo arruinaría el
+      target <em>sin que nada falle</em>, que es la peor clase de bug. Lo normalizamos, y hay un test de
+      regresión que lo cuida.</p>
+      <p>Acá también encontramos un bug nuestro: la primera versión de esta tarea sólo procesaba las
+      partidas que había bajado esa corrida. Con eso el CSV nunca hubiera crecido entre corridas. Ahora
+      recorre todo el bronce acumulado, y por eso una corrida de dos minutos regenera el dataset entero.</p>
+      <p><code>consolidate</code> junta las seis plataformas, <strong>deduplica por
+      <code>match_id</code></strong> y castea los tipos. Ésa es la deduplicación que sostiene la promesa
+      de que la clave primaria es única.</p>
+      <p><code>validate</code> son los chequeos duros: que las columnas sean exactamente las 137
+      esperadas, que la clave no repita, que no haya nulos donde no puede haberlos y que el objetivo esté
+      en un rango plausible. Si algo de eso falla, <strong>el DAG falla</strong>: no publicamos un dataset
+      roto. Y de paso escribe este reporte de calidad, que es el que trajimos —acá están los seis números
+      que pide la consigna, calculados por la corrida, no a mano.</p>
+      <p>Y <code>save</code> escribe el CSV fechado: <code>lol_2026-09-06.csv</code>. Facu abre el archivo.</p>
+    </div>
+
+    <div class="anclas"><strong>Los datos de este bloque:</strong>
+    <ul>
+      <li>Los cuatro filtros de admisión: <code>gameVersion</code> empieza con «16.», duración ≥ 300 s,
+      exactamente 10 participantes, 5 y 5 por equipo.</li>
+      <li>Las 137 columnas se <em>generan</em>, no se escriben a mano: 3 + (10 variables × 5 posiciones × 2 equipos) + (17 × 2).</li>
+      <li>10 tests en verde, <code>ruff</code> sin hallazgos, <code>astro dev parse</code> limpio.</li>
+      <li>Dos de esos tests son de regresión sobre bugs reales: la duración en milisegundos y el
+      <code>teamPosition</code> vacío que alimenta <code>roles_inferidos</code>.</li>
+      <li><code>save</code> toma la fecha de <code>dag_run.logical_date or dag_run.run_after</code>, nunca de
+      <code>ds</code>: <code>ds</code> sólo existe si el DAG tiene <em>schedule</em>, y el nuestro corre a demanda.</li>
+    </ul></div>
+
+    <p class="pase">→ Pase: «Facu abre el archivo.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 5 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">5 · Facundo Aracena</span><span class="reloj">9:20 → 11:40</span></div>
+  <div class="cuerpo">
+    <p class="tema">El dataset · los seis criterios, los nulos, tidy y el sesgo</p>
+    <div class="pantalla"><b>En pantalla:</b> pestaña 3 — el CSV abierto. Señalar la columna
+    <code>match_id</code> al hablar de la clave y <code>game_duration_s</code> al hablar del objetivo.
+    Volver a la pestaña 2 (<code>calidad.md</code>) para los números si es más cómodo leerlos de ahí.</div>
+
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>Éste es el CSV que produjo esa corrida. Voy por los criterios.</p>
+      <p><strong>Clave sin duplicados: verdadero.</strong> La clave es <code>match_id</code>, viene de la
+      fuente —no la inventamos nosotros— y ya trae el prefijo del servidor donde se jugó, así que es
+      única a nivel global sin combinarla con nada. <strong>Volumen: 19.145 filas</strong>, diecinueve
+      veces el mínimo de mil. <strong>Ancho: 137 columnas.</strong> <strong>Mezcla de tipos:</strong> 106
+      enteras, 20 flotantes y 11 de texto. <strong>Columnas vacías: ninguna.</strong></p>
+      <p>La columna objetivo es <code>game_duration_s</code>: media 1.748 segundos —29 minutos—, mediana
+      1.751, o sea prácticamente simétrica, y rango de 301 a 3.963 segundos. El piso de 301 no es
+      casualidad: es el filtro que descarta los remakes.</p>
+      <p><strong>Nulos: no hay ninguno</strong>, y ésta es la parte que quiero explicar bien, porque no
+      es que los datos vengan perfectos. Donde la fuente no tiene el dato, imputamos un valor que
+      <em>significa</em> algo: un jugador sin ranking queda con elo 1500 y winrate 0,50, que codifica
+      «habilidad desconocida, asumimos promedio»; un jugador que nunca usó ese campeón queda con cero
+      puntos de maestría, que es literalmente cierto. Y la contra la decimos nosotros: imputar 1500
+      mezcla «es de nivel medio» con «no sabemos nada de él». La alternativa sería una columna
+      <code>es_unranked</code> explícita —el código ya la calcula, sólo no la escribe— y la dejamos
+      deliberadamente abierta para la Unidad 2.</p>
+      <p>Y dos cosas que preferimos decir antes de que nos las pregunten.</p>
+      <p>Una: <strong>el dataset no es del todo <em>tidy</em></strong>. La observación más fina que existe
+      acá es jugador-en-partida, y hay diez por partida; están aplanados en cien columnas en lugar de
+      diez filas. Es una concesión deliberada: la unidad de nuestra pregunta es la partida, y en formato
+      largo el target se repetiría idéntico diez veces, que rompe la correspondencia una-fila-una-observación
+      justo respecto de lo que queremos predecir.</p>
+      <p>Dos: tenemos un <strong>sesgo de muestreo por tier</strong>, y lo tenemos medido. Cada servidor
+      quedó con partidas de un rango casi puro y distinto: el elo medio va de 1.627 en Norteamérica a
+      3.231 en LAN. Sabemos por qué pasa, sabemos qué implica y sabemos cómo se corrige.</p>
+    </div>
+
+    <div class="anclas"><strong>Los datos de este bloque:</strong>
+    <ul>
+      <li>Las 137 columnas: 3 de identidad/objetivo/calidad + 100 por jugador + 34 de agregados de equipo.</li>
+      <li>Tres columnas derivadas: <code>player_elo</code>, <code>is_main</code> (umbral 50.000 puntos) y
+      <code>roles_inferidos</code>.</li>
+      <li>Sólo 17 filas de 19.145 tienen <code>roles_inferidos &gt; 0</code>. Se filtran con
+      <code>df[df.roles_inferidos == 0]</code>.</li>
+      <li>Cuartiles del objetivo: Q1 = 1.496 s, mediana = 1.751 s, Q3 = 2.010 s.</li>
+      <li>Correlación elo↔duración: −0,16 global, −0,25 en KR (la única con rango amplio), −0,01 en NA1.
+      La señal aparece donde hay variación: es la firma del sesgo.</li>
+    </ul></div>
+
+    <p class="pase">→ Cierre (Ezequiel, si sobra tiempo): «Eso es lo que trajimos. Quedamos para las preguntas.»</p>
+  </div>
+</div>
+
+<!-- ================================================================= -->
+<h2 class="seccion"><span class="n">Sección 5</span>Reglas de la mesa · los minutos 12 a 18</h2>
+
+<p>Acá se juega la nota. El docente elige a quién le pregunta qué, y explícitamente avisó que
+«la pregunta sobre el <em>scraping</em> puede caerle a quien escribió la transformación».
+Estas cinco reglas valen para los cinco.</p>
+
+<table>
+<tr><th style="width:28%">Situación</th><th>Qué hacer</th></tr>
+<tr><td><strong>Te preguntan de tu área</strong></td>
+<td>Respuesta corta primero —una o dos oraciones que contesten exactamente lo que preguntaron— y
+después el detalle. No arrancar por el contexto: arrancar por la respuesta.</td></tr>
+<tr><td><strong>Te preguntan de otra área y la sabés</strong></td>
+<td>Contestala. No mires al compañero ni le pases la pelota: que la pregunta le haya tocado a otro
+es <em>a propósito</em>. Mirar al que «le corresponde» es exactamente lo que el docente está buscando detectar.</td></tr>
+<tr><td><strong>Te preguntan algo que sabés a medias</strong></td>
+<td>Decí lo que sí sabés y marcá el límite: «El detalle exacto del limitador lo trabajó Anthony;
+lo que sí te puedo decir es que el control es proactivo, calcula el cupo antes de mandar el pedido».
+Media respuesta honesta suma; una respuesta inventada resta el doble.</td></tr>
+<tr><td><strong>No lo sabés</strong></td>
+<td>«Eso no lo sé» + dónde está la respuesta: «está en la parte IV de nuestra documentación,
+lo trabajó Rodrigo». Es una respuesta aceptable <em>una vez</em>. La segunda ya no.</td></tr>
+<tr><td><strong>Te preguntan por un problema o una limitación</strong></td>
+<td>No lo minimices. Nombralo, decí cómo lo detectaste, qué hiciste y qué queda pendiente.
+Las cinco limitaciones de la sección 7 son puntos a favor cuando se cuentan enteras y en contra
+cuando se esquivan.</td></tr>
+</table>
+
+<div class="aviso">
+  <span class="etiqueta">Lo que no hay que decir</span>
+  <ul style="margin-bottom:0">
+    <li><span class="no">«No hay nulos»</span> a secas. Siempre seguido de <em>«porque imputamos, y esto es lo que imputamos y por qué»</em>.</li>
+    <li><span class="no">«El dataset es representativo»</span>. No lo es, y está medido que no lo es. Decirlo sería el peor error posible.</li>
+    <li><span class="no">«Corre solo todos los días»</span>. No: <code>schedule=None</code>, se dispara a mano, y hay una razón concreta.</li>
+    <li><span class="no">«El elo lo sacamos de Riot»</span>. Riot no publica el MMR. <code>player_elo</code> es una construcción nuestra.</li>
+    <li><span class="no">«Eso lo hizo la IA»</span> o <span class="no">«no sé, eso lo hizo otro»</span> como respuesta completa. Ver la pregunta 26.</li>
+    <li><span class="no">Números redondeados de memoria.</span> Si no te acordás el número exacto, decí el orden de magnitud y señalá el reporte: está proyectado en la pantalla.</li>
+  </ul>
+</div>
+
+<!-- ================================================================= -->
+<h2 class="seccion"><span class="n">Sección 6</span>Lo que todos tienen que saber igual</h2>
+
+<p>Esto <strong>no se reparte</strong>. Son las cinco preguntas que la consigna dice textualmente que se
+van a preguntar, más los seis números. Los cinco integrantes las tienen que poder responder de memoria.</p>
+
+<h3>Las cinco preguntas de la consigna</h3>
+
+<div class="pregunta">
+  <span class="q">1 · «Una fila es un ___»</span>
+  <p class="corta">Una partida clasificatoria de League of Legends, modalidad Solo/Duo, de la Season 16.</p>
+  <p class="mas">Y coincide con la pregunta del proyecto: queremos predecir cuánto dura <em>una partida</em>,
+  y la unidad sobre la que sacamos conclusiones es exactamente ésa. Si la unidad fuera el jugador,
+  habría un desajuste con la pregunta.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">2 · ¿Cuál es la columna objetivo?</span>
+  <p class="corta"><code>game_duration_s</code>: la duración de la partida en segundos. Es continua,
+  así que es un problema de regresión.</p>
+  <p class="mas">Sale de <code>info.gameDuration</code> del detalle de partida, con la corrección de
+  milisegundos. Como estructura latente alternativa, el dataset también permite agrupamiento no
+  supervisado sobre las columnas de composición, para encontrar arquetipos de equipo.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">3 · ¿Por qué hay nulos donde hay nulos?</span>
+  <p class="corta">No hay nulos — y hay que explicar por qué, porque no es que los datos vengan perfectos.
+  Donde la fuente no tiene el dato, imputamos un valor que significa algo.</p>
+  <p class="mas"><b>Sin ranking:</b> <code>player_elo = 1500</code> y <code>player_winrate = 0.50</code>
+  («habilidad desconocida, asumimos promedio»; 1500 cae entre Gold y Platinum, la zona más poblada).
+  <b>Nunca jugó ese campeón:</b> <code>champ_mastery_pts = 0</code> — no es imputación, es el valor real.
+  <b>Sin <code>perks</code> en el payload:</b> runas en 0, que no es un identificador válido, así que el
+  caso queda distinguible. <b>La contra:</b> imputar 1500 mezcla «es de nivel medio» con «no sabemos nada
+  de él»; la alternativa es una columna <code>es_unranked</code>, pendiente para la Unidad 2.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">4 · ¿Qué pasa si lo corrés de nuevo? ¿Sale el mismo archivo?</span>
+  <p class="corta">No: sale uno más grande, y es a propósito. Hay que separar dos cosas.</p>
+  <p class="mas">De <code>refine_silver</code> para abajo el pipeline es una <strong>función pura del
+  disco</strong>: con el mismo bronce produce siempre exactamente el mismo CSV. Pero
+  <code>land_bronze</code> es <strong>acumulativo</strong>: cada corrida busca partidas que todavía no
+  tiene; las que ya están nunca se vuelven a pedir, las nuevas se suman. Es la única forma de juntar
+  volumen con una API que permite 100 pedidos cada 2 minutos por región y una key que vence cada 24 horas.
+  Si quisiéramos congelar el dataset, alcanza con no volver a correr la descarga y reprocesar el bronce
+  tal como está.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">5 · ¿Dónde guardás el dato crudo? ¿Tenés el bronce?</span>
+  <p class="corta">Sí, y guardamos más que el mínimo: en <code>include/output/bronze/</code> queda la
+  respuesta JSON de la API tal como llegó, comprimida y particionada por plataforma.</p>
+  <p class="mas">No guardamos sólo las partidas: guardamos <strong>las tres respuestas que hacen falta
+  para reconstruir una fila</strong> —el detalle de la partida, la entrada de ranking de cada jugador y
+  su maestría— más el catálogo de campeones. Por eso la capa plata se reconstruye 100 % sin red.
+  La prueba concreta: si mañana descubrimos que veníamos interpretando mal una columna, corregimos
+  <code>transform.py</code> y reprocesamos los 1,1 GB que ya están en disco, sin gastar un solo pedido a
+  Riot. Son ~13 minutos contra las 14 h 39 min que costó bajarlos.</p>
+</div>
+
+<h3>Los seis números</h3>
+
+<table>
+<tr><th>Criterio</th><th style="width:26%">Cómo se verifica</th><th style="width:22%">Resultado (6/9/2026)</th></tr>
+<tr><td>Clave sin duplicados</td><td><code>df["match_id"].is_unique</code></td><td class="ok">True</td></tr>
+<tr><td>Volumen suficiente (&gt; 1.000)</td><td><code>len(df)</code></td><td class="ok">19.145</td></tr>
+<tr><td>Ancho suficiente (≥ 5)</td><td><code>df.shape</code></td><td class="ok">137 columnas</td></tr>
+<tr><td>Mezcla de tipos</td><td><code>df.dtypes.value_counts()</code></td><td class="ok">106 int · 20 float · 11 object</td></tr>
+<tr><td>Nulos conocidos</td><td><code>df.isna().mean()</code></td><td class="ok">ninguno</td></tr>
+<tr><td>Sin columnas vacías</td><td><code>df.columns[df.isna().all()]</code></td><td class="ok">vacío</td></tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">El criterio que más pesa</span>
+  <p>La consigna lo dice: la clave primaria «es el test operativo de la unidad de análisis: si la clave
+  repite, o la unidad está mal definida o el pipeline está duplicando filas». <strong>Nuestra respuesta
+  tiene tres capas:</strong> el <code>match_id</code> viene de la fuente y ya incluye el prefijo de la
+  plataforma, así que es único globalmente; <code>consolidate</code> hace un
+  <code>drop_duplicates("match_id")</code> explícito al juntar los seis parciales; y
+  <code>validate</code> hace fallar el DAG si aun así llegara a repetirse.</p>
+</div>
+
+<!-- ================================================================= -->
+<h2 class="seccion"><span class="n">Sección 7</span>Los seis tropiezos, y cómo los resolvimos</h2>
+
+<p>Esto es material de oro para las preguntas dirigidas. Un grupo que cuenta un bug real, cómo lo
+detectó y qué cambió después demuestra que entendió el pipeline; uno que dice «funcionó todo bien»
+demuestra que lo corrió una vez y no lo miró. <strong>Cada integrante debería poder contar al menos
+tres de estos seis.</strong></p>
+
+<div class="pregunta">
+  <span class="q">1 · El HTTP 400 que parecía un dato corrupto <span class="duenio">Anthony</span></span>
+  <p><b>Síntoma:</b> con el pool de siete keys, las seis tareas <code>land_bronze</code> fallaban con
+  <code>400 Bad Request — Exception decrypting &lt;puuid&gt;</code> desde el primer pedido, con todas las
+  keys por igual. El mensaje sugiere un dato corrupto.</p>
+  <p><b>Causa:</b> Riot devuelve cada <code>puuid</code> <em>encriptado para la key puntual que hizo esa
+  request</em>. Cualquier otra key del pool, aunque sea válida, no lo puede leer.</p>
+  <p><b>Cómo se confirmó:</b> pegándole a la misma URL con distintas keys: una respondía 200 y las demás
+  400.</p>
+  <p><b>Solución:</b> afinidad key↔puuid. Cada <code>puuid</code> viaja con su «key dueña» desde
+  <code>iter_puuids</code> hasta el pedido de perfil, y el limitador acepta un parámetro para no rotar.
+  Si esa key venció en el medio, se saltea el pedido en vez de gastar reintentos contra keys que nunca
+  lo van a poder leer.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">2 · La hibernación de las 03:19 <span class="duenio">Matías / Ezequiel</span></span>
+  <p><b>Qué pasó:</b> el 6/9 la notebook entró en hibernación con cuatro tareas <code>land_bronze</code> a
+  mitad de camino, entre 2.520 y 2.610 partidas de 3.334. Los procesos murieron en seco — los logs se
+  cortan sin <em>traceback</em>.</p>
+  <p><b>Qué no pasó:</b> no se perdió un solo archivo del bronce. A las 07:16 el <em>scheduler</em>
+  detectó las tareas huérfanas y las relanzó solo, sin que nadie tocara nada. El dataset se generó igual
+  ese mismo día.</p>
+  <p><b>Por qué importa:</b> es la mejor defensa de la arquitectura que tenemos. El estado vive en disco,
+  no en memoria ni en XCom. Con un script monolítico habría que haber empezado de cero.
+  <em>Lección operativa:</em> desactivar suspensión antes de una corrida larga.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">3 · El CSV que nunca hubiera crecido <span class="duenio">Rodrigo</span></span>
+  <p><b>Bug:</b> la primera versión de <code>refine_silver</code> iteraba sólo las partidas que había
+  bajado <em>esa</em> corrida. Cada corrida producía un CSV con su propia cuota y pisaba el anterior:
+  toda la estrategia de acumular hacia 20.000 filas en varias tandas no funcionaba.</p>
+  <p><b>Solución:</b> <code>glob</code> sobre todo el bronce de la plataforma.</p>
+  <p><b>Verificación a escala real (6/9):</b> con 19.133 partidas en bronce, una corrida de cuota 2 por
+  plataforma bajó 12 partidas nuevas y produjo un CSV de <strong>19.145 filas</strong> — el acumulado
+  entero, no las 12 de esa corrida. Es lo que permite regenerar el entregable en 15 minutos sin volver a
+  recolectar.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">4 · El rol asignado en silencio <span class="duenio">Rodrigo</span></span>
+  <p><b>Bug heredado del prototipo:</b> cuando la fuente no informaba <code>teamPosition</code> —pasa en
+  remakes y con <em>autofill</em>— el jugador se colocaba en el slot que sobraba y quedaba etiquetado
+  como jungla sin haberlo sido. El dato estaba mal y <strong>no había forma de saberlo</strong>.</p>
+  <p><b>Solución:</b> la columna <code>roles_inferidos</code> cuenta cuántos de los 10 quedaron sin
+  emparejar. El error sigue existiendo —la fuente no tiene el dato— pero ahora es visible y esas filas se
+  filtran. Son 17 de 19.145.</p>
+  <p><b>Cómo se dice esto:</b> «no arreglamos el dato, lo hicimos visible». Es una distinción que vale.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">5 · La columna que valía siempre 1 <span class="duenio">Rodrigo / Facundo</span></span>
+  <p>El esquema del prototipo traía <code>t1_count_smite</code> y <code>t2_count_smite</code>. En toda la
+  muestra valían 1: el juego le impone Smite al jungla y hay un jungla por equipo. Una columna de
+  <strong>varianza cero</strong> no aporta nada a un modelo, así que se quitó. Los otros tres conteos de
+  hechizo —flash, teleport, ignite— sí varían y se conservan.</p>
+  <p>La cuenta de las columnas: 138 del prototipo + 1 (<code>roles_inferidos</code>) − 2 (los dos
+  <em>smite</em>) = <strong>137</strong>.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">6 · La extrapolación que nos hizo planificar mal <span class="duenio">Ezequiel</span></span>
+  <p>Una versión anterior de nuestra documentación proyectaba ~6.400 partidas/hora con 6 keys,
+  extrapolando linealmente desde una. La corrida real dio <strong>1.154/hora con 7 keys</strong>: cinco
+  veces y media menos.</p>
+  <p><b>Por qué:</b> el techo no lo pone el cupo de las keys sino la concurrencia del cliente. Dentro de
+  cada tarea las partidas se bajan una por una y sólo los perfiles van en paralelo, con cuatro hilos.
+  Sumar keys agranda un cupo que no se está llegando a consumir.</p>
+  <p><b>Qué cambiamos:</b> planificamos con el número medido, no con el proyectado, y pasamos a una
+  estrategia por tandas. Si en algún momento hace falta acelerar de verdad, el cambio que rinde es subir
+  la concurrencia, no juntar más keys.</p>
+</div>
+
+<!-- ================================================================= -->
+<h2 class="seccion"><span class="n">Sección 8</span>Banco de preguntas probables</h2>
+
+<p>Treinta y dos preguntas, agrupadas por tema. La etiqueta gris de la derecha dice quién es el
+<em>dueño natural</em> de esa respuesta — pero el docente pregunta a quien quiere, así que la etiqueta
+sirve para saber quién la prepara <strong>a fondo</strong>, no para que los demás la salteen.</p>
+
+<h3>A · La pregunta, la unidad de análisis y el dataset</h3>
+
+<div class="pregunta">
+  <span class="q">1 · ¿Por qué la duración y no quién gana? <span class="duenio">Ezequiel</span></span>
+  <p class="corta">Porque la duración se puede predecir desde condiciones iniciales sin que el resultado
+  contamine nada, y es una variable continua, que nos da un problema de regresión.</p>
+  <p class="mas">Predecir el ganador desde el draft es un problema muy estudiado y con techo bajo — el
+  matchmaking está justamente diseñado para que sea 50/50. La duración, en cambio, depende de la
+  composición de los equipos de una forma más directa: un equipo de tanques y uno de asesinos no juegan
+  partidas de la misma longitud. Es una hipótesis que vamos a testear en la Unidad 2.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">2 · ¿Por qué 137 columnas? ¿No es demasiado ancho? <span class="duenio">Facundo</span></span>
+  <p class="corta">Porque una fila describe diez jugadores y dos equipos. Son 3 columnas de identidad,
+  objetivo y calidad, 100 por jugador (10 variables × 5 posiciones × 2 equipos) y 34 de agregados de
+  equipo (17 × 2).</p>
+  <p class="mas">Ninguna es de relleno: las 100 de jugador son las mismas diez variables repetidas por
+  slot, y las 34 de equipo son agregaciones de esas mismas más el catálogo de campeones. Y el ancho es
+  <em>generado</em>, no escrito a mano: <code>schema.py</code> arma los nombres a partir de dos listas,
+  así que es imposible que se escape un typo y agregar una variable por jugador es cambiar una lista de
+  diez elementos.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">3 · ¿El dataset es tidy? <span class="duenio">Facundo</span></span>
+  <p class="corta">No del todo, y es deliberado. La observación más fina es jugador-en-partida —hay diez
+  por partida— y están aplanados en 100 columnas en vez de diez filas.</p>
+  <p class="mas">Tres razones. <b>Una:</b> la unidad de nuestra pregunta es la partida; en formato largo
+  el target <code>game_duration_s</code> se repetiría idéntico en las diez filas, que rompe
+  «una fila, una observación» justo respecto de lo que importa. <b>Dos:</b> obligaría a re-agregar antes
+  de cada modelo, duplicando esa lógica en cada análisis en vez de resolverla una vez en el pipeline.
+  <b>Tres:</b> es el mismo tipo de concesión que hace el dataset de la cátedra con
+  <code>player_positions</code>. Lo que sí cumplimos: ninguna celda guarda listas ni valores múltiples,
+  que es justamente el problema del dataset FIFA.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">4 · ¿Qué es <code>t1_num_tanks</code> y por qué las seis columnas de tipo no suman 5? <span class="duenio">Facundo</span></span>
+  <p class="corta">Cuenta cuántos de los cinco campeones del equipo están etiquetados como <em>Tank</em> en
+  Data Dragon. No suman 5 porque un campeón puede tener varias etiquetas a la vez: Ornn es Tank y Fighter.</p>
+  <p class="mas">No es un error de cálculo, es cómo clasifica el catálogo oficial de Riot. Saberlo evita
+  interpretar mal esas columnas en la exploración de la Unidad 2.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">5 · ¿Está balanceado el objetivo? <span class="duenio">Facundo</span></span>
+  <p class="corta">Es una variable continua, así que la pregunta no es de balance sino de distribución
+  — y está centrada: media 1.748 s, mediana 1.751 s, desvío 424 s.</p>
+  <p class="mas">Media y mediana prácticamente iguales quiere decir que no hay asimetría fuerte.
+  El rango va de 301 a 3.963 segundos, sin colas absurdas. Y como <em>sanity check</em> externo: una
+  partida promedio de LoL ronda la media hora, así que nuestros 29 minutos coinciden con lo que se sabe
+  del juego — es una señal de que el parseo no está roto.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">6 · ¿Por qué el mínimo es 301 segundos y no 300? <span class="duenio">Rodrigo</span></span>
+  <p class="corta">El filtro admite desde 300 s inclusive; 301 es simplemente la partida más corta que
+  quedó. No hubo ninguna de exactamente 300.</p>
+  <p class="mas">El umbral de 300 s descarta los <em>remakes</em>: partidas que se cancelan en los
+  primeros minutos porque alguien no se conectó. No son partidas reales y su duración no tiene relación
+  con las variables que medimos.</p>
+</div>
+
+<h3>B · Airflow y la orquestación</h3>
+
+<div class="pregunta">
+  <span class="q">7 · ¿Por qué Airflow y no un script de Python? <span class="duenio">Matías</span></span>
+  <p class="corta">Porque la corrida dura horas y necesita sobrevivir a interrupciones. Airflow nos da
+  reintentos por tarea, logs separados, paralelismo entre las seis plataformas, estado visible y la
+  posibilidad de retomar sin repetir lo hecho.</p>
+  <p class="mas">Y lo probamos sin querer: el 6/9 la máquina hibernó a las 03:19 con cuatro tareas a
+  mitad de camino, y el <em>scheduler</em> las relanzó solo a las 07:16 sin que nadie tocara nada.
+  Con un script monolítico habría que haber empezado de cero. (Tropiezo 2 de la sección 7.)</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">8 · ¿Qué es un DAG y por qué tiene que ser acíclico? <span class="duenio">Matías</span></span>
+  <p class="corta">Un grafo dirigido acíclico: las tareas y las flechas de dependencia entre ellas.
+  Acíclico porque si hubiera un ciclo no existiría un orden de ejecución posible — A esperaría a B y B a A.</p>
+  <p class="mas">El DAG define <em>qué depende de qué</em>, no <em>cuándo</em>: el «cuándo» lo pone el
+  <code>schedule</code>, que en el nuestro es <code>None</code>. Nuestro DAG se llama
+  <code>lol_ingest</code> y tiene nueve tareas, dos de las cuales están mapeadas dinámicamente sobre las
+  seis plataformas.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">9 · ¿Por qué el DAG no está programado? <span class="duenio">Matías</span></span>
+  <p class="corta">Porque la development key de Riot vence cada 24 horas. Un DAG programado corriendo sin
+  nadie mirando fallaría todos los días apenas venciera la key, y el ruido de esas fallas taparía las
+  reales.</p>
+  <p class="mas">Se dispara a mano con la key recién renovada. Es una decisión, no una omisión: el DAG de
+  ejemplo de la cátedra, <code>pokemon_api</code>, también usa <code>schedule=None</code>.
+  Y va con <code>catchup=False</code>, así que si el entorno estuvo apagado una semana no intenta
+  recuperar corridas perdidas.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">10 · ¿Qué es un sensor y en qué se diferencia de una tarea normal? <span class="duenio">Matías</span></span>
+  <p class="corta">Una tarea que espera a que se cumpla una condición externa antes de dejar seguir al
+  resto. La nuestra es <code>wait_for_riot</code>: sondea la API cada 2 minutos hasta 30.</p>
+  <p class="mas">Dos detalles del nuestro. Corre en modo <strong>reschedule</strong>: entre sondeo y
+  sondeo libera el worker en vez de ocuparlo durmiendo. Y usa <strong><code>soft_fail=True</code></strong>,
+  así que agotar el tiempo lo deja en <em>salteado</em> y no en <em>fallado</em> — que Riot no responda no
+  es un error de nuestro pipeline.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">11 · ¿Qué es <code>trigger_rule</code> y por qué <code>check_key</code> usa <code>ALL_DONE</code>? <span class="duenio">Matías</span></span>
+  <p class="corta">Es la condición que decide si una tarea se ejecuta según cómo terminaron sus
+  predecesoras. Por defecto es <code>ALL_SUCCESS</code>: sólo corre si todas salieron bien.</p>
+  <p class="mas"><code>check_key</code> tiene que correr <em>justamente</em> cuando el sensor quedó
+  salteado, que es el caso que tiene que manejar. Con la regla por defecto no se ejecutaría nunca cuando
+  más falta hace. Con <code>ALL_DONE</code> corre pase lo que pase con la tarea de arriba, mira el
+  resultado y decide si cortocircuita el resto del DAG.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">12 · ¿Qué es XCom y qué mandan por ahí? <span class="duenio">Matías</span></span>
+  <p class="corta">Es el mecanismo de Airflow para pasar valores entre tareas. Por ahí mandamos
+  <strong>rutas y metadatos, nunca datos</strong>: los datos van a disco.</p>
+  <p class="mas">XCom se guarda en la base de metadatos de Airflow; meter ahí un DataFrame de 19.000
+  filas la haría explotar y además rompería el modelo medallón, donde cada capa es un archivo en disco
+  que se puede inspeccionar. Lo que viaja es «la plataforma <code>kr</code> dejó su parcial en tal ruta,
+  con tantas filas».</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">13 · ¿Por qué seis tareas de descarga en vez de una? <span class="duenio">Anthony</span></span>
+  <p class="corta">Porque Riot aplica los límites <strong>por región</strong>: cada plataforma tiene su
+  propio cupo. Seis tareas en paralelo multiplican la velocidad en los endpoints de perfil y maestría,
+  que son el cuello de botella real.</p>
+  <p class="mas">Medimos 16,8 pedidos por partida, de los cuales ~16 son perfiles. Con una sola tarea
+  estaríamos usando un solo cupo. La sutileza a tener a mano: <code>la1</code>, <code>la2</code>,
+  <code>br1</code> y <code>na1</code> <em>comparten</em> el cupo de partidas, porque las cuatro enrutan a
+  <em>americas</em>; pero como las partidas son ~1 pedido y los perfiles ~16, en la práctica no molesta.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">14 · ¿Por qué no usaron un operador prefabricado para los pedidos HTTP? <span class="duenio">Matías / Anthony</span></span>
+  <p class="corta">Porque nuestro cliente necesita rotar entre varias API keys y llevar la cuenta de los
+  pedidos por par (key, host) para respetar los límites. Ningún operador prefabricado hace eso.</p>
+  <p class="mas">La regla de la cátedra: operador cuando la acción es estándar, <code>@task</code> propio
+  cuando se necesita lógica específica. Sí usamos la infraestructura de <em>Connections</em> de Airflow
+  para la credencial, que es la parte que sí conviene reusar.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">15 · ¿Por qué <code>include/lol/</code> no importa Airflow? <span class="duenio">Rodrigo</span></span>
+  <p class="corta">Para que la lógica del dominio se pueda testear y ejecutar sin levantar un
+  orquestador. <code>dags/</code> tiene el flujo; <code>include/</code>, la lógica pesada.</p>
+  <p class="mas">Es lo que permite que <code>transform.py</code> sea un módulo puro que recibe un dict y
+  devuelve un dict, y que los tests corran en segundos. También es lo que haría barato cambiar de
+  orquestador algún día: habría que reescribir el DAG, no el proyecto.</p>
+</div>
+
+<h3>C · La fuente, las credenciales y la extracción</h3>
+
+<div class="pregunta">
+  <span class="q">16 · ¿Dónde está la API key? <span class="duenio">Anthony / Ezequiel</span></span>
+  <p class="corta">En una <em>Connection</em> de Airflow llamada <code>riot_api</code>, declarada en
+  <code>airflow_settings.yaml</code>, que está en el <code>.gitignore</code>. En el repositorio se
+  versiona <code>airflow_settings.example.yaml</code> con un placeholder. La key no aparece en ningún
+  <code>.py</code>.</p>
+  <p class="mas">El campo acepta varias keys separadas por coma, una por integrante, y el cliente arma un
+  pool. Hay una sola función en todo el proyecto que toca la credencial, y lee de la Connection.
+  <b>Si repregunta por qué el proyecto de la cátedra sí versiona ese archivo:</b> porque su única
+  conexión es la PokéAPI, que es pública y no tiene ningún secreto. En el nuestro hay una credencial
+  real, así que la decisión se invierte.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">17 · ¿Cómo eligieron las partidas? ¿La muestra es representativa? <span class="duenio">Facundo / Ezequiel</span></span>
+  <p class="corta">No es representativa, y lo sabemos <strong>medido</strong>. Es una muestra de
+  conveniencia sesgada por tier: lo medimos, lo declaramos, y sabemos cómo se corrige.</p>
+  <p class="mas"><b>Por qué pasa:</b> Riot no publica un listado de partidas, publica un ranking. Así que
+  el camino es escalera → jugador semilla → sus últimas 15 partidas. El recorrido mezcla el orden de los
+  tiers justamente para evitar el sesgo, pero el <em>shuffle</em> no alcanza: una página de escalera trae
+  205 jugadores y cada uno rinde hasta 15 partidas, así que una sola combinación tier/división llena la
+  cuota entera de la corrida y nunca se llega al segundo tier.
+  <b>El resultado:</b> elo medio de 1.627 en NA1 (33 % Silver, 29 % Bronze) a 3.231 en LA1 (39 %
+  Grandmaster). <b>Cómo se corrige:</b> rotar de tier cada N jugadores dentro de la corrida, en vez de
+  confiar en el orden mezclado. El bronce ya bajado se conserva, así que sumar tiers faltantes no obliga
+  a rehacer nada.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">18 · ¿Qué implica ese sesgo para el modelo? <span class="duenio">Facundo</span></span>
+  <p class="corta">Dos cosas concretas. El poder predictivo del elo está <em>subestimado</em>, y
+  plataforma y elo están <em>confundidos</em>.</p>
+  <p class="mas"><b>Lo primero:</b> dentro de cada plataforma el elo casi no varía, así que el modelo
+  tiene poco de dónde aprender. La correlación elo↔duración es −0,16 global, pero −0,25 en KR —la única
+  con rango amplio— y apenas −0,01 en NA1. La señal aparece donde hay variación y desaparece donde no la
+  hay: es la firma del sesgo, no una propiedad del juego. <b>Lo segundo:</b> en NA las partidas duran
+  1.826 s en promedio y en BR 1.687 s, pero eso no es un efecto de la región — es que NA quedó lleno de
+  plata/bronce y BR de diamante. Atribuirlo al servidor sería una conclusión falsa, y es justo el error
+  que la materia señala como «el modelo aprende el sesgo de recolección en vez de la señal».</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">19 · ¿Por qué las últimas 15 partidas de cada jugador y no todas? <span class="duenio">Ezequiel</span></span>
+  <p class="corta">Por dos razones: recencia y reparto de cuota.</p>
+  <p class="mas"><b>Recencia:</b> consultamos el winrate y la maestría <em>hoy</em>, así que cuanto más
+  reciente la partida, menos desfasado está ese dato — acota la fuga temporal que declaramos.
+  <b>Cuota:</b> si a un jugador le pidiéramos su historial entero, un puñado de jugadores se comería
+  toda la cuota de la corrida y el dataset tendría menos diversidad de jugadores.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">20 · ¿Por qué sólo la cola 420? <span class="duenio">Ezequiel</span></span>
+  <p class="corta">Para que todas las partidas sean comparables entre sí. Mezclar modalidades rompería
+  la comparabilidad.</p>
+  <p class="mas">Una partida de ARAM se juega en otro mapa, con otras reglas y otra duración típica.
+  Si el dataset mezclara modalidades, el modelo estaría aprendiendo a distinguir modalidades en vez de a
+  predecir duración. Restringir a una sola modalidad es una decisión de diseño del dataset.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">21 · ¿Qué pasa si Riot está caído cuando corren el pipeline? <span class="duenio">Matías</span></span>
+  <p class="corta">El sensor sondea cada 2 minutos durante media hora antes de rendirse. Si se agota,
+  queda salteado —no fallado—, <code>check_key</code> corta y la corrida termina bien sin hacer nada.</p>
+  <p class="mas">Y distinguimos ese caso del de una key inválida: ahí no esperamos, cortamos en el acto,
+  porque esperar no arregla una key vencida. Es la diferencia entre una falla transitoria y una
+  permanente, y el pipeline la trata distinto a propósito.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">22 · ¿Y si les piden hacer <em>scraping</em>? ¿Por qué API y no scraping? <span class="duenio">cualquiera</span></span>
+  <p class="corta">Nuestra fuente es una API REST oficial, que la consigna acepta explícitamente en el
+  criterio de «descargable de forma automatizada».</p>
+  <p class="mas">Y tiene una ventaja concreta sobre el scraping: la fuente es estable, está documentada y
+  no se rompe cuando alguien cambia el HTML de una página. A cambio pagamos dos costos que el scraping no
+  tiene: una credencial que hay que gestionar y que vence cada 24 h, y límites de pedidos que condicionan
+  toda la arquitectura del pipeline.</p>
+</div>
+
+<h3>D · Reproducibilidad, bronce e idempotencia</h3>
+
+<div class="pregunta">
+  <span class="q">23 · Si les cambio el parseo de una columna, ¿tienen que volver a descargar todo? <span class="duenio">Rodrigo</span></span>
+  <p class="corta">No, y ésa es exactamente la razón de tener capa bronce. Se corrige
+  <code>transform.py</code>, se vuelve a disparar el DAG y <code>refine_silver</code> reconstruye la plata
+  leyendo del disco, sin tocar la red.</p>
+  <p class="mas">Son ~13 minutos de reproceso sobre 19.145 partidas, contra las 14 h 39 min que costó
+  bajarlas. Con 20.000 partidas eso son horas de descarga ahorradas cada vez que cambia un criterio.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">24 · ¿Qué pasa si dos jugadores semilla mencionan la misma partida? <span class="duenio">Anthony</span></span>
+  <p class="corta">No se baja dos veces: <code>land_bronze</code> chequea si el archivo ya existe en disco
+  antes de cada pedido. Y si aun así llegara duplicada, <code>consolidate</code> deduplica por
+  <code>match_id</code>.</p>
+  <p class="mas">Esto pasa todo el tiempo, y es deseable: es lo que hace que el costo por partida baje a
+  medida que el dataset crece. La plataforma que más lejos llegó terminó en 11,7 pedidos por partida
+  contra 19,4 de la que menos avanzó, porque los perfiles ya guardados salen de caché en vez de la API.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">25 · ¿Y si me lo corrés ahora, cuánto tarda? <span class="duenio">Ezequiel</span></span>
+  <p class="corta">Con el bronce ya en disco, el DAG completo son <strong>15 minutos</strong> de punta a
+  punta. Con <code>partidas_objetivo</code> chico —10 o 20—, minutos, y produce el mismo CSV de 19.145
+  filas porque <code>refine_silver</code> reprocesa todo el acumulado.</p>
+  <p class="mas">Lo que <em>no</em> es rápido es la recolección: ~1.150 partidas/hora con las seis
+  plataformas en paralelo. Llegar a las 19.145 llevó 14 h 39 min de reloj repartidas en tandas.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">26 · ¿Usaron IA para esto? <span class="duenio">cualquiera</span></span>
+  <p class="corta">Sí, con asistencia de IA para escribir y documentar, con reglas escritas en el propio
+  repositorio. Cada decisión de diseño está documentada con su porqué, y la podemos defender — que es
+  justamente lo que estamos haciendo ahora.</p>
+  <p class="mas">Concretamente: el repo tiene un <code>CLAUDE.md</code> con las reglas de trabajo
+  (credenciales en Connection, XCom sin datos, nada de inventar requisitos) y una <em>skill</em>
+  versionada con las convenciones del proyecto y las trampas de la API. Los bugs que contamos en la
+  sección de tropiezos los encontramos corriendo el pipeline contra la API real, no leyendo código.
+  <b>La respuesta honesta y corta si insiste:</b> «la usamos como herramienta; el criterio, las
+  mediciones y las decisiones son nuestras, y por eso las podemos explicar».</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">27 · ¿Le puedo pasar el repo a otro grupo y les corre? <span class="duenio">Ezequiel</span></span>
+  <p class="corta">Sí: clonar, copiar <code>airflow_settings.example.yaml</code> a
+  <code>airflow_settings.yaml</code>, poner su propia key de Riot y <code>astro dev start</code>.</p>
+  <p class="mas">Lo que <em>no</em> viaja es el bronce: son 1,1 GB y está en el <code>.gitignore</code>,
+  porque son datos, no código. O sea que arrancarían el bronce de cero y tendrían que recolectar.
+  El CSV entregable tampoco se versiona por la misma razón.</p>
+</div>
+
+<h3>E · Preguntas cruzadas y de fondo</h3>
+
+<div class="pregunta">
+  <span class="q">28 · Explicame el grafo sin mirar la pantalla. <span class="duenio">cualquiera</span></span>
+  <p class="corta">Sensor → cortocircuito → dos ramas: el catálogo por un lado y el reparto de cuota por
+  otro. El reparto abre seis descargas en paralelo. Las dos ramas se juntan en seis transformaciones,
+  que confluyen en consolidar, validar y guardar.</p>
+  <p class="mas">Nueve tareas: <code>wait_for_riot</code>, <code>check_key</code>,
+  <code>fetch_ddragon</code>, <code>plan_plataformas</code>, <code>land_bronze</code> (×6),
+  <code>refine_silver</code> (×6), <code>consolidate</code>, <code>validate</code>, <code>save</code>.
+  <b>Practicar esto en el simulacro:</b> es la pregunta que más rápido distingue a quien entendió el
+  pipeline de quien memorizó la pantalla.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">29 · ¿Cómo saben que no hay fuga de información? <span class="duenio">Facundo / Rodrigo</span></span>
+  <p class="corta">Porque el esquema excluye <strong>por diseño</strong> todo lo que ocurre durante la
+  partida: no hay kills, ni oro, ni torres, ni deltas por minuto, ni bans. Sólo entran datos del draft
+  —campeones, hechizos, runas— y perfiles de jugador.</p>
+  <p class="mas">Dicho eso, hay una fuga acotada que declaramos nosotros: <code>player_winrate</code> y
+  <code>champ_mastery_pts</code> se consultan en el momento de la recolección, no en el momento en que se
+  jugó la partida. Para una partida de hace semanas son valores posteriores al hecho. La API de Riot no
+  expone winrate ni maestría históricos, así que no se puede resolver con esta fuente; lo que sí hacemos
+  es acotar el efecto pidiendo las últimas 15 partidas de cada jugador.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">30 · El elo lo construyeron ustedes. ¿No es inventar un dato? <span class="duenio">Facundo</span></span>
+  <p class="corta">Es una <strong>variable derivada</strong>, y la presentamos como tal. Riot no publica
+  el MMR: es privado. Lo que sí publica es el rango visible —tier, división y puntos— y nuestra fórmula
+  convierte esa escala ordinal en un número comparable.</p>
+  <p class="mas">La fórmula es <code>base_del_tier + bonus_de_división + puntos × 0,5</code>: 300 puntos
+  entre tiers consecutivos, repartidos en cuatro divisiones de 75, y los puntos de liga pesan la mitad
+  para que un jugador a punto de ascender quede cerca del tier siguiente sin superponerse. Un Oro I con
+  40 puntos da 1.700 + 225 + 20 = 1.945. Los coeficientes son una elección del grupo, no una medición —
+  y si en la Unidad 3 no aporta, se reemplaza por el tier como categórica sin costo de API, porque el
+  bronce guarda la respuesta cruda.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">31 · ¿Qué variable creen que va a explicar más la duración? <span class="duenio">cualquiera</span></span>
+  <p class="corta">Es una hipótesis para la Unidad 2, no un resultado. Apostamos a la composición de
+  equipo antes que al elo.</p>
+  <p class="mas">El razonamiento: un equipo cargado de tanques tiende a partidas largas de desgaste y uno
+  de asesinos a partidas cortas, así que <code>num_tanks</code>, <code>num_assassins</code> y
+  <code>total_base_hp</code> son las candidatas. Del elo esperamos poco <em>en este dataset</em>, y no
+  porque el elo no importe sino por el sesgo que ya medimos: casi no varía dentro de cada plataforma.
+  <b>La forma correcta de contestar esto es marcando que es una hipótesis</b> — afirmarlo como hallazgo
+  sería inventar un resultado que todavía no medimos.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">32 · ¿Qué es la capa oro y por qué no la tienen? <span class="duenio">Matías / Facundo</span></span>
+  <p class="corta">Es la capa de negocio del modelo medallón: agregados y variables construidas para un
+  uso puntual. No la tenemos porque la Entrega 1 pide el pipeline y la capa plata; el oro aparece en la
+  Unidad 3, sobre esta misma plata.</p>
+  <p class="mas">Bronce = crudo, tal como llegó, inmutable. Plata = limpio, tipado y validado; es lo que
+  entregamos. Oro = listo para consumir por un modelo o una app. Tener bronce es lo que permite que el
+  oro se pueda rehacer las veces que haga falta.</p>
+</div>
+
+<!-- ================================================================= -->
+<h2 class="seccion"><span class="n">Sección 9</span>Ficha de bolsillo</h2>
+
+<p>Una página para imprimir y tener en la mano. Si hay un solo papel sobre la mesa el día de la
+entrega, que sea éste.</p>
+
+<div class="ficha">
+  <h3>Los números que no se pueden equivocar</h3>
+  <table>
+    <tr><td>Filas del dataset</td><td>19.145</td></tr>
+    <tr><td>Columnas</td><td>137 &nbsp;<span style="font-weight:400;color:#4a5158">(3 + 100 + 34)</span></td></tr>
+    <tr><td>Clave primaria</td><td><code>match_id</code> — única: True</td></tr>
+    <tr><td>Columna objetivo</td><td><code>game_duration_s</code> — regresión</td></tr>
+    <tr><td>Objetivo: media / mediana / desvío</td><td>1.748 s / 1.751 s / 424 s</td></tr>
+    <tr><td>Objetivo: mínimo / máximo</td><td>301 s / 3.963 s</td></tr>
+    <tr><td>Tipos</td><td>106 int · 20 float · 11 object</td></tr>
+    <tr><td>Nulos</td><td>ninguno, en ninguna columna</td></tr>
+    <tr><td>Columnas 100 % vacías</td><td>ninguna</td></tr>
+    <tr><td>Filas con rol inferido</td><td>17 de 19.145</td></tr>
+    <tr><td>Peso del CSV</td><td>11 MB</td></tr>
+  </table>
+</div>
+
+<div class="ficha">
+  <h3>El bronce</h3>
+  <table>
+    <tr><td>Partidas crudas</td><td>19.145</td></tr>
+    <tr><td>Perfiles de jugador</td><td>290.654</td></tr>
+    <tr><td>Partidas descartadas (índice)</td><td>1.651</td></tr>
+    <tr><td>Tamaño en disco</td><td>1,1 GB comprimido &nbsp;<span style="font-weight:400;color:#4a5158">(&gt; 8 GB sin comprimir)</span></td></tr>
+    <tr><td>Por plataforma</td><td>kr 3.430 · br1 3.356 · la1 3.355 · la2 3.066 · na1 2.988 · euw1 2.950</td></tr>
+  </table>
+</div>
+
+<div class="ficha">
+  <h3>La corrida</h3>
+  <table>
+    <tr><td>Recolección grande</td><td>5/9 11:53 → 6/9 09:33 (≈21 h 40)</td></tr>
+    <tr><td>Tiempo neto de descarga</td><td>14 h 39 min para ~17.000 partidas</td></tr>
+    <tr><td>Ritmo agregado (6 plataformas)</td><td>~1.154 partidas/hora</td></tr>
+    <tr><td>Pedidos por partida</td><td>16,8 promedio (1 partida + ~16 perfiles)</td></tr>
+    <tr><td>Reproceso de plata (sin red)</td><td>~13 min</td></tr>
+    <tr><td>DAG completo con bronce en disco</td><td>15 min</td></tr>
+    <tr><td>Calidad de código</td><td>10/10 tests · ruff limpio · parse limpio</td></tr>
+  </table>
+</div>
+
+<div class="ficha">
+  <h3>El sesgo, en una línea por servidor</h3>
+  <table>
+    <tr><td>la1 (LAN)</td><td>elo medio 3.231 — Grandmaster 39 %</td></tr>
+    <tr><td>br1 (BR)</td><td>elo medio 3.036 — Diamond 49 %</td></tr>
+    <tr><td>euw1 (EUW)</td><td>elo medio 2.585 — Emerald 48 %</td></tr>
+    <tr><td>kr (KR)</td><td>elo medio 2.254 — bimodal (Silver/Bronze + Challenger)</td></tr>
+    <tr><td>la2 (LAS)</td><td>elo medio 2.178 — Gold 37 %</td></tr>
+    <tr><td>na1 (NA)</td><td>elo medio 1.627 — Silver 33 %, Bronze 29 %</td></tr>
+  </table>
+</div>
+
+<div class="clave">
+  <span class="etiqueta">Las tres frases de cierre, si hay que resumir todo en diez segundos</span>
+  <p><strong>1.</strong> Una fila es una partida clasificatoria de la Season 16; el objetivo es
+  <code>game_duration_s</code>; la clave es <code>match_id</code> y no repite.<br>
+  <strong>2.</strong> El dato crudo está en disco: podemos rehacer el dataset entero sin volver a
+  pedirle nada a Riot.<br>
+  <strong>3.</strong> Sabemos dónde el dataset se aparta del ideal —no es del todo tidy y tiene un sesgo
+  por tier— y las dos cosas están medidas y escritas, no descubiertas en esta mesa.</p>
+</div>
+
+<div class="pie">
+  FF-15 · Proyecto Integrador de Ciencia de Datos · UTN FRM · 2026 · Grupo 5K09-02<br>
+  Guión de la defensa de la Entrega 1. Los números salen de la corrida del 6/9/2026 y del reporte
+  <code>include/output/reports/calidad.md</code>. El desarrollo completo de cada tema está en
+  <code>docs/documentacion-proyecto.pdf</code>.<br>
+  Fuente editable: <code>docs/guion-defensa-entrega1.html</code> · Regenerar el PDF:
+  <code>python docs/generar_pdf.py guion-defensa-entrega1.html</code>
+</div>
+
+</body>
+</html>

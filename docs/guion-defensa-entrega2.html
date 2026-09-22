@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FF-15 · Guión de la defensa · Entrega 2</title>
+<style>
+@page { size: A4; margin: 18mm 16mm 16mm 16mm; }
+:root{
+  --tinta:#16191d; --suave:#4a5158; --linea:#d8dde2; --fondo:#f6f8fa;
+  --acento:#0b5fa5; --alerta:#a3341f; --verde:#4a7c2f; --ambar:#b7791f;
+}
+*{box-sizing:border-box}
+body{font-family:"Charter","Georgia","Times New Roman",serif;color:var(--tinta);
+  font-size:10.5pt; line-height:1.55; margin:0;}
+h1,h2,h3,h4{font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;line-height:1.25;
+  color:var(--tinta); page-break-after:avoid;}
+h1{font-size:23pt;margin:0 0 6pt;letter-spacing:-.4pt}
+h2{font-size:16pt;margin:22pt 0 8pt;padding-bottom:4pt;border-bottom:2px solid var(--acento)}
+h3{font-size:12.5pt;margin:16pt 0 5pt;color:var(--acento)}
+h4{font-size:10.5pt;margin:12pt 0 4pt;text-transform:uppercase;letter-spacing:.6pt;color:var(--suave)}
+p{margin:0 0 8pt;text-align:justify}
+ul,ol{margin:0 0 9pt;padding-left:18pt}
+li{margin-bottom:4pt}
+code{font-family:"Cascadia Mono","Consolas","DejaVu Sans Mono",monospace;font-size:9pt;
+  background:var(--fondo);padding:1px 3px;border-radius:3px;border:1px solid var(--linea)}
+table{width:100%;border-collapse:collapse;margin:0 0 11pt;font-size:9.2pt;page-break-inside:avoid}
+th{background:var(--fondo);text-align:left;font-family:"Segoe UI",Arial,sans-serif;
+  font-size:8.8pt;text-transform:uppercase;letter-spacing:.4pt;color:var(--suave);
+  padding:5pt 6pt;border-bottom:1.5px solid var(--acento)}
+td{padding:5pt 6pt;border-bottom:1px solid var(--linea);vertical-align:top}
+tr:last-child td{border-bottom:none}
+
+.portada{height:245mm;display:flex;flex-direction:column;justify-content:center;
+  page-break-after:always;text-align:center}
+.portada .materia{font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;letter-spacing:2.5pt;
+  text-transform:uppercase;color:var(--suave);margin-bottom:14pt}
+.portada h1{font-size:30pt;margin-bottom:10pt}
+.portada .sub{font-size:13pt;color:var(--suave);font-style:italic;margin-bottom:26pt;
+  max-width:135mm;margin-left:auto;margin-right:auto;text-align:center}
+.portada .meta{font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;color:var(--suave);line-height:1.9}
+.portada .equipo{font-family:"Segoe UI",Arial,sans-serif;font-size:10.5pt;color:var(--tinta);
+  line-height:1.8;margin-top:20pt;border-top:1px solid var(--linea);
+  border-bottom:1px solid var(--linea);padding:12pt 0;max-width:120mm;margin-left:auto;margin-right:auto}
+
+.seccion{page-break-before:always;border-top:4px solid var(--acento);padding-top:10pt;margin-top:0}
+.seccion .n{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;letter-spacing:2pt;
+  text-transform:uppercase;color:var(--acento);display:block;margin-bottom:2pt}
+
+.nota,.aviso,.clave{padding:8pt 11pt;margin:0 0 11pt;border-radius:4px;font-size:9.6pt;page-break-inside:avoid}
+.nota{background:#eef4fa;border-left:3px solid var(--acento)}
+.aviso{background:#fdf2ee;border-left:3px solid var(--alerta)}
+.clave{background:#f2f7ee;border-left:3px solid var(--verde)}
+.nota p:last-child,.aviso p:last-child,.clave p:last-child{margin-bottom:0}
+.etiqueta{font-family:"Segoe UI",Arial,sans-serif;font-size:8.5pt;font-weight:600;
+  text-transform:uppercase;letter-spacing:.7pt;display:block;margin-bottom:3pt}
+.nota .etiqueta{color:var(--acento)} .aviso .etiqueta{color:var(--alerta)} .clave .etiqueta{color:var(--verde)}
+
+.turno{border:1.5px solid var(--acento);border-radius:5px;margin:0 0 14pt;overflow:hidden;page-break-inside:avoid}
+.turno.nueva{page-break-before:always}
+.turno > .cab{background:var(--acento);color:#fff;padding:6pt 10pt;
+  font-family:"Segoe UI",Arial,sans-serif;display:flex;justify-content:space-between;align-items:baseline}
+.turno > .cab .quien{font-size:12.5pt;font-weight:600;letter-spacing:-.2pt}
+.turno > .cab .reloj{font-size:10pt;font-family:"Cascadia Mono","Consolas",monospace;opacity:.95}
+.turno > .cuerpo{padding:9pt 11pt}
+.turno.ficha-p{border-color:var(--alerta)} .turno.ficha-p > .cab{background:var(--alerta)}
+.turno.ficha-s{border-color:var(--ambar)} .turno.ficha-s > .cab{background:var(--ambar)}
+.turno.ficha-r{border-color:#6b7178} .turno.ficha-r > .cab{background:#6b7178}
+.turno .tema{font-family:"Segoe UI",Arial,sans-serif;font-size:9.5pt;color:var(--suave);
+  margin:0 0 8pt;padding-bottom:6pt;border-bottom:1px solid var(--linea)}
+.pantalla{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;background:#fff;
+  border:1px dashed var(--linea);border-radius:3px;padding:6pt 9pt;margin:0 0 9pt;color:var(--suave)}
+.pantalla b{color:var(--tinta)}
+.decir{background:#fffdf5;border-left:3px solid #c9a227;padding:9pt 12pt;margin:0 0 9pt;
+  border-radius:0 4px 4px 0}
+.decir p{margin:0 0 7pt;text-align:left}
+.decir p:last-child{margin-bottom:0}
+.decir .etiqueta{color:#8a6d10}
+.pase{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;color:var(--verde);
+  font-weight:600;margin:0;padding-top:5pt;border-top:1px solid var(--linea)}
+.anclas{font-size:9.2pt;margin:0 0 9pt}
+.anclas ul{margin:0;padding-left:16pt}
+.anclas li{margin-bottom:2pt}
+
+.pregunta{background:var(--fondo);border:1px solid var(--linea);border-radius:4px;
+  padding:8pt 11pt;margin:0 0 9pt;page-break-inside:avoid}
+.pregunta .q{font-family:"Segoe UI",Arial,sans-serif;font-weight:600;font-size:10pt;
+  color:var(--acento);margin-bottom:5pt;display:block}
+.pregunta p{margin-bottom:6pt}
+.pregunta p:last-child{margin-bottom:0}
+.duenio{font-family:"Segoe UI",Arial,sans-serif;font-size:8pt;text-transform:uppercase;
+  letter-spacing:.5pt;color:var(--suave);float:right;font-weight:600;
+  background:#fff;border:1px solid var(--linea);border-radius:10px;padding:1pt 7pt;margin-left:8pt}
+.corta{font-weight:600}
+.mas{font-size:9.3pt;color:var(--suave);border-top:1px dotted var(--linea);padding-top:5pt;margin-top:5pt}
+.mas b{color:var(--tinta)}
+
+.ok{color:#2d6a1f;font-weight:600} .no{color:var(--alerta);font-weight:600} .am{color:var(--ambar);font-weight:600}
+.pie{margin-top:20pt;padding-top:8pt;border-top:1px solid var(--linea);
+  font-size:8.5pt;color:var(--suave);font-family:"Segoe UI",Arial,sans-serif}
+
+.linea-tiempo{border:1px solid var(--linea);border-radius:4px;overflow:hidden;
+  display:flex;margin:0 0 12pt;font-family:"Segoe UI",Arial,sans-serif;font-size:8.2pt;text-align:center}
+.linea-tiempo div{padding:7pt 3pt;border-right:1px solid #fff;color:#fff;line-height:1.35}
+.linea-tiempo div:last-child{border-right:none}
+.lt1{background:#0b5fa5;flex:2} .lt2{background:#1d74bd;flex:2.5}
+.lt3{background:#2f89d3;flex:2.5} .lt4{background:#4a9edd;flex:.9}
+.lt5{background:#b7791f;flex:5.1} .lt6{background:#a3341f;flex:5}
+.lt7{background:#6b7178;flex:2}
+.linea-tiempo b{display:block;font-size:9pt}
+</style>
+</head>
+<body>
+
+<!-- ============================ PORTADA ============================ -->
+<div class="portada">
+  <div class="materia">UTN FRM · Ingeniería en Sistemas de Información · Ciencia de Datos 2026</div>
+  <h1>Guión de la defensa</h1>
+  <p class="sub">Entrega 2 · Análisis exploratorio · Veinte minutos, cuatro voces,
+  una sola pregunta de fondo: ¿sabemos qué tiene adentro el dataset, y podemos defender con un
+  número cada decisión que tomamos sobre él?</p>
+  <div class="meta">
+    <strong>Grupo 5K09-02</strong><br>
+    Proyecto FF-15 — predicción de la duración de una partida de League of Legends<br>
+    Exposición: miércoles 23 de septiembre · 20 minutos con el docente, en privado<br>
+    Se muestra desde: <strong>Google Colab</strong>, con el notebook
+    <code>notebooks/entrega-2/eda_entrega2.ipynb</code> (versión del 22/9)
+  </div>
+  <div class="equipo">
+    Ezequiel Aguilar · Rodrigo «Toto» Viluron<br>
+    Anthony «Cocha» Cochachin · Facundo Aracena
+  </div>
+</div>
+
+<!-- ============================ 1 ============================ -->
+<div class="seccion">
+<span class="n">Sección 1</span>
+<h2 style="margin-top:0;border:none">Cómo usar este guión</h2>
+
+<p>La consigna lo dice dos veces: <strong>la evaluación es individual</strong> y «que hable uno solo
+es el error más caro, porque las preguntas van dirigidas y la nota es individual». Por eso los
+primeros siete minutos están repartidos en cuatro turnos, y cada una de las ocho fichas tiene una
+persona que la <em>arranca</em> si el docente la elige.</p>
+
+<p>El texto sobre fondo amarillo es <strong>lo que se dice</strong>, escrito para sonar hablado. No
+se lee el día de la entrega: se ensaya hasta poder decirlo mirando la pantalla. Lo que está debajo
+son los datos que lo sostienen, por si el docente frena en el medio. Todos los números de este
+guión salen de las salidas guardadas del notebook o se recalcularon sobre el mismo CSV; ninguno es
+de memoria.</p>
+
+<table>
+<tr><th style="width:32%">Regla</th><th>Por qué</th></tr>
+<tr><td><strong>El reparto es para arrancar, no para saber</strong></td><td>La consigna: «la pregunta
+sobre una hipótesis puede caerle a quien hizo la limpieza». Las ocho fichas, el perfil y la tabla de
+candidatas los tienen que poder recorrer los cuatro. El dueño de una ficha es quien empieza a
+hablar si cae; nada más.</td></tr>
+<tr><td><strong>Se contesta con un número, nunca con el gráfico</strong></td><td>«Se ve que hay
+diferencia» es una de las tres formas de perder los 20 minutos que lista la consigna. Cada
+respuesta arranca con el número y su zona; el gráfico viene después, a explicarlo.</td></tr>
+<tr><td><strong>Nadie interrumpe el turno de otro</strong></td><td>Si a alguien se le escapa un
+dato, el que sigue lo retoma. Corregir a un compañero delante del docente come tiempo y hace que el
+grupo se vea desarmado.</td></tr>
+<tr><td><strong>Cada turno se cierra con el pase</strong></td><td>Una frase que nombra al que sigue.
+Evita el silencio entre turnos.</td></tr>
+<tr><td><strong>Si no sabés, decilo y devolvé algo</strong></td><td>«Eso lo trabajó Toto, pero lo
+que sí te puedo decir es…». Nunca inventar un número: se descubre en la repregunta. Y la consigna
+lo premia: «si algo no te dio, vení igual y decilo».</td></tr>
+</table>
+
+<div class="clave">
+  <span class="etiqueta">La frase que resume la entrega</span>
+  <p>«<strong>Las condiciones iniciales de una partida no dicen cuánto va a durar, pero sí se dicen
+  mucho entre ellas.</strong> La mejor columna explica el 2,6 % de la varianza de la duración; en
+  cambio, cuatro pares de columnas se duplican con fuerza medida. Por eso llegamos a la Entrega 3
+  con 82 columnas afuera, cada una con su razón, y con un rival claro: predecir 1.748 segundos
+  siempre.»</p>
+</div>
+
+<h3>Las tres formas de perder los 20 minutos (de la consigna)</h3>
+<ul>
+  <li><strong>El EDA de checklist.</strong> «Veinte gráficos, ninguna conclusión.» → Cada turno de
+  este guión termina en una decisión.</li>
+  <li><strong>Contestar con el gráfico.</strong> «Un gráfico no se compara contra nada; el número
+  sí.» → Cada ficha dice su número y su zona antes de mostrar el gráfico.</li>
+  <li><strong>Que hable uno solo.</strong> → Cuatro turnos y dos fichas por persona.</li>
+</ul>
+</div>
+
+<!-- ============================ 2 ============================ -->
+<div class="seccion">
+<span class="n">Sección 2</span>
+<h2 style="margin-top:0;border:none">Antes de entrar al aula</h2>
+
+<p>La consigna: «Llegá con esto ya hecho. Los 20 minutos son para mostrar y explicar, no para correr
+celdas ni para esperar que termine un gráfico». Y: el notebook «abierto antes de entrar. Si hay que
+correrlo delante nuestro, son minutos que no recuperás».</p>
+
+<h4>La noche anterior (martes 22)</h4>
+<table>
+<tr><th>Qué</th><th style="width:22%">Quién</th></tr>
+<tr><td>☐ Subir a Google Colab <strong>la versión del 22/9</strong> del notebook: la que tiene las
+fichas reordenadas (H1 tanques, H2 maestría, H3 t1/t2, H4 elo…). Una copia subida antes de esa
+fecha tiene <strong>la numeración vieja</strong> y no coincide con este guión.</td><td>Quien lleva la notebook</td></tr>
+<tr><td>☐ Abrirlo en Colab y comprobar que se ven las salidas guardadas: tablas, los doce gráficos y
+la tabla de columnas candidatas con estilo.</td><td>Quien lleva la notebook</td></tr>
+<tr><td>☐ Simulacro completo: los turnos cronometrados, dos fichas elegidas al azar por otro
+integrante, y después preguntas del banco de la sección 7.</td><td>Los cuatro</td></tr>
+<tr><td>☐ Cada uno lee <strong>las ocho fichas</strong>, no sólo las suyas.</td><td>Los cuatro</td></tr>
+</table>
+
+<h4>Quince minutos antes</h4>
+<table>
+<tr><th>Qué</th><th style="width:30%">Detalle</th></tr>
+<tr><td>☐ Colab abierto en el notebook, parado en el título, con el panel <strong>Índice</strong>
+(tabla de contenidos) de la barra izquierda desplegado.</td><td>Así se salta a cualquier ficha con
+un clic.</td></tr>
+<tr><td>☐ <strong>No ejecutar ninguna celda.</strong> Las salidas ya están guardadas.</td><td>Si
+alguien re-ejecuta, la primera celda de código busca el CSV en una carpeta <code>datos/</code>; si
+no se subió a la sesión de Colab, falla.</td></tr>
+<tr><td>☐ Zoom del navegador en 110–125 % y notificaciones silenciadas.</td><td>Se proyecta o se
+mira de cerca.</td></tr>
+<tr><td>☐ Este guión abierto en otro dispositivo, no en la pantalla que se muestra.</td><td></td></tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">Cómo se referencia el notebook en este guión</span>
+  <p>Colab no numera las celdas de forma estable, así que el guión remite a dos cosas que sí se
+  encuentran siempre: <strong>el título de la sección</strong>, tal como aparece en el Índice (por
+  ejemplo «H2 · La maestría binarizada pierde el orden de magnitud»), y <strong>la primera línea de
+  la celda de código</strong>, que en todo el notebook es un comentario que dice qué se pregunta
+  (por ejemplo <code># Las tres formas de agregar la misma columna…</code>).</p>
+</div>
+</div>
+
+<!-- ============================ 3 ============================ -->
+<div class="seccion">
+<span class="n">Sección 3</span>
+<h2 style="margin-top:0;border:none">El reparto de un vistazo</h2>
+
+<div class="linea-tiempo">
+  <div class="lt1"><b>Facundo</b>0:00–2:00</div>
+  <div class="lt2"><b>Ezequiel</b>2:00–4:30</div>
+  <div class="lt3"><b>Toto</b>4:30–7:00</div>
+  <div class="lt4"><b>Cocha</b>7:00</div>
+  <div class="lt5"><b>Dos fichas</b>7:45–13:00</div>
+  <div class="lt6"><b>Preguntas dirigidas</b>13:00–18:00</div>
+  <div class="lt7"><b>Devolución</b>18–20</div>
+</div>
+
+<table>
+<tr><th>Quién</th><th>Reloj</th><th>Qué expone</th><th>Momento de la consigna</th></tr>
+<tr><td><strong>Facundo Aracena</strong></td><td>0:00 – 2:00</td><td>Qué cambió desde la Entrega 1,
+qué es una fila, la clave, el tamaño y los tipos.</td><td>«Qué cambió» (0–2)</td></tr>
+<tr><td><strong>Ezequiel Aguilar</strong></td><td>2:00 – 4:30</td><td>La columna objetivo: su
+distribución, el corte de los 300 s, el escalón de los 900 s y las bandas de minutos.</td><td rowspan="2">«El perfil» (2–7)</td></tr>
+<tr><td><strong>Rodrigo «Toto» Viluron</strong></td><td>4:30 – 7:00</td><td>La calidad: duplicados,
+constantes, por qué no hay nulos, los ceros que son faltantes y la asimetría.</td></tr>
+<tr><td><strong>Anthony «Cocha» Cochachin</strong></td><td>7:00 – 7:45</td><td>El puente: el
+método en tres frases y el menú de las ocho fichas.</td><td rowspan="2">«Dos hipótesis» (7–13)</td></tr>
+<tr><td><strong>El dueño de cada ficha elegida</strong></td><td>7:45 – 13:00</td><td>Las dos fichas
+que elija el docente, enteras, desde la afirmación hasta la decisión. Unos 2:30 cada una.</td></tr>
+</table>
+
+<h3>Las ocho fichas, en el orden en que se ofrecen, y quién las arranca</h3>
+<table>
+<tr><th>Ficha</th><th>Grupo</th><th>Pregunta</th><th>Número · zona</th><th>La arranca</th></tr>
+<tr><td><strong>H1</strong> · más tanques, partida más larga</td><td>principal</td><td>responder</td><td>Pearson −0,008 · <span class="no">rojo</span> · refutada</td><td>Ezequiel</td></tr>
+<tr><td><strong>H2</strong> · la maestría binarizada pierde información</td><td>principal</td><td>predecir</td><td>0,471 → 0,769 · <span class="am">amarillo</span> → <span class="ok">verde</span></td><td>Toto</td></tr>
+<tr><td><strong>H3</strong> · la partición t1/t2 duplica</td><td>secundaria</td><td>predecir</td><td>|t1−t2| 0,0126 · <span class="no">rojo</span> (confirma)</td><td>Cocha</td></tr>
+<tr><td><strong>H4</strong> · a más elo, partidas más cortas</td><td>secundaria</td><td>responder</td><td>Pearson −0,161 · <span class="no">rojo</span> · refutada</td><td>Facundo</td></tr>
+<tr><td><strong>H5</strong> · rango largo, armadura baja</td><td>restante</td><td>responder</td><td>Pearson −0,672 · <span class="ok">verde</span></td><td>Ezequiel</td></tr>
+<tr><td><strong>H6</strong> · el elo y el winrate son lo mismo</td><td>restante</td><td>predecir</td><td>Pearson 0,711 · <span class="ok">verde</span></td><td>Facundo</td></tr>
+<tr><td><strong>H7</strong> · <code>avg_defense</code> es <code>num_tanks</code></td><td>restante</td><td>predecir</td><td>η² 0,319 · <span class="ok">verde</span></td><td>Cocha</td></tr>
+<tr><td><strong>H8</strong> · <code>count_flash</code> no aporta</td><td>restante</td><td>predecir</td><td>modal 0,838 y −0,014 · <span class="no">rojo</span> (confirma)</td><td>Toto</td></tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">Por qué este reparto</span>
+  <p>Cada uno tiene una de las cuatro primeras y una de las cuatro restantes, y las dos fichas de
+  cada persona tocan el mismo tema que su turno o entre sí: Ezequiel, composición y diseño del
+  juego (H1, H5); Toto, la maestría y la columna casi constante, que es calidad (H2, H8); Cocha, el
+  bloque de agregados de equipo (H3, H7); Facundo, el elo (H4, H6). Así, si el docente elige dos
+  fichas del mismo dueño, la segunda la arranca otro: <strong>la regla es que nadie arranca dos
+  seguidas</strong>. El que no arrancó ninguna toma la segunda.</p>
+</div>
+
+<p><strong>Si el docente deja elegir</strong>, se ofrecen las dos principales, H1 y H2: juntas cubren
+lo que la consigna quiere ver —una hipótesis que salió mal y el método entero con un movimiento—.
+Y si pregunta por qué hay ocho, está contestado en la sección 7.</p>
+</div>
+
+<!-- ============================ 4 ============================ -->
+<div class="seccion">
+<span class="n">Sección 4</span>
+<h2 style="margin-top:0;border:none">Los primeros siete minutos, turno por turno</h2>
+
+<!-- ---------------- TURNO 1 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">1 · Facundo Aracena</span><span class="reloj">0:00 → 2:00</span></div>
+  <div class="cuerpo">
+    <p class="tema">Qué cambió · qué es una fila · tamaño, clave y tipos</p>
+    <div class="pantalla"><b>En Colab:</b> el título del notebook, con la pregunta del proyecto.
+    Después, en el Índice, <b>Sección 1 · Inspección inicial del dataset</b> → «Dimensiones, y qué es
+    una fila» (celda <code># Observaciones y variables</code>) y «Tipos de datos»
+    (<code># Cuántas columnas hay de cada tipo</code>).</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>Buenas, somos el grupo 5K09-02. Primero, qué cambió desde la Entrega 1: <strong>nada</strong>.
+      No nos marcaron correcciones, y ni la pregunta del proyecto ni el esquema cambiaron. El dataset
+      que analizamos es el mismo que presentamos el 9 de septiembre.</p>
+      <p>La pregunta sigue siendo si se puede predecir cuánto dura una partida de <em>League of
+      Legends</em> con lo que se sabe antes de que arranque. <strong>Una fila es una partida
+      clasificatoria de cola 420, solo/dúo, de la Season 16.</strong> Son
+      <strong>19.145 partidas por 137 columnas</strong>, y la clave es <code>match_id</code>, que
+      trae adentro el prefijo del servidor.</p>
+      <p>Las 137 columnas no se leen de a una: son tres bloques. Tres de identidad, objetivo y calidad;
+      cien que son los diez jugadores aplanados —diez features por cinco posiciones por dos
+      equipos—; y treinta y cuatro agregados de equipo, diecisiete por equipo.</p>
+      <p>De tipos: 106 enteras, 20 decimales y 11 de texto. Ninguna numérica quedó como texto: las
+      once de texto son <code>match_id</code> y los diez nombres de campeón. Lo que sí hay que
+      marcar es lo contrario: <code>champ_id</code>, los hechizos y las runas son
+      <strong>códigos guardados como enteros</strong>, etiquetas y no cantidades.</p>
+      <p>Ezequiel les muestra la columna objetivo.</p>
+    </div>
+    <div class="anclas"><strong>Los datos de este bloque, por si frenan acá:</strong>
+    <ul>
+      <li>Seis servidores, entre 2.950 (EUW1) y 3.430 (KR) partidas cada uno (celda
+      <code># Cuántas partidas trajo cada servidor</code>).</li>
+      <li><code>t1</code> es el <code>teamId</code> 100 y <code>t2</code> el 200: un rótulo
+      arbitrario de Riot. Eso es H3.</li>
+      <li>La plataforma no es una columna del esquema: se deriva del prefijo de <code>match_id</code>
+      en la celda <code># Todas las derivadas del análisis…</code>.</li>
+      <li><strong>Tidy, si lo preguntan:</strong> la fila es una partida y eso está bien, pero «el elo
+      del jugador» no es una columna, son diez. Es una concesión deliberada: diez filas por partida
+      romperían la clave y la pregunta es sobre partidas. Esta explicación no está en el notebook;
+      se dice de palabra.</li>
+    </ul></div>
+    <p class="pase">→ Pase: «Ezequiel les muestra la columna objetivo.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 2 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">2 · Ezequiel Aguilar</span><span class="reloj">2:00 → 4:30</span></div>
+  <div class="cuerpo">
+    <p class="tema">La columna objetivo · el número más importante de la entrega</p>
+    <div class="pantalla"><b>En Colab:</b> <b>Sección 2 · Análisis univariado</b> → «La columna
+    objetivo…» (celdas <code># El objetivo: centro, dispersión y colas</code> y el histograma).
+    Después «El escalón de los quince minutos» (el histograma ampliado, con la línea en 900 s) y «La
+    distribución del objetivo, cuando el objetivo es continuo» (la tabla de bandas).</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>El objetivo es <code>game_duration_s</code>, la duración en segundos: continua, así que el
+      problema de la Entrega 3 es de regresión. Media <strong>1.748</strong> segundos, mediana
+      <strong>1.751</strong>, desvío 424.</p>
+      <p>Lo inesperado es la forma: <strong>asimetría −0,039 y curtosis 0,579</strong>. Es
+      prácticamente simétrica, y eso contradice lo que suele pasar con una duración, que casi
+      siempre tiene cola derecha y pide logaritmo. Ésta no: <strong>el objetivo no necesita
+      transformarse</strong>.</p>
+      <p>Tiene dos cosas que hay que declarar. La pared de la izquierda <strong>es nuestra</strong>: el
+      pipeline descarta las partidas de menos de 300 segundos porque son <em>remakes</em>. Y tiene un
+      escalón: <strong>del minuto 14 al 15 terminan 27 partidas; del 15 al 16, 714</strong>. A los
+      quince minutos se habilita la rendición. No es un error: es el fenómeno, y además es un control
+      de calidad, porque cae justo donde el reglamento dice. Son el 3,7 % del dataset en un punto, y un
+      modelo que prediga un número suave no lo va a reproducir.</p>
+      <p>La consigna mide la distribución con <code>value_counts</code>, pero con 2.180 valores
+      distintos eso no dice nada, así que agrupamos en bandas de minutos. <strong>La banda más
+      poblada, de 25 a 30 minutos, tiene el 29,9 %</strong>: no hay una clase que se coma todo. El
+      reverso: un modelo que prediga siempre la media ya va a parecer decente, así que ése es el
+      rival de la Entrega 3.</p>
+      <p>Toto sigue con la calidad del dato.</p>
+    </div>
+    <div class="anclas"><strong>Los datos de este bloque:</strong>
+    <ul>
+      <li>Mínimo 301 s, máximo 3.963 s. Percentil 1: 724,9; percentil 99: 2.778,6.</li>
+      <li>De los diez valores de duración más repetidos, seis caen entre 911 y 918 segundos.</li>
+      <li>Bandas: &lt;20 min 10,2 % · 20–25 15,1 % · 25–30 29,9 % · 30–35 26,2 % · 35–40 12,8 % · 40+ 5,8 %.</li>
+      <li>Extremos (Sección 4): 137 partidas de menos de 10 minutos y 289 de más de 45. No se sacan:
+      son el fenómeno. El único recorte legítimo es el de los remakes.</li>
+    </ul></div>
+    <p class="pase">→ Pase: «Toto sigue con la calidad del dato.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 3 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">3 · Rodrigo «Toto» Viluron</span><span class="reloj">4:30 → 7:00</span></div>
+  <div class="cuerpo">
+    <p class="tema">Calidad · duplicados, constantes, nulos y los ceros que mienten</p>
+    <div class="pantalla"><b>En Colab:</b> <b>Sección 4 · Análisis de calidad de datos</b> → «La
+    clave…» (<code># La misma pregunta con tres claves distintas</code>), «Columnas sin
+    información…», «Valores faltantes: cero, y ése es justamente el tema» (<code># La masa de
+    valores imputados…</code>) y «Dos ceros, dos significados…».</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>Duplicados: <strong>cero</strong>, y lo medimos con tres claves: por <code>match_id</code>,
+      por fila completa y por los diez campeones. Que los diez campeones no se repitan ni una vez en
+      19.145 partidas dice que cada composición es única. El cero de la clave no es suerte: el DAG
+      deduplica y falla la corrida si la clave repite.</p>
+      <p>Constantes: <strong>ninguna</strong>, porque <code>count_smite</code> ya la sacamos antes de
+      la Entrega 1. Casi constantes sí: <code>roles_inferidos</code> vale 0 en el
+      <strong>99,91 %</strong> de las filas —17 partidas— y los <code>count_flash</code> tienen su
+      valor modal en el 84 %.</p>
+      <p>Nulos: <strong>cero en las 137 columnas, y ésa es una decisión, no una propiedad</strong>.
+      Un jugador sin ranked recibe elo 1500 y winrate 0,50: habilidad desconocida, promedio. Es una
+      tercera categoría, además de los faltantes reales y los estructurales. Se cuenta buscando el
+      valor imputado: el elo en 1500 es el <strong>0,55 %</strong> de las celdas de jugador. Pero 1500
+      también le pasa a un Silver III con 50 puntos, así que exigimos elo 1500 <em>y</em> winrate
+      0,50 a la vez: eso descarta 111 falsos positivos y deja 944 celdas en 615 partidas.</p>
+      <p>Y un caso donde el cero miente: <code>rune_sub</code> tiene 27 ceros que son faltantes
+      disfrazados. <strong>Cinco celdas</strong> llevan la asimetría de <code>t1_jng_rune_sub</code>
+      de −24,22 a −0,40. Un criterio automático sobre la asimetría habría mandado a transformarla, y
+      transformar no arregla nada. El cero de la maestría, en cambio, es real: el jugador nunca jugó
+      ese campeón.</p>
+      <p>Cocha les cuenta cómo resolvimos las hipótesis.</p>
+    </div>
+    <div class="anclas"><strong>Los datos de este bloque:</strong>
+    <ul>
+      <li>Winrate en 0,50: 3,57 % de las celdas, casi todos jugadores reales con historial parejo.</li>
+      <li>Por partida: 18.530 sin imputados, 512 con uno; <strong>24 con nueve y 2 con diez</strong>.
+      Sospechamos una tanda de consultas fallida, no nueve jugadores sin clasificar. No se verificó:
+      hace falta el bronce de la corrida grande. Es un pendiente declarado.</li>
+      <li>Asimetría por familia: casi todas entre −0,5 y 0,6. Cola larga real sólo en la maestría
+      (mediana de la familia 4,67; mediana 111.880 puntos, máximo 13.841.137). <code>champ_id</code>
+      da 1,71 pero es un código: su asimetría no significa nada.</li>
+      <li><code>champ_id</code> y <code>champ_name</code>: 173 y 173, uno a uno, cero
+      <code>Unknown</code>.</li>
+    </ul></div>
+    <p class="pase">→ Pase: «Cocha les cuenta cómo resolvimos las hipótesis.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 4 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">4 · Anthony «Cocha» Cochachin</span><span class="reloj">7:00 → 7:45</span></div>
+  <div class="cuerpo">
+    <p class="tema">El puente · el método y el menú de fichas</p>
+    <div class="pantalla"><b>En Colab:</b> <b>Sección 7</b> → «El semáforo» (la tabla de cortes), y
+    enseguida <b>Sección 9</b> → «El resumen de las ocho fichas».</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>Cada hipótesis se escribió antes de medir, y la forma de la afirmación fija la medida:
+      comparación, asociación o composición. El número cae en una zona del semáforo con los cortes de
+      la cátedra: verde y rojo cierran la ficha; amarillo habilita un movimiento, con tope de dos.</p>
+      <p>Hicimos <strong>ocho fichas, ordenadas por importancia</strong>. Las cuatro primeras cumplen
+      solas la consigna: hay de las dos preguntas y dos salen refutadas. Y el resultado de fondo es
+      que <strong>las cuatro que miden contra la duración dan rojo, y las cuatro que miden una
+      columna contra otra dan verde</strong>. ¿Cuáles querés que recorramos?</p>
+    </div>
+    <p class="pase">→ Si deja elegir: «Arrancamos por la H1, la que nos salió mal. Ezequiel.»</p>
+  </div>
+</div>
+</div>
+
+<!-- ============================ 5 ============================ -->
+<div class="seccion">
+<span class="n">Sección 5</span>
+<h2 style="margin-top:0;border:none">Las ocho fichas, en orden de importancia</h2>
+
+<p>Cada ficha tiene su texto de unos dos minutos y medio, que recorre las seis casillas:
+afirmación, qué esperábamos ver, por qué esa medida, resultado con su zona, movimiento si lo hubo,
+y qué hacemos con eso. En Colab, cada una está en <b>Sección 8</b>, bajo su grupo.</p>
+
+<!-- ---------------- H1 ---------------- -->
+<div class="turno ficha-p">
+  <div class="cab"><span class="quien">Principal · H1 · Más tanques, partida más larga</span><span class="reloj">arranca Ezequiel</span></div>
+  <div class="cuerpo">
+    <p class="tema">Principal · pregunta de dominio («qué queremos responder») · asociación · <span class="no">rojo</span> · refutada</p>
+    <div class="pantalla"><b>En Colab:</b> Sección 8 → Las dos fichas principales → <b>«H1 · Las
+    composiciones con más tanques alargan la partida»</b>. Celdas <code># Los tanques de los dos
+    equipos juntos contra la duración</code> y <code># La duración mediana por cantidad de
+    tanques…</code> (gráfico de dos paneles y la tabla).</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p><strong>Afirmación:</strong> cuantos más tanques hay en la partida, más dura. El tanque no
+      mata rápido y es difícil de matar, así que las peleas se estiran y cerrar cuesta más.</p>
+      <p><strong>Qué esperábamos:</strong> una relación positiva y clara. De las tres de dominio, era
+      la que más convencidos nos tenía: es lo que diría cualquiera que juegue.</p>
+      <p><strong>Medida:</strong> dos numéricas —tanques de la partida, de 0 a 10, contra segundos—,
+      así que es asociación: Pearson y Spearman.</p>
+      <p><strong>Resultado: Pearson −0,008, rojo.</strong> Spearman −0,007. Es el número más cercano
+      a cero de las ocho fichas, y encima con el signo al revés. <strong>Refutada.</strong></p>
+      <p>El gráfico sirve para ver una trampa. La línea de medianas parece bajar al final, pero el
+      panel de al lado muestra que con 7 y 8 tanques hay <strong>3 partidas y 1</strong>. Donde hay
+      datos, de 0 a 5 tanques, que es el 99,7 % de las filas, las medianas van de 1.737 a 1.757
+      segundos: veinte segundos de diferencia sobre un desvío de 424. Mirando sólo la línea,
+      habríamos creído que había una caída.</p>
+      <p><strong>Qué hacemos con eso:</strong> la conclusión sobre el juego es que la cantidad de
+      tanques no dice nada de cuánto va a durar la partida. Pero <code>num_tanks</code> no sale por
+      esto: una columna no se descarta porque falle una hipótesis sobre ella. Entra a la Entrega 3
+      como suma de los dos equipos, con el resto de la composición.</p>
+    </div>
+    <div class="anclas"><strong>Si frena acá:</strong>
+    <ul>
+      <li>Medianas por cantidad de tanques: 0 → 1.752 · 1 → 1.751 · 2 → 1.757 · 3 → 1.748 ·
+      4 → 1.737 · 5 → 1.738 segundos. Con 6 son 59 partidas.</li>
+      <li>¿Por qué no hubo movimiento? Rojo cierra la ficha. Insistir sobre un rojo, partiendo la
+      población hasta encontrar un subgrupo, es cazar resultados.</li>
+      <li>La misma variable contra la duración con η² (en H7) da 0,001: también rojo.</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ---------------- H2 ---------------- -->
+<div class="turno nueva ficha-p">
+  <div class="cab"><span class="quien">Principal · H2 · La maestría binarizada pierde el orden de magnitud</span><span class="reloj">arranca Toto</span></div>
+  <div class="cuerpo">
+    <p class="tema">Principal · decide sobre columnas («qué queremos predecir») · asociación · <span class="am">amarillo</span> → <span class="ok">verde</span> · confirmada</p>
+    <div class="pantalla"><b>En Colab:</b> Sección 8 → Las dos fichas principales → <b>«H2 · La
+    maestría binarizada pierde el orden de magnitud»</b>. Celdas <code># Qué tan exigente es el
+    umbral que elegimos</code>, <code># El conteo de mains contra la maestría agregada…</code>, el
+    gráfico <code># Los dos paneles que eligen el movimiento…</code> y <code># Las tres formas de
+    agregar la misma columna…</code>.</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p><strong>Afirmación:</strong> <code>is_main</code> es la maestría mayor o igual a 50.000
+      puntos, un umbral que elegimos nosotros, y <code>mains_count</code> los cuenta por equipo.
+      Binarizar tira información; la pregunta es cuánta. Si la bandera conserva casi todo, sobra la
+      continua; si no, sobra la bandera.</p>
+      <p><strong>Qué esperábamos:</strong> verde de entrada, sin movimientos. El umbral nos parecía
+      razonable.</p>
+      <p><strong>Medida:</strong> asociación, Pearson y Spearman, y acá la casilla que más importa es
+      la brecha entre los dos, porque la maestría tiene una cola larguísima.</p>
+      <p><strong>Resultado parcial: Pearson 0,471, amarillo; brecha 0,078, también amarillo.</strong>
+      Es la única ficha de las ocho que cae en amarillo. Y el primer número explica por qué: el umbral
+      de 50.000 marca como «main» al <strong>67,9 %</strong> de los jugadores, cuando la mediana es
+      111.880. No separa especialistas: se prende para dos de cada tres.</p>
+      <p>El movimiento lo elige el gráfico: la curva sube pero no es recta, y la maestría es una cola
+      de hasta trece millones de puntos. Un solo <em>one-trick</em> mueve el promedio de los diez.
+      Brecha grande más cola larga es el caso de <strong>cambiar la escala</strong>. Pero importa
+      dónde: la bandera se arma jugador por jugador, así que el logaritmo también va jugador por
+      jugador, antes de promediar.</p>
+      <p><strong>Resultado tras el movimiento: 0,769, verde</strong>, Spearman 0,829. Y el mismo
+      logaritmo aplicado al promedio ya calculado da 0,582: sigue amarillo. Aplicado en el lugar
+      equivocado, el movimiento no alcanzaba.</p>
+      <p><strong>Qué hacemos con eso:</strong> confirmada, y salen <strong>doce columnas</strong>: los
+      diez <code>is_main</code> y los dos <code>mains_count</code>. Queda la maestría, en logaritmo por
+      jugador antes de promediar. Si alguna vez hace falta una bandera, el umbral lo elige el dato,
+      por ejemplo el percentil 90, que es 1.011.698 puntos, y no el grupo a ojo.</p>
+    </div>
+    <div class="anclas"><strong>Si frena acá:</strong>
+    <ul>
+      <li>Asimetría de la maestría por jugador: 4,80. Un movimiento, de los dos que permite el tope.</li>
+      <li>Salvedad escrita en la ficha: el promedio del logaritmo tiene asimetría −3,88, por las 22
+      partidas donde nadie supera el umbral y arrastran ceros reales. No mueven el Spearman.</li>
+      <li>Reparo de fuga: la maestría se lee después de la partida y ya suma los puntos de esa misma
+      partida. Está declarado en la Sección 9.</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ---------------- H3 ---------------- -->
+<div class="turno nueva ficha-s">
+  <div class="cab"><span class="quien">Secundaria · H3 · La partición t1/t2 duplica la información</span><span class="reloj">arranca Cocha</span></div>
+  <div class="cuerpo">
+    <p class="tema">Secundaria · decide sobre columnas · asociación · <span class="no">rojo</span>, que acá confirma · la que más cambia la Entrega 3</p>
+    <div class="pantalla"><b>En Colab:</b> Sección 8 → Las dos fichas secundarias → <b>«H3 · La
+    partición t1/t2 duplica la información»</b>. Celdas <code># Cada agregado, medido cuatro veces
+    contra el objetivo</code>, <code># Los dos números que deciden</code> y el gráfico <code># El
+    mismo agregado, medido de las cuatro formas</code>.</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p><strong>Afirmación:</strong> <code>t1</code> y <code>t2</code> son los <code>teamId</code> 100
+      y 200, que Riot asigna sin criterio: no hay equipo local ni favorito. Entonces cada agregado se
+      tiene que relacionar igual con la duración en los dos equipos, y las 34 columnas del bloque de
+      equipo son 17 repetidas.</p>
+      <p><strong>Qué esperábamos:</strong> la misma correlación para las dos mitades, y además que la
+      suma de los dos equipos correlacione mejor que cada mitad.</p>
+      <p><strong>Medida:</strong> cada agregado, medido cuatro veces contra el objetivo: la mitad de
+      t1, la de t2, la suma y la diferencia absoluta. Decide la diferencia entre las dos primeras
+      correlaciones. Acá <strong>el rojo confirma</strong>: si la diferencia es roja, las mitades son
+      indistinguibles, que es lo que afirmamos.</p>
+      <p><strong>Resultado: la diferencia es 0,0126 en promedio y 0,028 como máximo, rojo</strong>,
+      siete veces por debajo del corte. Y la suma es la mejor de las cuatro formas en <strong>11 de
+      los 17</strong> agregados: magos pasa de 0,044 y 0,053 por separado a 0,069 sumado.</p>
+      <p>El porqué está en la celda del medio: las composiciones de los dos equipos son independientes
+      entre sí, y sumar dos medidas independientes del mismo fenómeno cancela ruido.</p>
+      <p><strong>Qué hacemos con eso:</strong> confirmada. Los agregados entran como suma de los dos
+      equipos. Contando las otras fichas que sacan agregados, de 34 columnas quedan 24, y se colapsan
+      en <strong>12 sumas</strong>. «Cuántos magos hay en la partida» es una variable del juego;
+      «cuántos tiene el equipo al que Riot le puso el 100», no.</p>
+    </div>
+    <div class="anclas"><strong>Si frena acá:</strong>
+    <ul>
+      <li>Los cinco agregados que salen por otras fichas: <code>mains_count</code> (H2),
+      <code>avg_defense</code> y <code>avg_magic</code> (H7), <code>total_base_armor</code> (H5),
+      <code>count_flash</code> (H8). 17 − 5 = 12.</li>
+      <li>La mayor correlación entre <code>t1_X</code> y <code>t2_X</code> es <code>mains_count</code>,
+      0,176. De <code>num_marksmen</code> se conserva también la diferencia absoluta, que fue su
+      mejor forma.</li>
+      <li>El mismo argumento vale para las cien columnas de jugador: queda como recomendación
+      agregarlas por partida.</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ---------------- H4 ---------------- -->
+<div class="turno nueva ficha-s">
+  <div class="cab"><span class="quien">Secundaria · H4 · A más elo, las partidas son más cortas</span><span class="reloj">arranca Facundo</span></div>
+  <div class="cuerpo">
+    <p class="tema">Secundaria · pregunta de dominio · asociación · <span class="no">rojo</span> · refutada · lleva al hallazgo de fondo</p>
+    <div class="pantalla"><b>En Colab:</b> Sección 8 → Las dos fichas secundarias → <b>«H4 · A más
+    elo, las partidas son más cortas»</b>. Celda <code># El elo medio de los 10 jugadores contra la
+    duración</code> y el gráfico <code># La nube completa, y la duración mediana por decil de
+    elo</code>. Para cerrar: Sección 9 → «El hallazgo que atraviesa las ocho».</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p><strong>Afirmación:</strong> cuanto mejores son los diez jugadores, más corta es la partida:
+      convierten una ventaja en objetivos más rápido y cierran antes.</p>
+      <p><strong>Qué esperábamos:</strong> una nube que baja. No fuerte, pero sí la relación más
+      fuerte del dataset, porque el elo es lo único que mide directamente cuán bien se juega.</p>
+      <p><strong>Medida:</strong> asociación entre el elo medio de la partida y la duración, Pearson y
+      Spearman, con la brecha como control de curvatura.</p>
+      <p><strong>Resultado: Pearson −0,161, Spearman −0,155, rojo. Brecha 0,006, rojo:</strong> no
+      hay curva escondida. El signo es el esperado y la magnitud no alcanza. <strong>Refutada, y
+      rojo cierra.</strong></p>
+      <p>En el gráfico, la nube es una banda horizontal. Promediando por decil sí baja, pero no
+      monótonamente —sube hasta el cuarto decil, 1.848 segundos— y de punta a punta son
+      <strong>202 segundos</strong> sobre todo el rango de elo: una tendencia real, chica y sucia.</p>
+      <p><strong>Qué hacemos con eso:</strong> se descarta la afirmación, no la columna. El elo sigue
+      siendo la columna más asociada al objetivo de las 137, así que entra a la Entrega 3 agregado por
+      partida, como candidata débil. Y es el número del hallazgo de fondo: <strong>la mejor columna del
+      dataset explica el 2,6 % de la varianza de la duración</strong>. Con estas features, medidas de
+      a una, la respuesta a la pregunta del proyecto por ahora es no; si hay señal, está en
+      combinaciones, y eso lo decide el modelo.</p>
+    </div>
+    <div class="anclas"><strong>Si frena acá:</strong>
+    <ul>
+      <li>Medianas del primer y último decil de elo: 1.803 y 1.601 segundos.</li>
+      <li><strong>Si pregunta por el servidor</strong> (respuesta oral: ese control se quitó del
+      notebook al simplificarlo, y se recalculó el 22/9 sobre el mismo CSV). Dentro de cada servidor,
+      partida a partida, la correlación va de −0,014 (NA1) a −0,254 (KR): controlar el servidor no
+      rescata nada. Y comparando los <strong>seis promedios</strong> de servidor da −0,682, verde: es
+      la trampa de agregación. Seis puntos no son partidas; para predecir una partida manda el −0,161.</li>
+      <li>El winrate, la segunda del ranking, da −0,120. Ver H6.</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ---------------- H5 ---------------- -->
+<div class="turno nueva ficha-r">
+  <div class="cab"><span class="quien">Restante · H5 · Los campeones de rango largo son de armadura baja</span><span class="reloj">arranca Ezequiel</span></div>
+  <div class="cuerpo">
+    <p class="tema">Pregunta de dominio · asociación · <span class="ok">verde</span> · confirmada · sale <code>total_base_armor</code></p>
+    <div class="pantalla"><b>En Colab:</b> Sección 8 → Las cuatro fichas restantes → <b>«H5 · Los
+    campeones de rango largo…»</b>. Celdas <code># El alcance medio de los 10 campeones contra la
+    armadura base…</code>, el gráfico por octil y <code># Las tres columnas de estadísticas base…</code>.</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p><strong>Afirmación:</strong> alcance de ataque y armadura base son la misma decisión de
+      diseño: el que pega de lejos lo paga siendo frágil. Si es así, <code>avg_attackrange</code> y
+      <code>total_base_armor</code> cuentan lo mismo con el signo cambiado, y una sobra. La hipótesis
+      <strong>salió de la matriz de correlación de la Sección 3</strong>, donde apareció un −0,654 sin
+      buscarlo; lo declaramos en la ficha.</p>
+      <p><strong>Qué esperábamos:</strong> una nube fuerte que baja, sin curvatura.</p>
+      <p><strong>Medida:</strong> asociación a nivel de partida, Pearson y Spearman con brecha.</p>
+      <p><strong>Resultado: Pearson −0,672, verde;</strong> Spearman −0,653, brecha 0,019, recta.
+      La armadura mediana cae de 312 a 280 del primer al último octil de alcance, en los ocho
+      escalones: más de dos desvíos.</p>
+      <p><strong>Qué hacemos con eso:</strong> sale <code>total_base_armor</code>, dos columnas. La
+      armadura es el centro de dos redundancias a la vez —0,672 con el alcance y 0,529 con la vida
+      base— así que sacarla resuelve las dos. Contra la duración las tres son rojas (0,054; −0,066;
+      −0,003), así que eso no sirve para desempatar, y no lo usamos.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ---------------- H6 ---------------- -->
+<div class="turno nueva ficha-r">
+  <div class="cab"><span class="quien">Restante · H6 · El elo y el winrate son la misma columna</span><span class="reloj">arranca Facundo</span></div>
+  <div class="cuerpo">
+    <p class="tema">Decide sobre columnas · asociación · <span class="ok">verde</span> · confirmada · salen los diez <code>player_winrate</code></p>
+    <div class="pantalla"><b>En Colab:</b> Sección 8 → <b>«H6 · El elo y el winrate son la misma
+    columna»</b>. Celda <code># El elo medio de la partida contra el winrate medio…</code> y el
+    gráfico por decil.</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p><strong>Afirmación:</strong> elo y winrate salen de la misma respuesta de la API y miden lo
+      mismo, porque la única forma de subir es ganar más de lo que se pierde.</p>
+      <p><strong>Qué esperábamos:</strong> fuerte pero no perfecta: el elo es acumulado y el winrate es
+      la tasa del momento. Verde, no 0,95.</p>
+      <p><strong>Medida:</strong> asociación entre los dos promedios por partida, con brecha.</p>
+      <p><strong>Resultado: Pearson 0,711, Spearman 0,748, verde;</strong> brecha 0,037, recta. El
+      winrate mediano sube de 0,478 a 0,537 del primer al décimo decil de elo, sin una inversión: seis
+      puntos de winrate, porque el winrate vive apretado alrededor de 0,50 por construcción.</p>
+      <p><strong>Qué hacemos con eso:</strong> salen los diez <code>player_winrate</code> y quedan los
+      <code>player_elo</code>, por tres razones: la redundancia es verde; el elo conserva más de la
+      poca señal que hay, −0,161 contra −0,120; y el winrate tiene el peor reparo de fuga, porque ya
+      cuenta el resultado de esta misma partida.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ---------------- H7 ---------------- -->
+<div class="turno nueva ficha-r">
+  <div class="cab"><span class="quien">Restante · H7 · avg_defense es num_tanks escrito de otra forma</span><span class="reloj">arranca Cocha</span></div>
+  <div class="cuerpo">
+    <p class="tema">Decide sobre columnas · <strong>comparación</strong> · <span class="ok">verde</span> (η²) · confirmada · salen <code>avg_defense</code> y <code>avg_magic</code></p>
+    <div class="pantalla"><b>En Colab:</b> Sección 8 → <b>«H7 · avg_defense es num_tanks…»</b>.
+    Celdas <code># Lo que la cantidad de tanques explica de la defensa media, con las dos
+    medidas</code>, <code># El control: la misma categoría de once niveles…</code> y el boxplot.</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p><strong>Afirmación:</strong> el bloque de equipo dice lo mismo dos veces: cuántos campeones
+      tienen el tag <code>Tank</code>, y el promedio de la estadística <code>defense</code> de esos
+      cinco. Si describen al mismo campeón, saber cuántos tanques hay explica buena parte de la defensa
+      media, y una columna sobra. También salió de la matriz de correlación, y lo declaramos.</p>
+      <p><strong>Qué esperábamos:</strong> verde; casi una definición.</p>
+      <p><strong>Medida:</strong> la afirmación es una <strong>comparación entre grupos</strong> —la
+      defensa difiere según cuántos tanques hay— y esa forma trae <strong>η²</strong>. El conteo de 0
+      a 10 se lee como grupo.</p>
+      <p><strong>Resultado: η² 0,319, verde</strong>: los tanques explican el 31,9 % de la variación
+      de la defensa media. Pearson da 0,565, amarillo, y los dos números están a la vista: la medida
+      se fijó por la forma de la afirmación, no por cuál convenía. η² no exige que la relación sea
+      recta; Pearson sí.</p>
+      <p>El control contra la objeción de que η² sube con muchos grupos: la misma categoría de once
+      niveles contra la duración da 0,001, y contra el alcance 0,129. Si fuera azar, serían parecidas.
+      Y magia contra magos da 0,310: mismo mecanismo.</p>
+      <p><strong>Qué hacemos con eso:</strong> salen <code>avg_defense</code> y
+      <code>avg_magic</code>, cuatro columnas; quedan <code>num_tanks</code> y <code>num_mages</code>,
+      porque entre dos que miden lo mismo se queda la que se explica en una frase.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ---------------- H8 ---------------- -->
+<div class="turno nueva ficha-r">
+  <div class="cab"><span class="quien">Restante · H8 · count_flash no aporta información</span><span class="reloj">arranca Toto</span></div>
+  <div class="cuerpo">
+    <p class="tema">Decide sobre columnas · dos medidas · <span class="no">rojo</span>, que acá confirma · salen los dos <code>count_flash</code></p>
+    <div class="pantalla"><b>En Colab:</b> Sección 8 → <b>«H8 · count_flash no aporta…»</b>. Celdas
+    <code># Cuán concentrado está el reparto…</code>, <code># ¿Y aporta algo, aunque varíe
+    poco?</code> y <code># Los otros dos contadores de hechizos…</code>.</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p><strong>Afirmación:</strong> <code>count_flash</code> es otra <code>count_smite</code>: casi
+      todos llevan Destello, así que la columna casi no varía y no puede distinguir partidas.</p>
+      <p><strong>Qué esperábamos:</strong> un reparto muy concentrado y una asociación con la duración
+      indistinguible de cero.</p>
+      <p><strong>Medidas:</strong> son dos partes, así que dos números: el peso del valor más
+      frecuente, y la asociación con el objetivo, porque una columna puede variar poco y aun así
+      informar.</p>
+      <p><strong>Resultado:</strong> el <strong>83,8 %</strong> de los equipos lleva los cinco
+      Destellos y el 70,1 % de las partidas tiene diez de diez. Contra la duración, <strong>Pearson
+      −0,014, rojo</strong>, η² 0,0002. Confirmada.</p>
+      <p>Y un control que corrige el argumento: teletransporte e ignición varían mucho más —valor modal
+      en 33 % y 30 %— y también dan rojo, 0,017 y 0,044. O sea que los hechizos no explican la
+      duración, y la varianza baja de Destello es un motivo aparte para sacarla.</p>
+      <p><strong>Qué hacemos con eso:</strong> salen los dos <code>count_flash</code>, con el mismo
+      criterio que <code>count_smite</code> pero con dos números. Teletransporte e ignición se quedan:
+      tienen varianza real, y correlacionan −0,543 entre sí porque compiten por el mismo lugar.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============================ 6 ============================ -->
+<div class="seccion">
+<span class="n">Sección 6</span>
+<h2 style="margin-top:0;border:none">Lo que se verifica con un número, y lo que la consigna dice que se pregunta</h2>
+
+<h3>Los siete números de la consigna</h3>
+<table>
+<tr><th>Qué</th><th>Qué da</th><th>Qué hay que saber decir</th><th>Dónde en Colab</th></tr>
+<tr><td>Tamaño</td><td><strong>19.145 × 137</strong></td><td>Una fila es una partida clasificatoria de cola 420, Season 16.</td><td>Sección 1 · «Dimensiones…»</td></tr>
+<tr><td>Tipos</td><td>106 int64 · 20 float64 · 11 object</td><td>Ninguna numérica como texto: los 11 son <code>match_id</code> y los 10 <code>champ_name</code>. Sí hay códigos guardados como enteros.</td><td>Sección 1 · «Tipos de datos»</td></tr>
+<tr><td>Nulos</td><td><strong>0</strong> en las 137</td><td>Los faltantes se imputaron aguas arriba: elo 1500 y winrate 0,50. Elo 1500 en el 0,55 % de las celdas de jugador.</td><td>Sección 4 · «Valores faltantes…»</td></tr>
+<tr><td>Constantes</td><td><strong>Ninguna</strong></td><td><code>count_smite</code> ya salió antes de la Entrega 1. Casi constante: <code>roles_inferidos</code>, 99,91 %.</td><td>Sección 4 · «Columnas sin información…»</td></tr>
+<tr><td>Duplicados de la clave</td><td><strong>0</strong></td><td>También 0 por fila completa y por los diez campeones.</td><td>Sección 4 · «La clave…»</td></tr>
+<tr><td>Distribución del objetivo</td><td>banda máxima <strong>29,9 %</strong></td><td>Continuo: 2.180 valores distintos, así que va en bandas de minutos. Sin desbalance.</td><td>Sección 2 · «La distribución del objetivo…»</td></tr>
+<tr><td>Asimetría</td><td>objetivo −0,039</td><td>Cola larga real sólo en la maestría. Los −24 de <code>rune_sub</code> son cinco ceros.</td><td>Sección 2 · «Las medidas de forma…»</td></tr>
+</table>
+
+<h3>Las cinco preguntas que la consigna anticipa</h3>
+
+<div class="pregunta">
+  <span class="q">1 · Cuál es la variable objetivo y cómo está distribuida <span class="duenio">Ezequiel</span></span>
+  <p class="corta"><code>game_duration_s</code>, continua, en segundos. Media 1.748, mediana 1.751,
+  asimetría −0,039: simétrica, sin desbalance —la banda más poblada es el 29,9 %— y no necesita
+  transformarse.</p>
+  <p class="mas">Truncada a izquierda en 300 s por decisión nuestra (remakes), y con un escalón de
+  714 partidas en el minuto 15, cuando se habilita la rendición.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">2 · Por qué hay nulos donde hay nulos <span class="duenio">Toto</span></span>
+  <p class="corta">No hay nulos, y ésa es la respuesta: los faltantes se convirtieron en valores por
+  defecto en el pipeline. Es una tercera categoría, además de los faltantes reales y los
+  estructurales.</p>
+  <p class="mas">Sin ranked: elo 1500 y winrate 0,50 (0,55 % de las celdas por el elo; con los dos a
+  la vez, 944 celdas en 615 partidas). Un cero que sí es faltante: los 27 ceros de
+  <code>rune_sub</code>. Un cero que es real: los 512 ceros de maestría, de jugadores que nunca
+  jugaron ese campeón.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">3 · Qué hipótesis salió mal, y qué hicieron con eso <span class="duenio">Ezequiel</span></span>
+  <p class="corta">H1: estábamos convencidos de que los tanques alargaban la partida, y dio −0,008,
+  con el signo al revés. La escribimos refutada tal como salió.</p>
+  <p class="mas">Y no descartamos <code>num_tanks</code> por eso: sigue en la tabla de candidatas.
+  También salió mal H4, la del elo, y H2 arrancó en amarillo cuando esperábamos verde.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">4 · Qué columna descartaron por fuga, y cuándo se completa en la realidad <span class="duenio">Cocha</span></span>
+  <p class="corta">Ninguna, y es una respuesta con contenido: el esquema tiene sólo condiciones
+  iniciales. No hay kills, oro, torres ni resultado. Pero declaramos dos reparos.</p>
+  <p class="mas"><b>Uno:</b> elo, winrate y maestría se leen días después de la partida, así que ya
+  incluyen esa partida. No filtran la duración, pero no son el valor al arrancar. El winrate es el
+  peor, porque cuenta la victoria o derrota entera, y ya sale por H6. <b>Dos:</b> el carril sale de
+  <code>teamPosition</code>, que Riot completa al cerrar la partida. En producción habría que tomarlo
+  de la selección de campeones. Está en Sección 9 · «El chequeo de fuga…».</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">5 · Qué quedó inconcluso y qué haría falta <span class="duenio">Facundo</span></span>
+  <p class="corta">Cuatro cosas, en Sección 9 · «Qué quedó inconcluso…».</p>
+  <p class="mas"><b>1.</b> Si la señal está en combinaciones de columnas: hace falta un modelo con
+  interacciones, de la Unidad 3. <b>2.</b> Las 26 partidas con 9 o 10 jugadores imputados: hace
+  falta el bronce de la corrida grande. <b>3.</b> Si los valores previos a la partida cambian algo:
+  hay que leer elo y maestría antes del arranque y volver a recolectar. <b>4.</b> La composición de
+  campeones: en el cuartil de partidas más largas Brand y Teemo aparecen 1,35 veces lo esperado y
+  Kalista 0,61; quedó como candidata a novena ficha.</p>
+</div>
+</div>
+
+<!-- ============================ 7 ============================ -->
+<div class="seccion">
+<span class="n">Sección 7</span>
+<h2 style="margin-top:0;border:none">Banco de preguntas dirigidas</h2>
+
+<p>El dueño es quien contesta primero si la pregunta va al grupo. Si va dirigida a otro, contesta
+ése: por eso los cuatro leen todo.</p>
+
+<div class="pregunta">
+  <span class="q">«¿Por qué ocho fichas, si la consigna pide cuatro?» <span class="duenio">Cocha</span></span>
+  <p class="corta">Porque cada decisión de columna necesitaba su número. Pero están ordenadas: las
+  cuatro primeras, H1 a H4, cumplen solas la consigna —de las dos preguntas, y dos refutadas— y son
+  las cuatro que proponemos.</p>
+  <p class="mas">Las cuatro restantes sacan columnas duplicadas o casi constantes. Sin ellas, esas
+  columnas habrían quedado adentro sin nada que lo justifique.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">«Las cuatro verdes no miden contra el objetivo. ¿No es trampa?» <span class="duenio">Cocha</span></span>
+  <p class="corta">No: la consigna pide también hipótesis que deciden sobre una columna del modelo, y
+  una columna que duplica a otra sale aunque las dos sean inútiles para predecir.</p>
+  <p class="mas">Trampa sería presentar el 0,711 entre elo y winrate como señal contra la duración, y
+  no lo hacemos. El verde no es una feature buena: es una redundancia. Esas cuatro sacan 28
+  columnas.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">«¿Por qué una sola ficha usó un movimiento?» <span class="duenio">Toto</span></span>
+  <p class="corta">Porque el semáforo sólo habilita movimientos en amarillo, y de los ocho números
+  sólo el de H2 cayó ahí.</p>
+  <p class="mas">Verde y rojo cierran. Insistir sobre un rojo, partiendo el dataset hasta que algo dé,
+  es cazar resultados.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">«En H7, η² da verde y Pearson amarillo. ¿Eligieron la que convenía?» <span class="duenio">Cocha</span></span>
+  <p class="corta">No: la forma de la afirmación fija la medida antes de medir. «Difiere entre
+  grupos» es una comparación, y eso es η².</p>
+  <p class="mas">Los dos números están a la vista en la ficha. Y el control descarta que η² se infle
+  por tener once grupos: la misma categoría contra la duración da 0,001.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">«H5 y H7 salieron de mirar la matriz. ¿No rompe la regla del orden?» <span class="duenio">Ezequiel</span></span>
+  <p class="corta">No: la regla prohíbe usar el resultado que estás por calcular, no lo que la
+  exploración ya mostró. La fase 6 de la teórica dice que el EDA tiene que generar preguntas
+  nuevas.</p>
+  <p class="mas">Las dos lo declaran en su primera casilla, y lo que agregan es la decisión: medir a
+  nivel de partida y resolver qué columna sale.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">«Si nada correlaciona con la duración, ¿el proyecto no sirve?» <span class="duenio">Facundo</span></span>
+  <p class="corta">Correlación mide una columna a la vez y de forma monótona. Lo que sabemos es que no
+  hay una feature obvia; si hay señal, está en combinaciones, y eso lo decide el modelo.</p>
+  <p class="mas">Y ahora hay un rival claro: predecir siempre la media, 1.748 segundos. Si el modelo
+  no le gana con claridad, la respuesta es negativa, y eso también es un resultado.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">«¿Por qué el elo entra a la Entrega 3 si H4 se refutó?» <span class="duenio">Facundo</span></span>
+  <p class="corta">Se refutó que el elo <em>explique</em> la duración, no la columna. Sigue siendo la
+  más asociada al objetivo de las 137, −0,161.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">«¿Qué entra al modelo, entonces?» <span class="duenio">Cocha</span></span>
+  <p class="corta">De las 137 columnas, 82 no entran como feature y 54 sí, más el objetivo. Está en
+  Sección 9 · «La tabla de columnas candidatas», y la celda siguiente verifica que cubre las 137.</p>
+  <p class="mas">Salen 30 por las fichas (H6: 10 · H2: 12 · H7: 4 · H5: 2 · H8: 2), los 10
+  <code>champ_name</code> por duplicar a <code>champ_id</code>, los 40 códigos <code>sum1</code>,
+  <code>sum2</code>, <code>rune_primary</code> y <code>rune_sub</code>, y <code>match_id</code> y
+  <code>roles_inferidos</code>. Entran agregadas: elo por partida, maestría en logaritmo por jugador,
+  <code>champ_id</code> como categórica, y los agregados de equipo como 12 sumas.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">«¿Cómo saben que el escalón de 900 s no es un bug?» <span class="duenio">Ezequiel</span></span>
+  <p class="corta">Porque cae en el segundo exacto en que el juego habilita la rendición. Un artefacto
+  del pipeline no tendría por qué caer justo ahí.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">«¿Por qué no sacaron los outliers de duración?» <span class="duenio">Ezequiel</span></span>
+  <p class="corta">Porque son el fenómeno: una partida de 66 minutos es real, y una de 5 es una
+  rendición temprana. Sacarlas recortaría justo lo que el modelo tiene que explicar.</p>
+  <p class="mas">137 duran menos de 10 minutos y 289 más de 45. El único recorte legítimo ya está
+  hecho: los remakes de menos de 300 s.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">«Trece millones de puntos de maestría, ¿no es un bug?» <span class="duenio">Toto</span></span>
+  <p class="corta">Lo verificamos contra el bronce, jugador por jugador: 200 celdas comparadas contra
+  el <code>championPoints</code> crudo, 200 coincidencias exactas. Es un <em>one-trick</em> real.</p>
+  <p class="mas">Respuesta oral: esa verificación no está en el notebook. Está en la documentación
+  integral, sección 5.6. Se hizo sobre las 20 partidas del bronce de una máquina, no sobre las 19.145,
+  pero valida la lógica de la transformación.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">«¿Por qué no agregaron una bandera es_unranked?» <span class="duenio">Toto</span></span>
+  <p class="corta">Porque no cambia la duración: las 615 partidas con jugadores imputados duran una
+  mediana de 1.788 segundos contra 1.750 del resto, separación 0,067, rojo.</p>
+  <p class="mas">Respuesta oral: esa medida se quitó del notebook al simplificarlo, y se recalculó el
+  22/9 sobre el mismo CSV. El pipeline ya calcula <code>es_unranked</code> en
+  <code>include/lol/riot.py</code> pero no lo escribe al CSV. La conclusión vale para este
+  objetivo.</p>
+</div>
+
+<div class="pregunta">
+  <span class="q">«¿El dataset tiene dimensión temporal?» <span class="duenio">Facundo</span></span>
+  <p class="corta">No: ninguna columna es una fecha, y la fase temporal no aplica. Decirlo es parte del
+  análisis.</p>
+  <p class="mas">Además todas las partidas son de parches 16.x y los agregados usan un único snapshot
+  de Data Dragon, el 16.17.1. Es una ventana de recolección de unos días de septiembre, y las
+  conclusiones valen para esa ventana. Sección 5 del notebook.</p>
+</div>
+
+<div class="aviso">
+  <span class="etiqueta">Lo que no está en ningún lado, y no se inventa</span>
+  <p>Si el docente pregunta algo que no está en el notebook, en este guión ni en la documentación
+  integral, la respuesta es «eso no lo medimos», y si se puede, qué haría falta para medirlo. Es
+  exactamente lo que la consigna pide para lo inconcluso.</p>
+</div>
+
+<p class="pie">Guión de la Entrega 2 · Grupo 5K09-02 · preparado el 22/9/2026 sobre el notebook
+reordenado de esa fecha. Los números salen de las salidas guardadas del notebook o se recalcularon
+sobre <code>notebooks/entrega-2/datos/lol_2026-09-06.csv</code>. Documento de apoyo:
+<code>docs/documentacion-proyecto.pdf</code>, parte VIII.</p>
+</div>
+
+</body>
+</html>

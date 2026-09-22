@@ -111,24 +111,34 @@ La decisión de imputar con defaults en vez de dejar `NaN` es deliberada y hay q
 
 El esquema del pipeline **no cambió** —el CSV sigue teniendo las 137 columnas—, pero el análisis
 exploratorio decidió cuáles de ellas no entran al modelo de la Unidad 3. Cada decisión tiene una
-ficha de hipótesis detrás, en `notebooks/entrega-2/eda_entrega2.ipynb`:
+razón escrita en la tabla de candidatas de `notebooks/entrega-2/eda_entrega2.ipynb`. Las fichas
+están numeradas según el orden del 22/9 (por importancia: H1 tanques, H2 maestría, H3 t1/t2,
+H4 elo, H5 armadura, H6 winrate, H7 defensa, H8 flash):
 
 | Columnas | Cuántas | Ficha | El número |
 |---|---|---|---|
-| `_player_winrate` | 10 | H4 | 0,711 con `player_elo` agregado; el elo conserva más señal contra el objetivo (−0,161 contra −0,120) y tiene un reparo de fuga menor |
-| `_is_main` | 10 | H7 | con la escala correcta coincide 0,769 con la continua, y el umbral de 50.000 marca al 67,9 % de los jugadores |
-| `_mains_count` | 2 | H7 | es la suma de los `_is_main` |
-| `_avg_defense` y `_avg_magic` | 4 | H6 | η² 0,319 y 0,310 contra `_num_tanks` y `_num_mages` |
-| `_total_base_armor` | 2 | H3 | −0,672 con `_avg_attackrange` y 0,529 con `_total_base_hp`: es el centro de dos redundancias |
-| `_count_flash` | 2 | H5 | valor modal 0,838 y Pearson −0,014 |
+| `_player_winrate` | 10 | H6 | 0,711 con `player_elo` agregado; el elo conserva más señal contra el objetivo (−0,161 contra −0,120) y tiene un reparo de fuga menor |
+| `_is_main` | 10 | H2 | con la escala correcta coincide 0,769 con la continua, y el umbral de 50.000 marca al 67,9 % de los jugadores |
+| `_mains_count` | 2 | H2 | es la suma de los `_is_main` |
+| `_avg_defense` y `_avg_magic` | 4 | H7 | η² 0,319 y 0,310 contra `_num_tanks` y `_num_mages` |
+| `_total_base_armor` | 2 | H5 | −0,672 con `_avg_attackrange` y 0,529 con `_total_base_hp`: es el centro de dos redundancias |
+| `_count_flash` | 2 | H8 | valor modal 0,838 y Pearson −0,014 |
 | `_champ_name` | 10 | — | mapea 1 a 1 con `_champ_id` (173 y 173) |
+| `_sum1` y `_sum2` | 20 | — | códigos guardados como enteros; su información ya está en los `_count_*` |
+| `_rune_primary` | 10 | — | código, zona roja: es una etiqueta, no una magnitud |
+| `_rune_sub` | 10 | — | código, zona roja, con 27 ceros que son faltantes disfrazados |
+| `match_id` | 1 | — | es la clave, no una feature |
+| `roles_inferidos` | 1 | — | vale 0 en el 99,91 % de las filas; queda para filtrar las 17 filas dudosas |
+
+Son **82 columnas** que no entran como feature. Entran 54 —casi todas agregadas por partida o
+sumadas entre equipos— y la restante es el objetivo.
 
 Y dos transformaciones que hay que respetar al escribir el modelado:
 
 - **`_champ_mastery_pts` entra en logaritmo aplicado por jugador *antes* de promediar.** No es lo
   mismo que el logaritmo del promedio: medido contra `mains_count`, el promedio del logaritmo da
   0,769 y el logaritmo del promedio 0,582.
-- **Los agregados de equipo entran como suma `t1 + t2`, no por equipo** (H8). Los rótulos `t1` y
+- **Los agregados de equipo entran como suma `t1 + t2`, no por equipo** (H3). Los rótulos `t1` y
   `t2` son los `teamId` 100 y 200, que Riot asigna sin criterio: la diferencia entre la correlación
   de una mitad y la de la otra es 0,013 en promedio. De las 34 columnas quedan 24 tras los recortes
   de arriba, y se colapsan en **12 sumas**.
