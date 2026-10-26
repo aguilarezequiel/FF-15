@@ -9,6 +9,7 @@ from lol import schema, transform
 TAREAS_ESPERADAS = {
     "wait_for_riot", "check_key", "fetch_ddragon", "plan_plataformas",
     "land_bronze", "refine_silver", "consolidate", "validate", "save",
+    "plan_timelines", "land_timelines", "refine_minuto", "save_minuto",
 }
 
 
@@ -69,6 +70,15 @@ def test_particion_de_tipos():
 def test_clave_y_target_estan():
     assert "match_id" in schema.COLUMNS
     assert "game_duration_s" in schema.COLUMNS
+
+
+def test_ancho_del_dataset_al_minuto():
+    """Clave + objetivo + 10 métricas x (t1, t2, dif) + 3 de primera sangre."""
+    cols = schema.columnas_minuto(5)
+    assert len(cols) == 35
+    assert len(set(cols)) == len(cols)
+    assert cols[:2] == ["match_id", "game_duration_s"]
+    assert set(schema.columnas_minuto(10)).isdisjoint(cols[2:])
 
 
 # --- las trampas conocidas de la fuente ------------------------------------

@@ -120,11 +120,12 @@ la de la Entrega 2, con el análisis exploratorio y las ocho hipótesis.</p>
 <h3>Estado a la fecha de esta versión</h3>
 <table>
 <tr><th>Aspecto</th><th>Estado</th></tr>
-<tr><td>Pipeline</td><td>Completo y funcionando. Nueve tareas, todas verificadas en verde con datos reales de la API.</td></tr>
+<tr><td>Pipeline</td><td>Trece tareas en dos ramas. Las <strong>nueve de la rama principal</strong> están verificadas en verde con datos reales de la API. Las <strong>cuatro de la rama del timeline</strong> (agregadas el 25/10) parsean y pasan los tests, pero <strong>todavía no corrieron contra Riot</strong>.</td></tr>
 <tr><td>Corridas</td><td>La recolección grande corrió del 5/9 11:53 al 6/9 09:33 (≈21 h 40 min). La corrida final que produjo el entregable tardó <strong>15 minutos</strong> de punta a punta, porque el bronce ya estaba en disco.</td></tr>
 <tr><td>Bronce acumulado</td><td><strong>19.145</strong> partidas crudas, <strong>290.654</strong> perfiles de jugador, 1.651 partidas descartadas. <strong>1,1&nbsp;GB</strong> en disco (233&nbsp;MB de partidas, 850&nbsp;MB de perfiles).</td></tr>
 <tr><td>Dataset (capa plata)</td><td><strong>19.145 filas × 137 columnas</strong>, 11&nbsp;MB. Clave única, cero nulos, ninguna columna vacía. <strong>Supera 19 veces</strong> el mínimo de 1.000 filas que pide la consigna.</td></tr>
-<tr><td>Calidad de código</td><td>10/10 tests en verde · <code>ruff</code> sin hallazgos · <code>astro dev parse</code> limpio.</td></tr>
+<tr><td>Calidad de código</td><td>18/18 tests en verde (11 del DAG y los esquemas, 7 del corte del timeline) · <code>astro dev parse</code> limpio · <code>ruff</code> sin hallazgos en el código nuevo; queda un aviso <code>B023</code> en <code>land_bronze</code>, anterior al 25/10, que es un falso positivo (la <code>lambda</code> se consume dentro de la misma vuelta del bucle).</td></tr>
+<tr><td>Rama del timeline (25/10)</td><td>Es la corrección 2 del docente a la Entrega 2: como las condiciones iniciales solas predicen poco la duración, el DAG baja también la <strong>línea de tiempo</strong> de cada partida (endpoint H) y arma un segundo dataset, <code>lol_min5_AAAA-MM-DD.csv</code>, con el estado de la partida en el <strong>minuto 5</strong>: 35 columnas, unido al principal por <code>match_id</code>. Las 137 columnas no cambian. <strong>Falta correrlo</strong> sobre el bronce de 19.145 partidas, en la máquina de quien lo tiene. Ver III.4, IV.4.6, IV.5, V.8 y VI.8.</td></tr>
 <tr><td>Bug corregido (2026-09-05)</td><td><code>land_bronze</code> fallaba con <code>HTTP 400</code> en las seis plataformas: el pool de keys rotaba de key en cada request individual, y un <code>puuid</code> sólo lo puede leer la key que lo emitió. Fix: afinidad key↔puuid en <code>RiotClient</code> — ver 4.1.</td></tr>
 <tr><td>Incidente superado (2026-09-06)</td><td>La máquina entró en hibernación a las 03:19 con cuatro tareas <code>land_bronze</code> a mitad de camino. Los procesos murieron; <strong>el bronce no perdió un solo archivo</strong>. Airflow relanzó las tareas solo a las 07:16 y el dataset se generó igual. Es la mejor evidencia práctica de por qué el bronce va a disco y es append-only — ver 7.7.</td></tr>
 <tr><td>Limitación conocida</td><td><strong>Sesgo de muestreo por tier.</strong> Cada plataforma quedó con partidas de un rango casi puro y distinto (elo medio de 1.627 en NA1 a 3.231 en LA1). Está medido y declarado en 7.5; no invalida el dataset, pero condiciona qué conclusiones se pueden sacar de él.</td></tr>
@@ -134,7 +135,7 @@ la de la Entrega 2, con el análisis exploratorio y las ocho hipótesis.</p>
 <tr><td>Perfil del objetivo</td><td>Asimetría <strong>−0,039</strong> y curtosis 0,579: simétrico, <strong>no necesita transformarse</strong>. Sin desbalance —la banda más poblada, 25 a 30 minutos, es el 29,9 %—. Truncado a izquierda en 300 s por el filtro de remakes, y con un escalón de <strong>714 partidas</strong> en los 900 s: el minuto 15, cuando el juego habilita la rendición. Ver 8.2.</td></tr>
 <tr><td>Decisiones de columna tomadas</td><td>De las 137 columnas, <strong>82 no entran como feature y 54 sí</strong>, más el objetivo. Treinta salen por las fichas: los diez <code>player_winrate</code> (H6), los diez <code>is_main</code> y los dos <code>mains_count</code> (H2), los cuatro <code>avg_defense</code> y <code>avg_magic</code> (H7), los dos <code>total_base_armor</code> (H5) y los dos <code>count_flash</code> (H8). Salen además los diez <code>champ_name</code> por redundar con <code>champ_id</code>, los cuarenta códigos <code>sum1</code>, <code>sum2</code>, <code>rune_primary</code> y <code>rune_sub</code>, y <code>match_id</code> y <code>roles_inferidos</code>. De las 34 columnas de agregados de equipo quedan 24, y H3 las colapsa en <strong>12 sumas</strong>. Ver 8.5.</td></tr>
 <tr><td>Decisión que se cerró</td><td>La columna <code>es_unranked</code> que quedaba pendiente en 5.5 <strong>no hace falta</strong> para este objetivo: las partidas con jugadores imputados duran 38 segundos más, separación 0,067, zona roja. Se midió sin ficha propia en una versión anterior del notebook; esa celda se quitó al simplificarlo y el número queda como respuesta oral. Ver 8.5.</td></tr>
-<tr><td>Lo que falta</td><td>Nada bloqueante para la Entrega 2. Queda ensayar la defensa con el guion <code>docs/guion-defensa-entrega2.pdf</code> (reparto en 8.6), subir a Colab la versión reordenada del notebook, y resolver los cuatro pendientes de 8.7 —entre ellos, verificar contra el bronce las 26 partidas con 9 o 10 jugadores de elo imputado.</td></tr>
+<tr><td>Lo que falta</td><td>Nada bloqueante para la Entrega 2. Queda ensayar la defensa con el guion <code>docs/guion-defensa-entrega2.pdf</code> (reparto en 8.6), subir a Colab la versión reordenada del notebook, y resolver los cuatro pendientes de 8.7 —entre ellos, verificar contra el bronce las 26 partidas con 9 o 10 jugadores de elo imputado. Para la Entrega 3: correr la rama del timeline sobre el bronce grande y <strong>leer el chequeo de eventos del reporte antes de modelar</strong> con esos datos (VI.8).</td></tr>
 </table>
 
 <div class="toc">
@@ -168,7 +169,7 @@ la de la Entrega 2, con el análisis exploratorio y las ocho hipótesis.</p>
       <li>Qué publica Riot y cómo se accede</li>
       <li>La API key: tipos, límites y vencimiento</li>
       <li>Las dos familias de hosts, el detalle que más confunde</li>
-      <li>Los siete endpoints que usa el pipeline</li>
+      <li>Los ocho endpoints que usa el pipeline</li>
       <li>Data Dragon: el catálogo público sin key</li>
       <li>El recorrido de semilla a dataset</li>
     </ol>
@@ -190,7 +191,9 @@ la de la Entrega 2, con el análisis exploratorio y las ocho hipótesis.</p>
       <li>Reglas de admisión de una partida</li>
       <li>Variables derivadas y su justificación</li>
       <li>Los nulos: dónde, por qué y qué se hizo</li>
+      <li>El perfil medido del dataset</li>
       <li>Las capas en disco</li>
+      <li>El dataset al minuto N</li>
     </ol>
   </li>
   <li>Parte VI · Guía de ejecución
@@ -201,6 +204,8 @@ la de la Entrega 2, con el análisis exploratorio y las ocho hipótesis.</p>
       <li>Cómo llegar a 20.000 filas</li>
       <li>Qué mirar mientras corre</li>
       <li>Problemas frecuentes y cómo resolverlos</li>
+      <li>Antes de la entrega — lista de control</li>
+      <li>Completar los timelines de un bronce existente</li>
     </ol>
   </li>
   <li>Parte VII · La defensa de la Entrega 1
@@ -1009,7 +1014,7 @@ que parece un bug del código. Es probablemente el detalle técnico más importa
   En la práctica no molesta, porque las partidas son ~1 pedido y los perfiles ~18.</p>
 </div>
 
-<h3>4. Los siete endpoints que usa el pipeline</h3>
+<h3>4. Los ocho endpoints que usa el pipeline</h3>
 
 <table>
 <tr><th></th><th>Endpoint</th><th>Host</th><th>Para qué</th></tr>
@@ -1020,6 +1025,7 @@ que parece un bug del código. Es probablemente el detalle técnico más importa
 <tr><td>E</td><td><code>/lol/match/v5/matches/{matchId}</code></td><td><strong>región</strong></td><td>El detalle completo de la partida. <strong>Acá sale la variable objetivo.</strong></td></tr>
 <tr><td>F</td><td><code>/lol/league/v4/entries/by-puuid/{puuid}</code></td><td>plataforma</td><td>Rango, división, puntos y victorias/derrotas del jugador.</td></tr>
 <tr><td>G</td><td><code>/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}/by-champion/{championId}</code></td><td>plataforma</td><td>Puntos de maestría del jugador con ese campeón concreto.</td></tr>
+<tr><td>H</td><td><code>/lol/match/v5/matches/{matchId}/timeline</code></td><td><strong>región</strong></td><td>La línea de tiempo de la partida: un cuadro por minuto con el oro, la experiencia, los súbditos y el nivel de cada jugador, y la lista de eventos (asesinatos, torres, placas, monstruos, wards) con su momento. <strong>Es la fuente del dataset al minuto N</strong> (V.8). No lleva <code>puuid</code> en la URL, así que la puede pedir cualquier key del pool.</td></tr>
 </table>
 
 <p>Dos aclaraciones de vocabulario:</p>
@@ -1092,7 +1098,17 @@ por los jugadores. Ése recorrido —de un ranking a un dataset de partidas— e
 
           por cada uno de los 10 jugadores de esa partida:
             [G] pedir su maestría con el campeón que usó  .... va a BRONCE
-            [F] pedir su entrada de ranking  ................. va a BRONCE</pre>
+            [F] pedir su entrada de ranking  ................. va a BRONCE
+
+y después, por cada región (americas, europe, asia):
+  por cada partida del bronce que todavía no tenga su línea de tiempo:
+    [H] pedir el timeline  .................................. va a BRONCE
+    si Riot contesta 404 -> anotarla y NO volver a pedirla nunca</pre>
+
+<p>La segunda pasada recorre <strong>todo el bronce</strong>, no sólo lo que bajó la corrida: así un
+bronce juntado antes de que existiera esa pasada se completa sin volver a pedir las partidas. Cuesta
+<strong>un pedido por partida</strong>, y como match-v5 vive en el host de la región, se reparte por
+región y no por plataforma (IV.5, tarea 10).</p>
 
 <h4>Dos decisiones de este recorrido que hay que poder defender</h4>
 
@@ -1130,8 +1146,8 @@ vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más 
 <h3>1. Árbol completo y criterio de organización</h3>
 
 <div class="arbol">FF-15/
-├── CLAUDE.md                  116 líneas · contexto e instrucciones de trabajo
-├── README.md                  219 líneas · el entregable escrito
+├── CLAUDE.md                  151 líneas · contexto e instrucciones de trabajo
+├── README.md                  271 líneas · el entregable escrito
 ├── Dockerfile                   4 líneas · la imagen del entorno
 ├── requirements.txt             3 líneas · paquetes de Python
 ├── packages.txt                 0 líneas · paquetes de sistema (vacío)
@@ -1153,34 +1169,41 @@ vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más 
 │
 ├── dags/
 │   ├── .airflowignore                    · vacío
-│   └── lol_ingest.py          719 líneas · EL DAG: sólo orquestación
+│   └── lol_ingest.py         1088 líneas · EL DAG: sólo orquestación
 │
 ├── include/
 │   ├── lol/                              · LA LÓGICA · sin importar Airflow
 │   │   ├── __init__.py          9 líneas
-│   │   ├── riot.py            408 líneas · cliente, pool de keys, límites
+│   │   ├── riot.py            426 líneas · cliente, pool de keys, límites
 │   │   ├── ddragon.py          88 líneas · catálogo de campeones y hechizos
-│   │   ├── seeds.py            77 líneas · recorrido del ranking
-│   │   ├── schema.py          103 líneas · las 137 columnas y sus tipos
-│   │   └── transform.py       191 líneas · JSON crudo → fila
+│   │   ├── seeds.py            93 líneas · recorrido del ranking
+│   │   ├── schema.py          138 líneas · las 137 columnas, las 35 del minuto N
+│   │   ├── transform.py       191 líneas · JSON crudo → fila
+│   │   └── timeline.py        241 líneas · timeline crudo → fila al minuto N
 │   └── output/                           · SALIDAS · gitignoreado
 │       ├── bronze/                       · capa bronce
 │       ├── silver/_parciales/            · plata por plataforma
 │       ├── reports/calidad.md            · el chequeo de la consigna
-│       └── lol_AAAA-MM-DD.csv            · EL ENTREGABLE
+│       ├── reports/calidad_minutoN.md    · el chequeo del dataset al minuto N
+│       ├── lol_AAAA-MM-DD.csv            · EL ENTREGABLE
+│       └── lol_minN_AAAA-MM-DD.csv       · el dataset al minuto N
 │
 ├── notebooks/                            · EL ANÁLISIS (Unidades 2+)
 │   ├── requirements.txt                  · el stack de análisis, versiones exactas
-│   └── entrega-2/
-│       ├── eda_entrega2.ipynb  174 celdas · el EDA, ejecutado
-│       └── datos/lol_2026-09-06.csv      · el CSV congelado, versionado
+│   ├── entrega-2/
+│   │   ├── eda_entrega2.ipynb  174 celdas · el EDA, ejecutado
+│   │   └── datos/lol_2026-09-06.csv      · el CSV congelado, versionado
+│   └── entrega-3/
+│       ├── modelado_entrega3.ipynb       · el modelado, ejecutado
+│       └── datos/lol_min5_AAAA-MM-DD.csv · el dataset al minuto 5, versionado (cuando llegue)
 │
-├── tests/dags/
-│   └── test_dag_integrity.py   90 líneas · 10 tests
+├── tests/
+│   ├── dags/test_dag_integrity.py 100 líneas · 11 tests
+│   └── test_timeline.py       125 líneas · 7 tests, sin Airflow
 │
 ├── docs/                                 · LA DOCUMENTACIÓN INTEGRAL
 │   ├── documentacion-proyecto.html       · este documento (fuente editable)
-│   ├── documentacion-proyecto.pdf        · este documento (81 páginas)
+│   ├── documentacion-proyecto.pdf        · este documento (89 páginas)
 │   ├── informe-sesgo-muestreo.{html,pdf} · el anexo sobre el sesgo por tier
 │   ├── guion-defensa-entrega2.{html,pdf} · el guión de la defensa de la Entrega 2
 │   └── generar_pdf.py                    · regenera el PDF con Chrome
@@ -1318,7 +1341,7 @@ separadas por coma —una por integrante— y el cliente las usa en paralelo.</p
 
 <h3>4. <code>include/lol/</code> — la lógica del dominio</h3>
 
-<h4>4.1 <code>riot.py</code> · 408 líneas · el cliente de la API</h4>
+<h4>4.1 <code>riot.py</code> · 426 líneas · el cliente de la API</h4>
 
 <p>Es el módulo más complejo del proyecto. Su responsabilidad: hablar con la API de Riot respetando
 los límites, rotando entre varias keys y sin que nadie de afuera tenga que pensar en eso.</p>
@@ -1419,6 +1442,18 @@ haya cupo en las dos ventanas de tiempo.</p>
 <tr><td><code>5xx</code> / timeout</td><td>Problema del servidor o de red</td><td>Reintenta con espera creciente.</td></tr>
 </table>
 
+<p><strong>El timeline</strong> (endpoint H) es el único método que no devuelve la key que respondió,
+porque no trae <code>puuid</code> que haya que heredar. Devuelve, en cambio, si la respuesta fue un
+<code>404</code>: no es lo mismo «Riot no tiene esta línea de tiempo» —se anota y no se vuelve a pedir
+nunca— que «se agotaron los reintentos» —se reintenta en la próxima corrida—. El cliente ya distinguía
+los dos casos (en el 404 devuelve la key, en el agotamiento no); el método sólo lo hace explícito:</p>
+
+<pre>def timeline(self, region, match_id):
+    url = (f"https://{region}.api.riotgames.com/lol/match/v5/matches/"
+           f"{match_id}/timeline")
+    datos, key = self._request(url)
+    return datos, (datos is None and key is not None)   # (datos, no_existe)</pre>
+
 <p><strong>Las cachés en memoria.</strong> Un jugador aparece en muchas partidas; sin caché, cada partida
 volvería a pedir los mismos 10 perfiles. Con ella, el costo por partida baja a medida que el dataset crece.</p>
 
@@ -1455,7 +1490,7 @@ keys sería gastar cupo en algo que no lo necesita.</p>
     una búsqueda lineal por cada uno de los 10 campeones de cada partida.
     """</pre>
 
-<h4>4.3 <code>seeds.py</code> · 77 líneas · el recorrido del ranking</h4>
+<h4>4.3 <code>seeds.py</code> · 93 líneas · el recorrido del ranking</h4>
 
 <p>Un <strong>generador</strong> que va entregando jugadores del ranking. Es un generador y no una lista
 por una razón concreta: la corrida se corta cuando se alcanza la cuota de partidas, no cuando se agota
@@ -1488,7 +1523,7 @@ para <code>match_ids</code>. Y cuando <code>match()</code> trae el detalle de un
 respondió esa llamada se vuelve la dueña de los <code>puuid</code> de los 10 participantes, para
 <code>league_by_puuid</code>/<code>mastery</code>. Ver el aviso sobre keys y puuids en 4.1.</p>
 
-<h4>4.4 <code>schema.py</code> · 103 líneas · el contrato del dataset</h4>
+<h4>4.4 <code>schema.py</code> · 138 líneas · el contrato del dataset</h4>
 
 <p>Define <strong>qué columnas tiene el dataset y en qué orden</strong>. Es el contrato: si el
 transformador produce algo distinto, la validación falla y el DAG falla.</p>
@@ -1519,6 +1554,24 @@ en <code>t2_sup_champ_mastery_pts</code>, y agregar una variable por jugador es 
 diez elementos en vez de escribir veinte nombres.</p>
 
 <p>La cuenta: <code>3 + (10 × 5 × 2) + (17 × 2) = 3 + 100 + 34 = 137</code>.</p>
+
+<p>Desde el 25/10 el módulo define también el contrato del <strong>segundo dataset</strong>, el del
+minuto N (V.8). Se genera igual, de una lista:</p>
+
+<pre>METRICAS_MINUTO = ["gold", "xp", "cs", "level", "kills", "towers",
+                   "plates", "elite_monsters", "wards_placed", "wards_killed"]
+
+def columnas_minuto(minuto):
+    s = f"_m{minuto}"
+    cols = ["match_id", "game_duration_s"]
+    for m in METRICAS_MINUTO:
+        cols += [f"t1_{m}{s}", f"t2_{m}{s}", f"dif_{m}{s}"]
+    cols += [f"t1_first_blood{s}", f"t2_first_blood{s}", f"first_blood_s{s}"]
+    return cols</pre>
+
+<p>La cuenta: <code>2 + (10 × 3) + 3 = 35</code>. El minuto va en el nombre de cada columna para que
+los datasets de dos minutos distintos —el 5 y el 10— se puedan unir por <code>match_id</code> sin
+pisarse.</p>
 
 <p>El módulo también fija las <strong>reglas de admisión</strong>:</p>
 <pre>SEASON_PREFIX = "16."
@@ -1590,9 +1643,54 @@ solo pedido.</p>
   igual; lo que cambió es que ahora es visible.</strong></p>
 </div>
 
+<h4>4.6 <code>timeline.py</code> · 241 líneas · del timeline crudo al minuto N</h4>
+
+<p>Es puro, como <code>transform.py</code>: recibe la partida y su línea de tiempo tal como las guardó
+el bronce y devuelve una fila de <code>schema.columnas_minuto</code>. El <strong>minuto de corte es un
+parámetro</strong>, no una constante: el bronce guarda el timeline entero, así que pasar del minuto 5
+al 10 es volver a correr la plata, sin pedirle nada a Riot.</p>
+
+<p>El timeline trae dos cosas, y de cada una sale una parte de la fila:</p>
+<ul>
+  <li><strong>Cuadros</strong> (<code>frames</code>), uno por minuto, con una foto de cada jugador. Se
+  toma el <strong>primer cuadro que alcanza el corte</strong>: el del minuto 5 no cae exacto en los
+  300.000 ms sino unos milisegundos después, y el primero que llega es la foto más cercana sin mirar
+  antes de tiempo. De ahí salen oro, experiencia, súbditos y nivel.</li>
+  <li><strong>Eventos</strong> (<code>events</code>), cada uno con su momento en milisegundos. Se
+  cuentan los que pasaron <strong>hasta el corte inclusive</strong>: asesinatos, torres, placas,
+  monstruos épicos y wards.</li>
+</ul>
+
+<p>Los eventos nombran a los jugadores por <code>participantId</code> (1 a 10), no por equipo. El
+equipo sale del <code>participantId</code> del detalle de la partida y <strong>no del
+<code>puuid</code></strong>: la partida y su timeline pueden haber llegado con keys distintas del pool,
+y el <code>puuid</code> viene encriptado distinto para cada key (la trampa del 400 de 4.1).</p>
+
+<div class="aviso">
+  <span class="etiqueta">Una lectura de la fuente que se verifica con datos, no de memoria</span>
+  <p>En las torres y las placas, el evento trae un <code>teamId</code>. El módulo lo lee como el equipo
+  <strong>dueño</strong> de la torre —el que la pierde— y le anota el punto al rival. Al escribirlo no
+  había un timeline real a mano para confirmarlo, así que en vez de confiar se agregó
+  <code>chequeo_contra_partida</code>: recorre la partida <strong>entera</strong> y compara cada conteo
+  con el total que trae el detalle de la partida —kills, torres, monstruos y primera sangre contra
+  <code>teams[].objectives</code>; placas contra <code>challenges.turretPlatesTaken</code>; wards contra
+  <code>wardsPlaced</code> y <code>wardsKilled</code>—. Si una lectura estuviera al revés, esa métrica no
+  coincidiría en ninguna partida, y se vería en el reporte del minuto (VI.8). Hay un test que lo
+  prueba: dar vuelta las torres en un caso sintético hace saltar el chequeo.</p>
+</div>
+
+<p>Dos decisiones más, que salen de la misma regla de no mentir con un cero:</p>
+<ul>
+  <li><strong>Una partida que terminó antes del minuto de corte queda afuera</strong>, con
+  <code>PartidaDescartada</code>. No tiene «estado al minuto 5»; meterla con ceros diría que en el
+  minuto 5 no pasó nada, cuando en realidad no hubo minuto 5.</li>
+  <li><strong>Un asesinato con <code>killerId</code> 0 no suma para nadie</strong>: lo hizo una torre o
+  un súbdito. Igual que en el marcador del juego. Por eso tampoco cuenta como primera sangre.</li>
+</ul>
+
 <h3>5. <code>dags/lol_ingest.py</code> — la orquestación</h3>
 
-<p>719 líneas, pero la mayoría son docstrings: cada tarea explica <em>por qué</em> está donde está.
+<p>1088 líneas, pero la mayoría son docstrings: cada tarea explica <em>por qué</em> está donde está.
 Esos textos se renderizan en la interfaz de Airflow y son la chuleta para la defensa oral.</p>
 
 <h4>La declaración del DAG</h4>
@@ -1629,13 +1727,15 @@ lol_ingest()   # SIN ESTA LÍNEA el DAG no aparece en la interfaz</pre>
   el DAG de ejemplo de la cátedra (<code>pokemon_api</code>) también usa <code>schedule=None</code>.</p>
 </div>
 
-<h4>Los cuatro parámetros de corrida</h4>
+<h4>Los seis parámetros de corrida</h4>
 <table>
 <tr><th>Parámetro</th><th>Default</th><th>Qué hace</th></tr>
 <tr><td><code>partidas_objetivo</code></td><td>1500</td><td>Cuántas partidas juntar. Se reparte en partes iguales entre las plataformas.</td></tr>
 <tr><td><code>plataformas</code></td><td>las 6</td><td>Qué servidores recorrer.</td></tr>
 <tr><td><code>tiers</code></td><td>los 10</td><td>De qué rangos salen los jugadores semilla.</td></tr>
-<tr><td><code>forzar</code></td><td><code>false</code></td><td>Ignora el bronce ya bajado y vuelve a pedir todo.</td></tr>
+<tr><td><code>forzar</code></td><td><code>false</code></td><td>Ignora el bronce ya bajado y vuelve a pedir todo, timelines incluidos.</td></tr>
+<tr><td><code>buscar_partidas_nuevas</code></td><td><code>true</code></td><td>Con <code>false</code> no se agranda el bronce: <code>land_bronze</code> termina sin pedir nada y la corrida sólo completa los timelines que falten y rehace los dos datasets. Es el modo para un bronce que ya tiene miles de partidas (VI.8).</td></tr>
+<tr><td><code>minuto_corte</code></td><td>5</td><td>En qué minuto se mira el estado de la partida, de 1 a 60. Cambiarlo no pide nada a Riot.</td></tr>
 </table>
 
 <p>Todos llevan <code>title</code> y <code>description</code> en castellano, para que el formulario de
@@ -1644,9 +1744,15 @@ disparo de la interfaz se explique solo.</p>
 <h4>El grafo</h4>
 <div class="grafo">wait_for_riot → check_key ─┬→ fetch_ddragon ──────────────────┐
                            │                                  ├→ refine_silver[6] → consolidate → validate → save
-                           └→ plan_plataformas → land_bronze[6] ┘</div>
+                           └→ plan_plataformas → land_bronze[6] ┤
+                                                              └→ plan_timelines → land_timelines[3] → refine_minuto[3] → save_minuto</div>
 
-<h4>Las nueve tareas, una por una</h4>
+<p>Las dos ramas salen de <code>land_bronze</code> y no dependen una de la otra: si la del timeline falla
+—por ejemplo, porque la key vence a mitad de camino—, la principal entrega su dataset igual. Las del
+timeline se mapean sobre <strong>3 regiones</strong>, no sobre 6 plataformas; el porqué está en la
+tarea 10.</p>
+
+<h4>Las trece tareas, una por una</h4>
 
 <p><strong>1 · <code>wait_for_riot</code></strong> — un <em>sensor</em>. Comprueba que la API responde y
 que la key sirve. Sondea cada 2 minutos hasta 30, en modo <code>reschedule</code> para no ocupar un
@@ -1698,8 +1804,9 @@ lo vuelve a pedir.</p>
 </div>
 
 <p><strong>5 · <code>land_bronze</code></strong> — <span style="color:#8a5a20;font-weight:600">bronce</span>.
-Se mapea sobre las plataformas, así que en la interfaz aparecen seis instancias. <strong>Es la única
-tarea de todo el DAG que toca la red.</strong> No parsea, no limpia, no valida: guarda el JSON tal como
+Se mapea sobre las plataformas, así que en la interfaz aparecen seis instancias. <strong>Junto con
+<code>land_timelines</code>, son las únicas tareas del DAG que bajan datos de la red.</strong> Con
+<code>buscar_partidas_nuevas=false</code> termina en el acto sin pedir nada. No parsea, no limpia, no valida: guarda el JSON tal como
 vino y anota dónde quedó.</p>
 
 <p>El detalle más valioso de esta tarea es el orden de las operaciones:</p>
@@ -1762,18 +1869,67 @@ ds = momento.date().isoformat()</pre>
 cuando el DAG tiene <code>schedule</code>, y el nuestro corre a demanda. Es un tropiezo clásico al pasar
 de Airflow 2 a 3, y está explícitamente listado entre los errores frecuentes del apunte de la cátedra.</p>
 
+<p>Las cuatro que siguen son la <strong>rama del timeline</strong>, agregada el 25/10.</p>
+
+<p><strong>10 · <code>plan_timelines</code></strong> — agrupa las plataformas por <strong>región
+continental</strong>. El timeline vive en match-v5, que se pide al host de la región. Cada tarea
+mapeada corre en su propio proceso, con su propio limitador: si las cuatro plataformas de
+<code>americas</code> pidieran timelines por separado, cada una creería tener el cupo entero del host y
+entre las cuatro lo pasarían cuatro veces, a fuerza de <code>429</code>. Con una tarea por región, un
+solo limitador lleva la cuenta exacta. Recibe la salida de <code>land_bronze</code> para correr
+<strong>después</strong> de que el bronce de partidas esté completo.</p>
+
+<div class="nota">
+  <span class="etiqueta">El mismo problema existe en <code>land_bronze</code>, y por qué no se tocó</span>
+  <p>Las cuatro tareas de <code>americas</code> de <code>land_bronze</code> también comparten el host de
+  match-v5 con limitadores separados. Ahí pesa poco porque el cuello de botella son los perfiles, que
+  van a hosts de plataforma (III.6: 1 pedido de partida contra ~16 de perfiles). En el timeline es al
+  revés: <strong>todos</strong> los pedidos van al host de la región.</p>
+</div>
+
+<p><strong>11 · <code>land_timelines</code></strong> — <span style="color:#8a5a20;font-weight:600">bronce</span>.
+Una por región. Recorre todo el bronce de partidas de la región y pide el timeline de las que no lo
+tienen, con cuatro hilos que comparten el limitador. Mismas reglas que <code>land_bronze</code>:
+guarda el timeline <strong>entero</strong>, tal como llega —recortarlo al minuto 5 obligaría a pedir
+19.000 timelines de nuevo el día que se quiera el minuto 10—; es append-only; y un <code>404</code> se
+anota en <code>bronze/descartadas/sin_timeline_plataforma=X.txt</code> para no preguntar de nuevo,
+mientras que un fallo transitorio no se anota y se reintenta en la próxima corrida. Si las keys vencen a
+mitad de camino, la tarea falla, pero lo bajado ya está en disco y el índice se guarda igual.</p>
+
+<p><strong>12 · <code>refine_minuto</code></strong> — <span style="color:#5b6770;font-weight:600">plata</span>.
+Una por región, <strong>sin red</strong>. Lee la partida y su timeline del bronce y llama a
+<code>timeline.estado_al_minuto</code>. Además corre el <strong>chequeo contra la partida</strong> sobre
+cada una (4.6) y manda por XCom cuántas coinciden de cuántas se compararon: catorce números, no datos.</p>
+
+<p><strong>13 · <code>save_minuto</code></strong> — junta las regiones, deduplica y valida: columnas
+exactas, clave única, ningún nulo fuera de <code>first_blood_s_mN</code>. Si falla un chequeo, falla el
+DAG. Hace en una sola tarea lo que la rama principal reparte en tres, porque este dataset tiene 35
+columnas de tipos conocidos y no necesita el casteo de <code>consolidate</code>. Escribe
+<code>lol_minN_AAAA-MM-DD.csv</code> (fechado igual que <code>save</code>, sin <code>ds</code>) y el
+reporte <code>reports/calidad_minutoN.md</code>, con la tabla del chequeo de eventos. Si una métrica no
+coincide en todas las partidas, además lo deja como <em>warning</em> en el log.</p>
+
 <h3>6. Tests, calidad de código y documentación</h3>
 
-<h4><code>tests/dags/test_dag_integrity.py</code> · 10 tests</h4>
+<h4><code>tests/dags/test_dag_integrity.py</code> · 11 tests</h4>
 <table>
 <tr><th>Grupo</th><th>Qué verifica</th></tr>
-<tr><td>El DAG</td><td>Que no haya errores de import, que se registre, que estén las nueve tareas, que corra a demanda y que no haga catchup.</td></tr>
-<tr><td>El esquema</td><td>Que sean 137 columnas sin repetidas, que cada columna caiga en exactamente un grupo de tipo, y que estén la clave y el objetivo.</td></tr>
+<tr><td>El DAG</td><td>Que no haya errores de import, que se registre, que estén las trece tareas, que corra a demanda y que no haga catchup.</td></tr>
+<tr><td>El esquema</td><td>Que sean 137 columnas sin repetidas, que cada columna caiga en exactamente un grupo de tipo, y que estén la clave y el objetivo. Y que el dataset al minuto tenga 35 columnas sin repetidas, empiece por la clave y el objetivo, y que las del minuto 5 no choquen con las del 10.</td></tr>
 <tr><td>Las trampas de la fuente</td><td>Que una duración en milisegundos se normalice, y que un <code>teamPosition</code> vacío se cuente en <code>roles_inferidos</code>.</td></tr>
 </table>
 
 <p>Los dos últimos son los más valiosos: son <em>tests de regresión</em> sobre bugs reales. Si alguien
 en el futuro simplifica esa lógica sin entenderla, el test lo frena.</p>
+
+<h4><code>tests/test_timeline.py</code> · 7 tests</h4>
+<p>No importa Airflow —<code>timeline.py</code> es puro—, así que se prueba con una partida y un
+timeline sintéticos armados con la forma de match-v5. Verifica que se tome el primer cuadro que alcanza
+el corte, que los eventos posteriores al corte no cuenten, que una ejecución (<code>killerId</code> 0)
+no sea primera sangre, que sin primera sangre antes del corte el segundo quede vacío, que una partida
+más corta que el corte quede afuera, y que el chequeo contra la partida coincida cuando todo está bien
+y <strong>salte cuando las torres se leen al revés</strong>. Lo que no puede verificar un test
+sintético es que la forma real de la fuente sea ésa: eso lo verifica el chequeo con datos reales.</p>
 
 <div class="nota">
   <span class="etiqueta">Un detalle técnico que costó descubrir</span>
@@ -2064,14 +2220,22 @@ para qué sirve guardar el bronce: se pudo responder sin volver a la API.</p>
 │   ├── players/plataforma=la2/puuid=AO23g.../
 │   │   ├── liga.json.gz                        ranking del jugador
 │   │   └── maestria_875.json.gz                maestría con ese campeón
-│   └── descartadas/plataforma=la2.txt          ids que no volver a bajar
+│   ├── timelines/plataforma=la2/
+│   │   └── LA2_1617259431.json.gz              su línea de tiempo cruda
+│   └── descartadas/
+│       ├── plataforma=la2.txt                  ids que no volver a bajar
+│       └── sin_timeline_plataforma=la2.txt     ids sin timeline en Riot (404)
 │
 ├── silver/_parciales/                          ← CAPA PLATA
-│   └── plataforma_la2.csv                      filas de una plataforma
+│   ├── plataforma_la2.csv                      filas de una plataforma
+│   └── minuto5_americas.csv                    filas al minuto 5 de una región
 │
 ├── _consolidado.csv                            todas, deduplicadas
 ├── lol_2026-08-27.csv                          ← EL ENTREGABLE
-└── reports/calidad.md                          el chequeo de la consigna</div>
+├── lol_min5_AAAA-MM-DD.csv                     el dataset al minuto 5
+└── reports/
+    ├── calidad.md                              el chequeo de la consigna
+    └── calidad_minuto5.md                      el chequeo del minuto 5</div>
 
 <h4>Por qué el bronce está particionado así</h4>
 <p>Las carpetas con nombre <code>clave=valor</code> son <strong>particionado estilo Hive</strong>, el
@@ -2102,6 +2266,67 @@ otra región.</p>
 420— anotadas en <code>bronze/descartadas/</code> para no volver a pedirlas nunca. Ese índice es el
 que más cuota ahorra: el detalle de partida es la respuesta más pesada de la API, y sin él cada
 partida basura se volvería a bajar cada vez que otro jugador semilla la menciona.</p>
+
+<h3>8. El dataset al minuto N</h3>
+
+<p>Es un <strong>segundo dataset</strong>, aparte del de condiciones iniciales. Lo pidió el docente como
+corrección 2 de la Entrega 2: si las diferencias entre equipos no alcanzaban para predecir la duración
+—y no alcanzaron—, armar un dataset con el estado de la partida a los 5 y a los 10 minutos. Se empieza
+por el minuto 5; el 10 sale de volver a correr la plata con <code>minuto_corte=10</code>.</p>
+
+<div class="aviso">
+  <span class="etiqueta">Cambia la pregunta, y hay que decirlo</span>
+  <p>El dataset principal contesta «¿cuánto va a durar, sabiendo sólo cómo arranca?». Éste contesta
+  «¿cuánto va a durar, sabiendo cómo iba en el minuto 5?». Todo lo que mide pasó antes del minuto de
+  corte, así que <strong>no es fuga del objetivo</strong>: en el minuto 5 la partida sigue en curso y
+  esos datos ya se conocen. Pero sólo sirve para partidas que <strong>ya llegaron</strong> al minuto 5,
+  y por eso las que terminaron antes quedan afuera. Por la misma razón se arma aparte y no se mezcla con
+  las 137 columnas: mezclarlo haría decir al dataset principal algo que no dice.</p>
+</div>
+
+<p><strong>Una fila es una partida</strong>, igual que en el principal, y la clave es la misma: los dos
+se unen por <code>match_id</code>. Lleva <code>game_duration_s</code> para que se pueda modelar solo. Son
+<strong>35 columnas</strong>, con el minuto en el nombre (<code>_m5</code>):</p>
+
+<table>
+<tr><th>Métrica</th><th>De dónde sale</th><th>Cómo se cuenta</th></tr>
+<tr><td><code>gold</code></td><td>Cuadro del minuto</td><td>Suma de <code>totalGold</code> de los 5 jugadores</td></tr>
+<tr><td><code>xp</code></td><td>Cuadro del minuto</td><td>Suma de <code>xp</code></td></tr>
+<tr><td><code>cs</code></td><td>Cuadro del minuto</td><td>Suma de <code>minionsKilled</code> + <code>jungleMinionsKilled</code></td></tr>
+<tr><td><code>level</code></td><td>Cuadro del minuto</td><td><strong>Promedio</strong> de <code>level</code>: «nivel medio del equipo» se lee mejor que una suma de niveles</td></tr>
+<tr><td><code>kills</code></td><td><code>CHAMPION_KILL</code></td><td>Al equipo de <code>killerId</code>; las ejecuciones (<code>killerId</code> 0) no suman</td></tr>
+<tr><td><code>towers</code></td><td><code>BUILDING_KILL</code> de tipo <code>TOWER_BUILDING</code></td><td>Al rival del <code>teamId</code> del evento (el dueño de la torre)</td></tr>
+<tr><td><code>plates</code></td><td><code>TURRET_PLATE_DESTROYED</code></td><td>Al rival del <code>teamId</code> del evento</td></tr>
+<tr><td><code>elite_monsters</code></td><td><code>ELITE_MONSTER_KILL</code></td><td>Al <code>killerTeamId</code>; todos los tipos de monstruo juntos</td></tr>
+<tr><td><code>wards_placed</code></td><td><code>WARD_PLACED</code></td><td>Al equipo de <code>creatorId</code></td></tr>
+<tr><td><code>wards_killed</code></td><td><code>WARD_KILL</code></td><td>Al equipo de <code>killerId</code></td></tr>
+</table>
+
+<p>Cada métrica sale <strong>tres veces</strong>: <code>t1_</code>, <code>t2_</code> y <code>dif_</code>,
+la diferencia absoluta. Es la misma decisión que se tomó para las diferencias entre equipos de la Entrega 3: <code>t1</code> y
+<code>t2</code> son el <code>teamId</code> 100 y 200, que es arbitrario (H3), así que el signo de la
+diferencia no significa nada. Las tres columnas que completan las 35 son de la primera sangre:
+<code>t1_first_blood_m5</code> y <code>t2_first_blood_m5</code> (0 o 1) y
+<code>first_blood_s_m5</code>, el segundo en que pasó.</p>
+
+<table>
+<tr><th>Qué saca a una partida del dataset al minuto N</th><th>Por qué</th></tr>
+<tr><td>No pasa las reglas de admisión del principal (V.3)</td><td>Es la misma población.</td></tr>
+<tr><td>Dura N minutos o menos</td><td>No tiene estado en el minuto N. Con N = 5 no debería sacar casi ninguna: la admisión ya exige más de 300 s.</td></tr>
+<tr><td>Riot no tiene su timeline (404)</td><td>No hay de dónde sacar los datos. Se cuenta en el reporte.</td></tr>
+<tr><td>El timeline no llega al minuto N</td><td>Mismo motivo que la duración, visto desde el timeline.</td></tr>
+</table>
+
+<p><strong>El único nulo permitido</strong> es <code>first_blood_s_m5</code>: si no hubo primera sangre
+antes del minuto 5, no hay segundo que anotar. No es un dato perdido, es la ausencia del evento, y las
+dos banderas valen 0. La validación falla si aparece un nulo en cualquier otra columna.</p>
+
+<div class="nota">
+  <span class="etiqueta">Lo que todavía no sabemos de este dataset</span>
+  <p>Cuántas filas va a tener, cuánto pesa el bronce de timelines y si las lecturas de los eventos
+  coinciden con el detalle de la partida: todo eso se mide en la primera corrida sobre el bronce
+  grande y se anota acá. Hasta entonces, esos números <strong>no existen</strong> y no hay que citarlos.</p>
+</div>
 
 <h2 class="parte"><span class="n">Parte VI</span>Guía de ejecución</h2>
 
@@ -2150,7 +2375,7 @@ Added Connection: riot_api</pre>
 <tr><td><code>astro dev stop</code></td><td>Apagarlo sin borrar nada.</td></tr>
 <tr><td><code>astro dev restart</code></td><td><strong>Sólo</strong> si se tocó <code>requirements.txt</code>, <code>packages.txt</code>, el <code>Dockerfile</code> o <code>airflow_settings.yaml</code>. Cambiar un <code>.py</code> no lo necesita.</td></tr>
 <tr><td><code>astro dev parse</code></td><td>Verificar que los DAGs no tengan errores de sintaxis.</td></tr>
-<tr><td><code>astro dev pytest</code></td><td>Correr los 10 tests.</td></tr>
+<tr><td><code>astro dev pytest</code></td><td>Correr los 18 tests.</td></tr>
 <tr><td><code>astro dev logs -f</code></td><td>Ver los logs de los contenedores.</td></tr>
 </table>
 
@@ -2397,6 +2622,72 @@ corrida lo reutiliza.</p>
   entorno o correr el pipeline en vivo se come la mitad de los veinte minutos, y la consigna lo dice
   explícitamente entre las cosas que no hay que hacer.</p>
 </div>
+
+<h3>8. Completar los timelines de un bronce existente</h3>
+
+<p>Es el caso de quien tiene el bronce de 19.145 partidas: no hace falta agrandarlo, sólo pedir el
+timeline de cada partida que ya está en disco. Los pasos:</p>
+
+<ol>
+  <li><code>git pull</code>, para tener el DAG con la rama del timeline.</li>
+  <li>Una key <strong>recién generada</strong> en la Connection <code>riot_api</code>
+  (<code>airflow_settings.yaml</code>, campo <code>conn_password</code>; varias, separadas por coma).
+  Si se tocó ese archivo, <code>astro dev restart</code>; si sólo cambió el código,
+  <code>astro dev start</code> alcanza.</li>
+  <li>Disparar <code>lol_ingest</code> desde la interfaz con:
+    <table>
+    <tr><th>Parámetro</th><th>Valor</th></tr>
+    <tr><td><code>buscar_partidas_nuevas</code></td><td><strong><code>false</code></strong></td></tr>
+    <tr><td><code>minuto_corte</code></td><td>5</td></tr>
+    <tr><td><code>plataformas</code></td><td>las 6</td></tr>
+    <tr><td><code>forzar</code></td><td><code>false</code> — con <code>true</code> volvería a pedir todo</td></tr>
+    </table>
+    <code>partidas_objetivo</code> y <code>tiers</code> no se usan en este modo.</li>
+  <li>Mirar el log de <code>land_timelines</code>: cada 100 timelines anota cuántos van, cuántos no
+  existen en Riot y cuántos fallaron.</li>
+</ol>
+
+<h4>Cuánto debería tardar <em>(estimación, no medida)</em></h4>
+<p>Cada timeline es <strong>un pedido</strong>, y todos van al host de la región. Con el límite de una
+development key (100 pedidos cada 2 minutos, por key y por host), el techo es
+<code>keys × 100 / 120</code> pedidos por segundo en cada región. Las tres regiones corren en paralelo,
+así que el total lo marca <code>americas</code>, que tiene cuatro de las seis plataformas. Las partidas
+por región salen de la tabla de V.7:</p>
+
+<table>
+<tr><th>Región</th><th>Plataformas</th><th>Timelines</th><th>Con 1 key</th><th>Con 7 keys</th></tr>
+<tr><td><code>americas</code></td><td>la2, la1, br1, na1</td><td>12.765</td><td>≈ 4 h 15 min</td><td>≈ 36 min</td></tr>
+<tr><td><code>europe</code></td><td>euw1</td><td>2.950</td><td>≈ 59 min</td><td>≈ 8 min</td></tr>
+<tr><td><code>asia</code></td><td>kr</td><td>3.430</td><td>≈ 1 h 9 min</td><td>≈ 10 min</td></tr>
+</table>
+
+<p>Es el techo que pone el cupo. La trampa 10 de la skill enseña que el número real puede quedar por
+debajo si el cliente no llega a consumirlo; por eso la tarea usa cuatro hilos por región, que deberían
+alcanzar para siete keys. <strong>Cuando termine la corrida hay que anotar acá el tiempo real</strong>,
+igual que se hizo con la recolección grande en VI.4. Si la key vence en el medio, se vuelve a disparar
+igual: lo bajado no se vuelve a pedir.</p>
+
+<p>La misma corrida rehace también el CSV principal (<code>refine_silver</code> reprocesa todo el bronce,
+unos 15 minutos), así que deja los dos datasets.</p>
+
+<h4>Qué revisar antes de usar el dataset</h4>
+<ol>
+  <li><code>include/output/reports/calidad_minuto5.md</code>, la tabla <strong>«Los eventos contra el
+  detalle de la partida»</strong>. Es lo primero. Si una métrica coincide en el 100 % o cerca, la
+  lectura del evento es correcta. Si coincide <strong>casi nunca</strong>, la lectura está mal
+  —probablemente al revés— y esa métrica <strong>no se usa</strong> hasta corregir
+  <code>timeline.py</code>, que se arregla y se reprocesa sin volver a pedir nada.</li>
+  <li>Cuántas partidas quedaron sin timeline o afuera por durar menos: la primera tabla del mismo
+  reporte.</li>
+  <li>El peso de <code>bronze/timelines/</code>, para anotarlo en V.7.</li>
+</ol>
+
+<h4>Adónde va el CSV</h4>
+<p>Como <code>include/output/</code> está gitignoreado, el CSV que sale vive sólo en la máquina de quien
+corrió. Se copia a <strong><code>notebooks/entrega-3/datos/</code></strong> y se versiona, igual que el
+CSV congelado de la Entrega 2 viaja en <code>notebooks/entrega-2/datos/</code>: así el modelado corre sin
+Airflow y en Colab. Conviene versionar al lado el reporte <code>calidad_minuto5.md</code>, que es la
+evidencia de que los eventos se leyeron bien.</p>
 
 <h2 class="parte"><span class="n">Parte VII</span>La defensa de la Entrega 1</h2>
 
@@ -2664,7 +2955,7 @@ las partes indicadas. Todos deberían poder responder las cinco preguntas de la 
 <tr><th>Área</th><th>Quién</th><th>Qué tiene que dominar</th><th>Partes a leer</th></tr>
 <tr>
   <td><strong>La fuente</strong></td><td style="color:#a3341f">________________</td>
-  <td>Qué es la API de Riot, los límites y el vencimiento de la key, las dos familias de hosts, los siete endpoints, y el recorrido de semilla a dataset.</td>
+  <td>Qué es la API de Riot, los límites y el vencimiento de la key, las dos familias de hosts, los ocho endpoints, y el recorrido de semilla a dataset.</td>
   <td>III completa</td>
 </tr>
 <tr>
@@ -2679,7 +2970,7 @@ las partes indicadas. Todos deberían poder responder las cinco preguntas de la 
 </tr>
 <tr>
   <td><strong>La orquestación</strong></td><td style="color:#a3341f">________________</td>
-  <td>El grafo completo, qué hace cada una de las nueve tareas y por qué está donde está. Sensores, cortocircuito, trigger rules, mapeo dinámico.</td>
+  <td>El grafo completo, qué hace cada una de las trece tareas y por qué está donde está. Sensores, cortocircuito, trigger rules, mapeo dinámico.</td>
   <td>II, IV.5</td>
 </tr>
 <tr>
@@ -3331,7 +3622,7 @@ predecir»:</p>
 <tr><th>Término</th><th>Qué es</th></tr>
 <tr><td><strong>Campeón</strong></td><td>El personaje que controla un jugador. Hay más de 160.</td></tr>
 <tr><td><strong>Carril</strong> (<em>lane</em>)</td><td>La posición que ocupa un jugador: top, jungla, mid, bot o support. Cinco por equipo.</td></tr>
-<tr><td><strong>Draft</strong></td><td>La fase previa donde cada equipo elige sus campeones. <strong>Todo lo que usamos sale de acá o de antes.</strong></td></tr>
+<tr><td><strong>Draft</strong></td><td>La fase previa donde cada equipo elige sus campeones. <strong>Todo lo del dataset principal sale de acá o de antes.</strong> El dataset al minuto N, no: mide la partida ya empezada (V.8).</td></tr>
 <tr><td><strong>Hechizo de invocador</strong></td><td>Habilidad extra que cada jugador elige antes de empezar. Flash (4), Smite (11), Teleport (12), Ignite (14).</td></tr>
 <tr><td><strong>Runas</strong></td><td>Configuración de bonificaciones elegida antes de la partida. Guardamos las dos ramas.</td></tr>
 <tr><td><strong>Maestría</strong></td><td>Puntos acumulados por un jugador con un campeón. Indica cuánto lo jugó.</td></tr>
@@ -3340,6 +3631,9 @@ predecir»:</p>
 <tr><td><strong>MMR</strong></td><td><em>Matchmaking Rating.</em> El número interno con el que Riot empareja. <strong>Riot no lo publica</strong>; por eso construimos <code>player_elo</code>.</td></tr>
 <tr><td><strong><code>puuid</code></strong></td><td>Identificador único y permanente de una cuenta.</td></tr>
 <tr><td><strong>Cola 420</strong></td><td>El código de la modalidad Ranked Solo/Duo. La única que recolectamos.</td></tr>
+<tr><td><strong>Timeline</strong> (línea de tiempo)</td><td>La respuesta del endpoint H: un cuadro por minuto con el estado de cada jugador, y los eventos de la partida con su momento. Es la fuente del dataset al minuto N.</td></tr>
+<tr><td><strong>Primera sangre</strong></td><td>El primer asesinato de un campeón a manos de otro campeón en la partida.</td></tr>
+<tr><td><strong>Placa de torre</strong></td><td>Las protecciones que tienen las torres exteriores en los primeros minutos de la partida. Romper cada una da oro, antes de tirar la torre.</td></tr>
 <tr><td><strong>Remake</strong></td><td>Partida cancelada en los primeros minutos porque alguien no se conectó. Las descartamos.</td></tr>
 <tr><td><strong>Plataforma</strong></td><td>El servidor de juego: <code>la2</code>, <code>na1</code>, <code>kr</code>… Determina el host de algunos endpoints.</td></tr>
 <tr><td><strong>Región continental</strong></td><td><code>americas</code>, <code>europe</code>, <code>asia</code>. Es el host de los endpoints de partidas.</td></tr>
@@ -3368,6 +3662,16 @@ predecir»:</p>
   para volver a ejecutarlo en una máquina local alcanza con el venv. Eso saca del camino
   el riesgo que más caro salió en la Entrega 1: depender de que el entorno arranque.</p>
 </div>
+
+<h3>La rama del timeline: lo que falta</h3>
+<table>
+<tr><th></th><th>Tarea</th><th>Quién</th></tr>
+<tr><td>1</td><td>Correr <code>lol_ingest</code> con <code>buscar_partidas_nuevas=false</code> sobre el bronce de 19.145 partidas (VI.8).</td><td>Quien tiene el bronce</td></tr>
+<tr><td>2</td><td>Leer el chequeo de eventos del reporte del minuto 5 y anotar en V.8 qué métricas coinciden; si alguna no, corregir <code>timeline.py</code> y reprocesar sin red.</td><td>Quien opera</td></tr>
+<tr><td>3</td><td>Anotar los números reales: filas del dataset al minuto 5, tiempo de la corrida, peso de <code>bronze/timelines/</code>.</td><td>Quien opera</td></tr>
+<tr><td>4</td><td>Copiar <code>lol_min5_*.csv</code> a <code>notebooks/entrega-3/datos/</code> y versionarlo (VI.8).</td><td>Quien opera</td></tr>
+<tr><td>5</td><td>Decidir si se corre también el minuto 10 (<code>minuto_corte=10</code>; no pide nada a Riot).</td><td>El grupo</td></tr>
+</table>
 
 <h3>Lo que quedó de la Entrega 1</h3>
 <table>

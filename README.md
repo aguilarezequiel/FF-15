@@ -7,6 +7,8 @@
 
 Pipeline de Apache Airflow que construye el dataset del proyecto a partir de la **API oficial de Riot Games**, usando exclusivamente variables conocidas **antes de que la partida empiece**.
 
+Desde la Entrega 3 arma además un **segundo dataset**, aparte: el estado de la partida en el **minuto 5**, sacado de la línea de tiempo de cada partida. Cambia la pregunta —«¿cuánto dura, sabiendo cómo iba en el minuto 5?»— y por eso no se mezcla con las 137 columnas de condiciones iniciales.
+
 ---
 
 ## El dataset en cuatro líneas
@@ -17,6 +19,7 @@ Pipeline de Apache Airflow que construye el dataset del proyecto a partir de la 
 | **Clave primaria** | `match_id` — ej. `LA2_1617259431` |
 | **Columna objetivo** | `game_duration_s` — segundos, continua → **regresión** |
 | **Ancho** | 137 columnas |
+| **Segundo dataset** | `lol_minN_AAAA-MM-DD.csv` — estado al minuto N (5 por defecto), 35 columnas, se une por `match_id` |
 
 ---
 
@@ -43,7 +46,9 @@ Airflow queda en <http://localhost:8081> (usuario `admin`, contraseña `admin`).
 | `partidas_objetivo` | 1500 | Cuántas partidas juntar en total. Se reparte en partes iguales entre las plataformas elegidas. La consigna pide más de 1.000 filas. |
 | `plataformas` | las 6 | `la2`, `la1`, `br1`, `na1`, `euw1`, `kr`. Cada una tiene su propio cupo de rate limit por key, así que más plataformas es más rápido. |
 | `tiers` | los 10 | De `IRON` a `CHALLENGER`. Se recorren en orden aleatorio para que una corrida cortada no quede sesgada hacia un rango. |
-| `forzar` | `false` | Ignora el bronce ya bajado. Normalmente no hace falta. |
+| `forzar` | `false` | Ignora el bronce ya bajado, timelines incluidos. Normalmente no hace falta. |
+| `buscar_partidas_nuevas` | `true` | Con `false` no se agranda el bronce: sólo se bajan los timelines que falten para las partidas que ya están en disco, y se rehacen los dos datasets. |
+| `minuto_corte` | 5 | En qué minuto se mira el estado de la partida. Cambiarlo no pide nada a Riot: el timeline completo ya está en bronce. |
 
 ### Cómo se junta el volumen
 
@@ -61,7 +66,8 @@ La corrida está pensada para dejarse andando varias horas dentro de la ventana 
 ```
 wait_for_riot → check_key ─┬→ fetch_ddragon ──┐
                            │                  ├→ refine_silver[6] → consolidate → validate → save
-                           └→ plan_plataformas → land_bronze[6] ───┘
+                           └→ plan_plataformas → land_bronze[6] ───┤
+                                              └→ plan_timelines → land_timelines[3] → refine_minuto[3] → save_minuto
 ```
 
 | Tarea | Qué hace |
@@ -70,11 +76,15 @@ wait_for_riot → check_key ─┬→ fetch_ddragon ──┐
 | `check_key` | **Short-circuit** con `ALL_DONE`. Si el sensor no consiguió respuesta, corta limpio y deja en el log que hay que renovar la key. Está arriba de todo a propósito: la corrida dura horas, y enterarse al final sería el peor resultado. |
 | `fetch_ddragon` | **Bronce.** Catálogo de campeones y hechizos desde el CDN público, particionado por versión: los campeones cambian entre parches y una partida vieja tiene que poder reinterpretarse con el catálogo que le correspondía. |
 | `plan_plataformas` | Reparte `partidas_objetivo` entre las plataformas elegidas. |
-| `land_bronze` | **Una tarea por plataforma, y la única que toca la red.** Baja el detalle de la partida y los perfiles de los 10 jugadores, y los guarda crudos. |
+| `land_bronze` | **Una tarea por plataforma.** Junto con `land_timelines`, son las únicas que bajan datos de la red. Baja el detalle de la partida y los perfiles de los 10 jugadores, y los guarda crudos. Con `buscar_partidas_nuevas=false` termina sin pedir nada. |
 | `refine_silver` | Una por plataforma, **sin red**. Del JSON crudo a las 137 columnas tipadas. |
 | `consolidate` | Junta los parciales, deduplica por `match_id` y castea tipos. |
 | `validate` | Chequeos duros —si alguno falla, el DAG falla— y escribe el reporte de calidad. |
 | `save` | Escribe el entregable fechado con la corrida. |
+| `plan_timelines` | Agrupa las plataformas por **región continental**: el timeline se pide al host de la región, y con un proceso por plataforma las cuatro de `americas` pasarían el cupo cuatro veces. |
+| `land_timelines` | **Bronce.** Una por región. Baja la línea de tiempo cruda y completa de cada partida del bronce que todavía no la tenga. Append-only; un 404 se anota para no volver a pedirlo. |
+| `refine_minuto` | Una por región, **sin red**. Corta el timeline en el minuto N y compara los eventos de la partida entera con los totales del detalle, para verificar que se leen bien. |
+| `save_minuto` | Junta, deduplica, valida y escribe `lol_minN_AAAA-MM-DD.csv` y el reporte `reports/calidad_minutoN.md`. |
 
 ### Las capas
 
@@ -89,7 +99,8 @@ include/output/bronze/
 ├── ddragon/version=16.17.1/{champion,summoner}.json.gz
 ├── matches/plataforma=la2/LA2_1617259431.json.gz
 ├── players/plataforma=la2/puuid=.../{liga.json.gz, maestria_875.json.gz}
-└── descartadas/plataforma=la2.txt
+├── timelines/plataforma=la2/LA2_1617259431.json.gz
+└── descartadas/{plataforma=la2.txt, sin_timeline_plataforma=la2.txt}
 ```
 
 La separación no es decorativa:
@@ -97,7 +108,7 @@ La separación no es decorativa:
 - Una partida que ya está en bronce **no se vuelve a pedir nunca**, ni en esta corrida ni en las que vengan.
 - `refine_silver` reprocesa **todo el bronce acumulado**, no sólo lo que bajó la corrida actual. Por eso el dataset **crece corrida a corrida**: con una development key no se juntan miles de partidas de una sentada.
 - Un bug en el parseo se corrige **sin volver a la fuente**: se arregla `refine_silver` y se reprocesa lo que ya está en disco.
-- El bronce guarda **las tres respuestas** que hacen falta para reconstruir una fila —partida, liga y maestría— así la capa plata queda 100 % offline.
+- El bronce guarda **las tres respuestas** que hacen falta para reconstruir una fila —partida, liga y maestría—, y además la línea de tiempo de cada partida para el dataset al minuto N. Así las dos platas quedan 100 % offline.
 - Una corrida que se corta a la mitad no pierde nada: dejó su bronce en disco y la siguiente lo levanta.
 
 ---
@@ -116,6 +127,12 @@ df.columns[df.isna().all()]                     # vacío
 ```
 
 `validate` además hace fallar el DAG si la clave repite, si falta una columna obligatoria, si aparece una columna 100 % nula o si el target se sale del rango plausible. **No se publica un dataset roto.**
+
+El dataset al minuto N deja su propio reporte en `include/output/reports/calidad_minutoN.md`. Lo más importante ahí es la tabla **«Los eventos contra el detalle de la partida»**: cada evento del timeline se cuenta sobre la partida entera y se compara con el total final que trae la partida. Si una métrica no coincide, el evento se está leyendo mal y no se usa hasta corregirlo.
+
+### Completar los timelines de un bronce que ya existe
+
+Disparar `lol_ingest` con `buscar_partidas_nuevas = false` y `minuto_corte = 5`. No se agranda el bronce: se bajan sólo los timelines que faltan —un pedido por partida— y se rehacen los dos CSV. Si la key vence a mitad de camino, se vuelve a disparar y sigue desde donde quedó. El CSV que sale se copia a `notebooks/entrega-3/datos/`, que es donde lo lee el modelado.
 
 ---
 
@@ -211,7 +228,7 @@ Lo que el análisis dejó decidido, en tres líneas:
 ## Probar
 
 ```bash
-astro dev pytest    # integridad del DAG, esquema y trampas conocidas de la fuente
+astro dev pytest    # integridad del DAG, esquemas, trampas de la fuente y corte del timeline
 astro dev parse     # chequeo de parseo
 ruff check .        # estilo
 ```
@@ -220,7 +237,7 @@ ruff check .        # estilo
 
 Para entender el proyecto entero —la teoría de la materia, el recorrido archivo por archivo,
 la guía de ejecución y la preparación de la defensa— está
-**[`docs/documentacion-proyecto.pdf`](docs/documentacion-proyecto.pdf)** (76 páginas).
+**[`docs/documentacion-proyecto.pdf`](docs/documentacion-proyecto.pdf)** (89 páginas).
 
 Se edita en `docs/documentacion-proyecto.html` y se regenera con `python docs/generar_pdf.py`.
 Es un documento vivo: cada avance del proyecto se refleja ahí, agregando lo nuevo y borrando
@@ -234,12 +251,14 @@ include/lol/          · toda la lógica pesada, sin un solo import de Airflow
   ├── riot.py         · cliente, pool de keys y limitador por (key, host)
   ├── ddragon.py      · catálogo de campeones y hechizos
   ├── seeds.py        · recorrido de la escalera → puuids
-  ├── schema.py       · las 137 columnas, tipos y reglas de admisión
-  └── transform.py    · payload crudo → fila (puro)
+  ├── schema.py       · las 137 columnas, las 35 del minuto N, tipos y reglas de admisión
+  ├── transform.py    · payload crudo → fila (puro)
+  └── timeline.py     · timeline crudo → fila al minuto N (puro)
 include/output/       · bronce, plata y entregables (gitignoreado)
 notebooks/            · el análisis de las Unidades 2+
   ├── requirements.txt      · el stack de análisis, en un venv aparte
-  └── entrega-2/            · el EDA, ya ejecutado, con el CSV congelado al lado
+  ├── entrega-2/            · el EDA, ya ejecutado, con el CSV congelado al lado
+  └── entrega-3/            · el modelado; en datos/ va el CSV del minuto 5
 tests/                · astro dev pytest
 docs/                 · la documentación integral (HTML fuente + PDF)
 Documentacion/        · material de la cátedra

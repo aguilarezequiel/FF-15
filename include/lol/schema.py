@@ -101,3 +101,38 @@ DURACION_MAXIMA_PLAUSIBLE_S = 20_000   # ~5,5 hs: nada dura tanto
 
 def es_ancho_esperado(n: int) -> bool:
     return n == len(COLUMNS)
+
+
+# --- el dataset al minuto N ------------------------------------------------
+#
+# Es un SEGUNDO dataset, aparte del de condiciones iniciales: sale del
+# timeline de match-v5 y describe cómo está la partida en el minuto N. No
+# se mezcla con las 137 columnas de arriba porque contesta otra pregunta
+# —"¿cuánto dura, sabiendo cómo arrancó?"— y se une por `match_id` cuando
+# se modela. Lleva el minuto en el nombre de cada columna para que los
+# datasets de dos minutos distintos se puedan juntar sin pisarse.
+
+# Las métricas que se miden por equipo. Cada una sale como t1, t2 y la
+# diferencia absoluta: t1/t2 son el teamId 100/200, que es arbitrario, así
+# que el signo de la diferencia no significa nada (igual que en la H9).
+METRICAS_MINUTO = [
+    "gold", "xp", "cs", "level",                 # del cuadro del minuto N
+    "kills", "towers", "plates", "elite_monsters",
+    "wards_placed", "wards_killed",              # de los eventos hasta N
+]
+
+
+def columnas_minuto(minuto: int) -> list[str]:
+    """Las columnas del dataset al minuto `minuto`, en orden."""
+    s = f"_m{minuto}"
+    cols = ["match_id", "game_duration_s"]
+    for m in METRICAS_MINUTO:
+        cols += [f"t1_{m}{s}", f"t2_{m}{s}", f"dif_{m}{s}"]
+    cols += [f"t1_first_blood{s}", f"t2_first_blood{s}", f"first_blood_s{s}"]
+    return cols
+
+
+def nulables_minuto(minuto: int) -> list[str]:
+    """La única columna que puede venir vacía: si no hubo primera sangre
+    antes del minuto de corte, no hay segundo que anotar."""
+    return [f"first_blood_s_m{minuto}"]

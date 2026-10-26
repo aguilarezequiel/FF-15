@@ -10,6 +10,7 @@
 | Unidad de análisis | Una partida clasificatoria (cola 420), Season 16 |
 | Clave primaria | `match_id` |
 | Columna objetivo | `game_duration_s` — segundos, continua → regresión |
+| Datasets | `lol_AAAA-MM-DD.csv` — condiciones iniciales, 137 columnas · `lol_minN_AAAA-MM-DD.csv` — estado de la partida al minuto N (timeline de match-v5), 35 columnas. Se unen por `match_id` |
 | Stack | Apache Airflow 3.3 · Astro Runtime 3.3-4 · Astro CLI · Docker |
 | Entrega 1 | miércoles 9/9, franja 14:55 – 15:15 — **presentada** |
 | Entrega 2 | miércoles 23/9, la clase completa · 20 min con el docente, en privado |
@@ -73,6 +74,8 @@ Están explicadas con su porqué en `.claude/skills/proyecto-integrador-ff15/SKI
 - `logging` con `%s` diferido. Nunca `print()`.
 - `include/lol/` no importa Airflow. Ni una línea.
 - **Bronce es append-only**: lo ya bajado no se vuelve a pedir.
+- **El timeline va entero al bronce**; el corte en el minuto se hace en la plata (`minuto_corte`). Cambiar de minuto no pide nada a Riot.
+- **El dataset al minuto N es aparte.** Nada del timeline entra en las 137 columnas de condiciones iniciales: cambia la pregunta, y mezclarlo la escondería.
 - Rutas absolutas del contenedor (`/usr/local/airflow/...`), nunca relativas.
 - Cada tarea con docstring que explica **por qué** está donde está. Se renderiza en la UI y es la chuleta de la defensa.
 
@@ -102,6 +105,11 @@ astro dev parse      # chequeo de parseo
 astro dev pytest     # tests de integridad
 astro dev logs -f
 ```
+
+Para completar los timelines de un bronce que ya existe sin agrandarlo: disparar `lol_ingest` con
+`buscar_partidas_nuevas=false`. Después, leer el chequeo de eventos de
+`include/output/reports/calidad_minutoN.md` antes de modelar con esos datos. El CSV del minuto se
+copia a `notebooks/entrega-3/datos/` y se versiona, como el CSV congelado de la E2.
 
 ```bash
 python -m venv .venv                                    # el entorno del análisis

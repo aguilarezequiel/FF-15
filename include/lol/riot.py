@@ -335,6 +335,24 @@ class RiotClient:
                f"{match_id}")
         return self._request(url)
 
+    def timeline(self, region: str, match_id: str
+                 ) -> tuple[dict | None, bool]:
+        """Línea de tiempo de una partida: un cuadro por minuto + eventos.
+
+        Es la fuente del dataset al minuto N. Como `match`, vive en el host
+        regional y no lleva `puuid` en la URL, así que cualquier key del
+        pool la puede pedir.
+
+        Devuelve `(datos, no_existe)`. La bandera distingue el 404 —Riot no
+        tiene esa línea de tiempo, y no la va a tener nunca: se anota para
+        no volver a pedirla— de un fallo transitorio (reintentos agotados,
+        keys vencidas), que se vuelve a intentar en la próxima corrida.
+        """
+        url = (f"https://{region}.api.riotgames.com/lol/match/v5/matches/"
+               f"{match_id}/timeline")
+        datos, key = self._request(url)
+        return datos, (datos is None and key is not None)
+
     def league_by_puuid(self, platform: str, puuid: str,
                         owner_key: str | None = None) -> dict | None:
         """Entradas de liga del jugador, crudas. Cacheado por puuid."""

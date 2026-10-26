@@ -13,11 +13,12 @@ continuo en segundos: es un problema de **regresión**.
 **Dos capas, y son tareas distintas en el grafo**, siguiendo el modelo
 medallón:
 
-* **Bronce** (`land_bronze`) — las respuestas de la API tal como llegaron,
-  comprimidas y particionadas por plataforma. Es la única tarea que toca
-  la red. No interpreta nada. Guarda las tres cosas que hacen falta para
-  reconstruir una fila: el detalle de la partida, las entradas de liga y
-  las maestrías de los 10 jugadores.
+* **Bronce** (`land_bronze`, y `land_timelines` en la rama del timeline)
+  — las respuestas de la API tal como llegaron, comprimidas y particionadas
+  por plataforma. Son las únicas tareas que bajan datos de la red. No
+  interpretan nada. Guardan lo que hace falta para reconstruir una fila: el
+  detalle de la partida, las entradas de liga y las maestrías de los 10
+  jugadores, y la línea de tiempo de la partida.
 * **Plata** (`refine_silver` + `consolidate`) — filas tipadas, una por
   partida, deduplicadas y validadas. **No toca la red**: lee del bronce.
 
@@ -39,6 +40,18 @@ buscar partidas que todavía no tiene.
 
 La tercera capa —**oro**: features del modelo, agregados— no se construye
 acá. Se arma en las Unidades 3 y 4 sobre esta misma plata.
+
+**Una segunda rama: el estado de la partida al minuto N.** Las condiciones
+iniciales solas predicen poco la duración (Entrega 3), así que el DAG baja
+también la **línea de tiempo** de cada partida (`land_timelines`) y arma
+un segundo dataset con cómo estaba la partida en el minuto de corte —5 por
+defecto— (`refine_minuto` + `save_minuto`). Es un CSV aparte, unido al
+principal por `match_id`: las 137 columnas de condiciones iniciales no
+cambian. Las mismas reglas valen acá: el timeline crudo y completo va a
+bronce, se pide una sola vez, y el corte en el minuto se hace en la plata.
+Con `buscar_partidas_nuevas=False` el DAG no agranda el bronce y sólo
+completa los timelines que falten: es el modo para un bronce que ya tiene
+miles de partidas.
 
 **Por qué `schedule=None`.** La development key de Riot vence cada 24 hs.
 Un DAG programado corriendo sin nadie mirando fallaría todos los días
@@ -66,7 +79,7 @@ import pendulum
 from airflow.sdk import Param, PokeReturnValue, dag, task
 from airflow.task.trigger_rule import TriggerRule
 
-from lol import ddragon, schema, transform
+from lol import ddragon, schema, timeline, transform
 from lol.riot import (
     ALL_TIERS,
     PLATFORM_ROUTING,
@@ -104,6 +117,12 @@ CHECKPOINT_CADA = 10
 # menos jugadores distintos y más partidas repetidas entre ellos.
 PARTIDAS_POR_JUGADOR = 15
 
+# Hilos que piden timelines dentro de cada región. Con un bucle secuencial
+# el techo lo pone la latencia de cada request y no el cupo de las keys
+# (ver la trampa 10 de references/riot-api.md); con cuatro hilos el que
+# frena es el limitador del cliente, que es lo que corresponde.
+HILOS_TIMELINE = 4
+
 
 # --------------------------------------------------------------- bronce io
 
@@ -118,6 +137,28 @@ def _ruta_perfil(platform: str, puuid: str, nombre: str) -> Path:
 
 def _ruta_descartadas(platform: str) -> Path:
     return BRONCE_DIR / "descartadas" / f"plataforma={platform}.txt"
+
+
+def _ruta_timeline(platform: str, match_id: str) -> Path:
+    return BRONCE_DIR / "timelines" / f"plataforma={platform}" / f"{match_id}.json.gz"
+
+
+def _ruta_sin_timeline(platform: str) -> Path:
+    return BRONCE_DIR / "descartadas" / f"sin_timeline_plataforma={platform}.txt"
+
+
+def _leer_indice(ruta: Path) -> set[str]:
+    if not ruta.exists():
+        return set()
+    return {linea.strip() for linea
+            in ruta.read_text(encoding="utf-8").splitlines() if linea.strip()}
+
+
+def _ids_en_bronce(platform: str) -> list[str]:
+    """Las partidas de la plataforma que ya están en bronce, ordenadas."""
+    carpeta = BRONCE_DIR / "matches" / f"plataforma={platform}"
+    return [r.name.removesuffix(".json.gz")
+            for r in sorted(carpeta.glob("*.json.gz"))]
 
 
 def escribir_json(destino: Path, data) -> None:
@@ -193,6 +234,23 @@ def api_keys() -> list[str]:
             description=("Ignora el bronce ya bajado y vuelve a pedir todo. "
                          "Normalmente no hace falta: el bronce es "
                          "append-only."),
+        ),
+        "buscar_partidas_nuevas": Param(
+            True, type="boolean",
+            title="Buscar partidas nuevas",
+            description=("Con False no se agranda el bronce: land_bronze no "
+                         "pide partidas, sólo se bajan las líneas de tiempo "
+                         "que falten para las partidas que ya están en disco "
+                         "y se rehacen los dos datasets. Es el modo para "
+                         "completar un bronce grande."),
+        ),
+        "minuto_corte": Param(
+            5, type="integer", minimum=1, maximum=60,
+            title="Minuto de corte",
+            description=("En qué minuto se mira el estado de la partida "
+                         "para el dataset del timeline. Cambiarlo no pide "
+                         "nada a Riot: el timeline completo ya está en "
+                         "bronce."),
         ),
     },
 )
@@ -331,6 +389,7 @@ def lol_ingest():
             "cuota": cuota,
             "tiers": params["tiers"],
             "forzar": params["forzar"],
+            "buscar": params["buscar_partidas_nuevas"],
         } for p in plataformas]
 
         log.info("Objetivo %s partidas · %s plataformas · cuota %s c/u",
@@ -344,8 +403,9 @@ def lol_ingest():
     def land_bronze(trabajo: dict) -> dict:
         """**Capa bronce**: guarda las respuestas crudas, sin interpretarlas.
 
-        Es la única tarea del DAG que toca la red. No parsea, no limpia,
-        no valida: deja el JSON tal como vino y anota dónde quedó.
+        Junto con `land_timelines`, son las únicas tareas del DAG que bajan
+        datos de la red. No parsea, no limpia, no valida: deja el JSON tal
+        como vino y anota dónde quedó.
 
         La regla del bronce es **append-only**: una partida ya bajada no
         se vuelve a pedir jamás, ni en esta corrida ni en las que vengan.
@@ -361,11 +421,23 @@ def lol_ingest():
 
         El `execution_timeout` de 20 hs está calibrado contra la ventana
         de vida de una development key.
+
+        Con `buscar_partidas_nuevas=False` la tarea no toca la red y
+        termina en el acto: el bronce queda como está y la corrida sólo
+        completa timelines. Sigue en el grafo igual, para que la plata y
+        la rama del timeline no cambien de forma según el modo.
         """
         platform = trabajo["platform"]
         region = trabajo["region"]
         cuota = trabajo["cuota"]
         forzar = trabajo["forzar"]
+
+        if not trabajo.get("buscar", True):
+            log.info("%s · buscar_partidas_nuevas=False: no se piden "
+                     "partidas. Bronce actual: %s partidas.",
+                     trabajo["nombre"], len(_ids_en_bronce(platform)))
+            return {"platform": platform, "nombre": trabajo["nombre"],
+                    "matches": [], "nuevas": 0, "reusadas": 0, "pedidas": 0}
 
         cliente = RiotClient(api_keys())
 
@@ -634,6 +706,243 @@ def lol_ingest():
         log.info("Dataset escrito en %s", destino)
         return str(destino)
 
+    # ----------------------------------------------------------------- 10
+    @task
+    def plan_timelines(lotes: list[dict], **context) -> list[dict]:
+        """Agrupa las plataformas por **región continental**.
+
+        El timeline vive en match-v5, que se pide al host de la región
+        (`americas`, `europe`, `asia`) y no al de la plataforma. Cada
+        tarea mapeada corre en su propio proceso con su propio limitador:
+        si las cuatro plataformas de `americas` pidieran timelines por
+        separado, cada una creería tener el cupo entero del host y entre
+        las cuatro lo pasarían cuatro veces, a fuerza de 429. Con una
+        tarea por región, un solo limitador lleva la cuenta exacta.
+
+        Recibe la salida de `land_bronze` para correr **después** de que
+        el bronce de partidas esté completo: no se le puede pedir el
+        timeline a una partida que todavía no se bajó.
+        """
+        params = context["params"]
+        por_region: dict[str, list[str]] = {}
+        for lote in lotes:
+            region = PLATFORM_ROUTING[lote["platform"]]["region"]
+            por_region.setdefault(region, []).append(lote["platform"])
+
+        trabajos = [{"region": region, "plataformas": sorted(plataformas),
+                     "minuto": params["minuto_corte"],
+                     "forzar": params["forzar"]}
+                    for region, plataformas in sorted(por_region.items())]
+        log.info("Timelines por región: %s",
+                 {t["region"]: t["plataformas"] for t in trabajos})
+        return trabajos
+
+    # ----------------------------------------------------------------- 11
+    @task(map_index_template="{{ task.op_kwargs['trabajo']['region'] }}",
+          retries=1, retry_delay=pendulum.duration(minutes=2),
+          execution_timeout=pendulum.duration(hours=20))
+    def land_timelines(trabajo: dict) -> dict:
+        """**Capa bronce**: la línea de tiempo cruda de cada partida.
+
+        Recorre **todo el bronce de partidas** de la región, no sólo lo
+        que bajó esta corrida: así un bronce juntado antes de que existiera
+        esta tarea se completa solo, sin volver a pedir las partidas.
+
+        Las mismas reglas que `land_bronze`. Se guarda el timeline entero,
+        tal como llega, y no recortado al minuto de corte: recortarlo
+        obligaría a volver a pedir 19.000 timelines el día que se quiera
+        el minuto 10. Es append-only: un timeline que ya está en disco no
+        se vuelve a pedir. Y si Riot contesta 404 —no tiene esa línea de
+        tiempo— se anota en un índice aparte para no preguntar de nuevo.
+        Un fallo transitorio, en cambio, no se anota: se reintenta en la
+        próxima corrida.
+
+        Los timelines se piden con varios hilos dentro de la región (ver
+        `HILOS_TIMELINE`); el limitador del cliente es compartido entre
+        hilos, así que el ritmo lo sigue poniendo el cupo de las keys.
+        """
+        region = trabajo["region"]
+        forzar = trabajo["forzar"]
+
+        sin_timeline = {p: (set() if forzar else _leer_indice(_ruta_sin_timeline(p)))
+                        for p in trabajo["plataformas"]}
+        pendientes = [
+            (p, mid) for p in trabajo["plataformas"] for mid in _ids_en_bronce(p)
+            if mid not in sin_timeline[p]
+            and (forzar or not _ruta_timeline(p, mid).exists())]
+        log.info("%s · %s timelines por bajar en %s", region,
+                 len(pendientes), trabajo["plataformas"])
+
+        def guardar_indices() -> None:
+            for p, ids in sin_timeline.items():
+                ruta = _ruta_sin_timeline(p)
+                ruta.parent.mkdir(parents=True, exist_ok=True)
+                ruta.write_text("\n".join(sorted(ids)), encoding="utf-8")
+
+        conteo = {"nuevos": 0, "no_existen": 0, "fallidos": 0}
+        if not pendientes:
+            return {**trabajo, **conteo, "pedidas": 0}
+
+        cliente = RiotClient(api_keys())
+
+        def bajar(par: tuple[str, str]) -> str:
+            platform, match_id = par
+            datos, no_existe = cliente.timeline(region, match_id)
+            if datos is not None:
+                escribir_json(_ruta_timeline(platform, match_id), datos)
+                return "nuevos"
+            return "no_existen" if no_existe else "fallidos"
+
+        try:
+            with ThreadPoolExecutor(max_workers=HILOS_TIMELINE) as pool:
+                for i, (par, res) in enumerate(
+                        zip(pendientes, pool.map(bajar, pendientes),
+                            strict=True), 1):
+                    conteo[res] += 1
+                    if res == "no_existen":
+                        sin_timeline[par[0]].add(par[1])
+                    if i % (CHECKPOINT_CADA * 10) == 0:
+                        guardar_indices()
+                        log.info("%s · %s/%s timelines (%s nuevos, %s sin "
+                                 "timeline en Riot, %s fallidos) · %s "
+                                 "requests", region, i, len(pendientes),
+                                 conteo["nuevos"], conteo["no_existen"],
+                                 conteo["fallidos"], cliente.pedidas)
+        finally:
+            # Si las keys vencen a mitad de camino la tarea falla, pero lo
+            # ya bajado está en disco y el índice de 404 no se pierde.
+            guardar_indices()
+
+        log.info("%s · FIN · %s timelines nuevos, %s sin timeline en Riot, "
+                 "%s fallidos · %s requests a Riot", region, conteo["nuevos"],
+                 conteo["no_existen"], conteo["fallidos"], cliente.pedidas)
+        return {**trabajo, **conteo, "pedidas": cliente.pedidas}
+
+    # ----------------------------------------------------------------- 12
+    @task(map_index_template="{{ task.op_kwargs['lote']['region'] }}")
+    def refine_minuto(lote: dict) -> dict:
+        """**Capa plata** del timeline: el estado de la partida al minuto N.
+
+        No toca la red: lee la partida y su timeline del bronce y corta en
+        el minuto de corte. Por eso cambiar el minuto es barato: es volver
+        a correr esta tarea, no volver a pedirle nada a Riot.
+
+        Además corre `timeline.chequeo_contra_partida` sobre cada partida:
+        cuenta los eventos de la partida **entera** y los compara con los
+        totales que trae el detalle (kills, torres, placas, monstruos,
+        wards, primera sangre). Es la prueba, con datos reales, de que los
+        eventos se están leyendo bien. El resultado viaja por XCom —son
+        catorce números, no datos— y `save_minuto` lo deja en el reporte.
+        """
+        import pandas as pd
+
+        minuto = lote["minuto"]
+        filas, sin_tl, descartes = [], 0, 0
+        chequeo = {c: {"coinciden": 0, "comparadas": 0}
+                   for c in timeline.CHEQUEOS}
+
+        for platform in lote["plataformas"]:
+            for match_id in _ids_en_bronce(platform):
+                ruta_tl = _ruta_timeline(platform, match_id)
+                if not ruta_tl.exists():
+                    sin_tl += 1
+                    continue
+                datos = leer_json(_ruta_partida(platform, match_id))
+                linea = leer_json(ruta_tl)
+                try:
+                    filas.append(timeline.estado_al_minuto(datos, linea, minuto))
+                except transform.PartidaDescartada as e:
+                    descartes += 1
+                    log.debug("%s fuera del dataset del minuto: %s",
+                              match_id, e)
+                    continue
+                for c, ok in timeline.chequeo_contra_partida(datos, linea).items():
+                    if ok is not None:
+                        chequeo[c]["comparadas"] += 1
+                        chequeo[c]["coinciden"] += int(ok)
+
+        PARTIAL_DIR.mkdir(parents=True, exist_ok=True)
+        destino = PARTIAL_DIR / f"minuto{minuto}_{lote['region']}.csv"
+        pd.DataFrame(filas, columns=schema.columnas_minuto(minuto)).to_csv(
+            destino, index=False)
+        log.info("%s · %s filas al minuto %s (%s partidas sin timeline, %s "
+                 "fuera por durar menos) -> %s", lote["region"], len(filas),
+                 minuto, sin_tl, descartes, destino.name)
+        return {"region": lote["region"], "minuto": minuto,
+                "ruta": str(destino), "filas": len(filas),
+                "sin_timeline": sin_tl, "descartadas": descartes,
+                "chequeo": chequeo}
+
+    # ----------------------------------------------------------------- 13
+    @task
+    def save_minuto(lotes: list[dict], **context) -> str:
+        """Junta las regiones, valida y escribe el dataset al minuto N.
+
+        Hace en una sola tarea lo que la rama principal reparte en tres
+        (`consolidate`, `validate`, `save`): este dataset tiene 35
+        columnas de tipos conocidos y no necesita el casteo de la plata
+        principal. Los chequeos duros son los mismos —columnas exactas,
+        clave única, nada vacío fuera de la columna que puede estarlo— y
+        si falla uno, falla el DAG.
+
+        El reporte que deja incluye el chequeo contra el detalle de la
+        partida: si una métrica no coincide nunca, el problema es cómo se
+        lee el evento y no la fuente, y eso tiene que verse antes de
+        modelar con ella.
+        """
+        import pandas as pd
+
+        lotes = list(lotes)
+        minuto = lotes[0]["minuto"]
+        columnas = schema.columnas_minuto(minuto)
+
+        partes = [pd.read_csv(lote["ruta"]) for lote in lotes
+                  if lote["filas"]]
+        if not partes:
+            raise ValueError(
+                f"Ninguna región produjo filas al minuto {minuto}. Revisá "
+                "los logs de land_timelines: lo más probable es que no se "
+                "haya bajado ningún timeline (key vencida).")
+        df = pd.concat(partes, ignore_index=True)
+        df = df.drop_duplicates("match_id").reset_index(drop=True)
+
+        problemas = []
+        if list(df.columns) != columnas:
+            problemas.append("las columnas no son las de schema.columnas_minuto")
+        if not df["match_id"].is_unique:
+            problemas.append("match_id repetidos")
+        obligatorias = [c for c in columnas
+                        if c not in schema.nulables_minuto(minuto)]
+        con_nulos = [c for c in obligatorias if df[c].isna().any()]
+        if con_nulos:
+            problemas.append(f"nulos en {con_nulos}")
+        if problemas:
+            raise ValueError(
+                "Validación fallida:\n  - " + "\n  - ".join(problemas))
+
+        chequeo = {c: {"coinciden": 0, "comparadas": 0}
+                   for c in timeline.CHEQUEOS}
+        for lote in lotes:
+            for c, v in lote["chequeo"].items():
+                chequeo[c]["coinciden"] += v["coinciden"]
+                chequeo[c]["comparadas"] += v["comparadas"]
+        for c, v in chequeo.items():
+            if v["comparadas"] and v["coinciden"] < v["comparadas"]:
+                log.warning("Chequeo %s: coincide en %s de %s partidas.",
+                            c, v["coinciden"], v["comparadas"])
+
+        _escribir_reporte_minuto(df, minuto, lotes, chequeo)
+
+        dag_run = context["dag_run"]
+        momento = dag_run.logical_date or dag_run.run_after
+        ds = momento.date().isoformat()
+
+        destino = OUTPUT_DIR / f"lol_min{minuto}_{ds}.csv"
+        df.to_csv(destino, index=False)
+        log.info("Dataset al minuto %s: %s filas x %s columnas -> %s",
+                 minuto, len(df), len(df.columns), destino)
+        return str(destino)
+
     # --------------------------------------------------------------- grafo
     espera = wait_for_riot()
     sigue = check_key()
@@ -648,6 +957,12 @@ def lol_ingest():
     espera >> sigue >> [version, plan]
 
     save(validate(consolidate(parciales)))
+
+    # La rama del timeline arranca cuando el bronce de partidas está
+    # completo y no depende de la plata principal: si una falla, la otra
+    # igual entrega su dataset.
+    lineas = land_timelines.expand(trabajo=plan_timelines(bronces))
+    save_minuto(refine_minuto.expand(lote=lineas))
 
 
 # ------------------------------------------------------------------ helpers
@@ -714,6 +1029,60 @@ def _escribir_reporte(df) -> None:
     destino = REPORTS_DIR / "calidad.md"
     destino.write_text("\n".join(lineas), encoding="utf-8")
     log.info("Reporte de calidad en %s", destino)
+
+
+def _escribir_reporte_minuto(df, minuto: int, lotes: list[dict],
+                             chequeo: dict) -> None:
+    """El reporte del dataset al minuto N, con el chequeo de los eventos."""
+    nulos = df.isna().mean()
+    con_nulos = nulos[nulos > 0]
+
+    lineas = [
+        f"# Chequeo del dataset al minuto {minuto}",
+        "",
+        f"Filas: **{len(df)}** · Columnas: **{len(df.columns)}** · "
+        f"Clave única: **{df['match_id'].is_unique}**",
+        "",
+        "## Cuántas partidas del bronce quedaron afuera, y por qué",
+        "",
+        "| Región | Filas | Sin timeline en bronce | Terminan antes del corte |",
+        "|---|---|---|---|",
+    ]
+    lineas += [f"| {lote['region']} | {lote['filas']} | "
+               f"{lote['sin_timeline']} | {lote['descartadas']} |"
+               for lote in lotes]
+    lineas += [
+        "",
+        "## Los eventos contra el detalle de la partida",
+        "",
+        ("Cada evento se cuenta sobre la partida **entera** y se compara con "
+         "el total que trae el detalle (`teams[].objectives` y los campos "
+         "de cada jugador). Si una métrica no coincide casi nunca, el evento "
+         "se está leyendo mal y esa métrica no se usa hasta corregirlo."),
+        "",
+        "| Métrica | Coinciden | Comparadas | % |",
+        "|---|---|---|---|",
+    ]
+    for c, v in chequeo.items():
+        pct = (f"{100 * v['coinciden'] / v['comparadas']:.1f}"
+               if v["comparadas"] else "—")
+        lineas.append(f"| {c} | {v['coinciden']} | {v['comparadas']} | {pct} |")
+    lineas += [
+        "",
+        "## Nulos",
+        "",
+        "```",
+        str(con_nulos) if len(con_nulos) else "Ninguna columna tiene nulos.",
+        "```",
+        "",
+        (f"`first_blood_s_m{minuto}` vacío = no hubo primera sangre antes del "
+         f"minuto {minuto}. No es un dato perdido."),
+    ]
+
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    destino = REPORTS_DIR / f"calidad_minuto{minuto}.md"
+    destino.write_text("\n".join(lineas), encoding="utf-8")
+    log.info("Reporte del minuto %s en %s", minuto, destino)
 
 
 lol_ingest()

@@ -69,6 +69,7 @@ Hay **dos familias de hosts** y confundirlas da 404:
 | E | `/lol/match/v5/matches/{matchId}` | **región** | El detalle completo de la partida. **Acá sale el target.** |
 | F | `/lol/league/v4/entries/by-puuid/{puuid}` | platform | Tier, rank, LP, wins/losses del jugador. |
 | G | `/lol/champion-mastery/v4/champion-masteries/by-puuid/{puuid}/by-champion/{championId}` | platform | Puntos de maestría del jugador con ese campeón. |
+| H | `/lol/match/v5/matches/{matchId}/timeline` | **región** | Línea de tiempo: un cuadro por minuto (`frames[].participantFrames`) y los eventos con `timestamp` en ms. Fuente del dataset al minuto N. Sin `puuid` en la URL: sirve cualquier key. Un 404 se indexa para no repetirlo. |
 
 Tiers válidos: `IRON`, `BRONZE`, `SILVER`, `GOLD`, `PLATINUM`, `EMERALD`, `DIAMOND`, `MASTER`, `GRANDMASTER`, `CHALLENGER`. Divisiones `I`–`IV`, salvo los tres apex que no tienen división.
 
@@ -105,6 +106,8 @@ por plataforma:
 ```
 
 `F` y `G` se cachean por puuid: un jugador aparece en varias partidas.
+
+Después, en una segunda pasada **por región** (`plan_timelines` → `land_timelines`), `H` para cada partida del bronce que todavía no tenga timeline. Va por región y no por plataforma porque todos esos pedidos caen en el host regional: cuatro tareas de `americas` con limitadores separados pasarían el cupo cuatro veces. Costo: 1 pedido por partida. Techo por región: `keys × 100 / 120` req/s.
 
 ## Manejo de errores
 

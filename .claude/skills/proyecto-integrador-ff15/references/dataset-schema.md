@@ -150,10 +150,36 @@ de la varianza. Las cuatro fichas verdes miden **columnas entre sí**, no contra
 ## Lo que NO está en el dataset
 
 - **Bans.** Excluidos a propósito.
-- **Cualquier variable in-game o post-partida**: kills, oro, torres, deltas por minuto. El dataset es estrictamente de condiciones iniciales.
+- **Cualquier variable in-game o post-partida**: kills, oro, torres, deltas por minuto. El dataset es estrictamente de condiciones iniciales. Lo del minuto N vive en **otro** dataset (abajo), nunca en estas 137 columnas.
 - `championLevel` de maestría: redundante con `championPoints`.
 - Tier y rank como categóricas: redundantes con `_player_elo`.
 - Duración en minutos: redundante con el target en segundos.
+
+## El dataset al minuto N (35 columnas) — aparte
+
+Agregado el 25/10/2026 por la corrección 2 del docente a la Entrega 2: si las diferencias entre equipos no alcanzaban (no alcanzaron, H9 de la E3), un dataset con el estado de la partida a los 5 y 10 minutos. Sale del **timeline** de match-v5 (endpoint H de `riot-api.md`), lo arma `include/lol/timeline.py` y lo define `schema.columnas_minuto(minuto)`. Archivo: `include/output/lol_minN_AAAA-MM-DD.csv`; la copia versionada que lee el modelado va en `notebooks/entrega-3/datos/`. Se une al principal por `match_id`.
+
+**Cambia la pregunta**: de "¿cuánto dura sabiendo cómo arranca?" a "¿cuánto dura sabiendo cómo iba en el minuto N?". No es fuga del objetivo (todo pasó antes del corte y la partida sigue en curso), pero sólo vale para partidas que llegaron al minuto N. Declararlo así.
+
+Columnas: `match_id`, `game_duration_s`, y por cada métrica `t1_{m}_mN`, `t2_{m}_mN`, `dif_{m}_mN` (diferencia absoluta: t1/t2 son arbitrarios, H3), más `t1_first_blood_mN`, `t2_first_blood_mN` (0/1) y `first_blood_s_mN`. `2 + 10×3 + 3 = 35`.
+
+| Métrica | Fuente | Regla |
+|---|---|---|
+| `gold` | primer cuadro con `timestamp` ≥ N·60.000 | suma de `totalGold` |
+| `xp` | ídem | suma de `xp` |
+| `cs` | ídem | suma de `minionsKilled + jungleMinionsKilled` |
+| `level` | ídem | **promedio** de `level` |
+| `kills` | `CHAMPION_KILL` con `timestamp` ≤ corte | equipo de `killerId`; `killerId` 0 (ejecución) no suma |
+| `towers` | `BUILDING_KILL` + `TOWER_BUILDING` | al **rival** del `teamId` del evento |
+| `plates` | `TURRET_PLATE_DESTROYED` | al **rival** del `teamId` |
+| `elite_monsters` | `ELITE_MONSTER_KILL` | `killerTeamId`, todos los tipos juntos |
+| `wards_placed` / `wards_killed` | `WARD_PLACED` / `WARD_KILL` | equipo de `creatorId` / `killerId` |
+
+El equipo de cada `participantId` sale del **detalle de la partida**, no del `puuid` (encriptado por key; partida y timeline pueden venir con keys distintas).
+
+**Lectura sin verificar al escribirla:** que `teamId` en torres y placas es el dueño de la torre. `timeline.chequeo_contra_partida` recorre la partida entera y compara contra `teams[].objectives` (kills, torres, monstruos, primera sangre), `challenges.turretPlatesTaken` (placas) y `wardsPlaced`/`wardsKilled`. El resultado queda en `reports/calidad_minutoN.md`. Una métrica que no coincide casi nunca no se usa hasta corregir el módulo.
+
+Quedan afuera: las que no pasan la admisión del principal, las que duran ≤ N minutos, las que no tienen timeline en Riot (404, indexadas en `bronze/descartadas/sin_timeline_plataforma=X.txt`) y aquellas cuyo timeline no llega al minuto. Único nulo permitido: `first_blood_s_mN` (no hubo primera sangre antes del corte).
 
 ## Precedente
 

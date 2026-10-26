@@ -101,6 +101,8 @@ Estas no son estilo, son cosas que rompen el pipeline o la nota si se ignoran:
 | **Plata** | Filas tipadas, una por partida, deduplicadas y validadas. **Es el entregable de la Entrega 1.** | `include/output/lol_AAAA-MM-DD.csv` |
 | **Oro** | Features derivadas, agregados. **No se construye acá** — es de las Unidades 3 y 4. | — |
 
+Desde el 25/10/2026 hay una **segunda rama** con las mismas capas: el timeline crudo de cada partida en `bronze/timelines/` (`land_timelines`, una tarea por región) y el dataset al minuto N en `include/output/lol_minN_AAAA-MM-DD.csv` (`refine_minuto` + `save_minuto`), aparte de las 137 columnas. Con el param `buscar_partidas_nuevas=false` el DAG sólo completa timelines de un bronce existente. Detalle en `references/dataset-schema.md` y `references/riot-api.md`.
+
 La consigna pregunta literalmente *"¿dónde guardás el dato crudo? El dataset que entregás es la capa plata; la pregunta es si además tenés el bronce."* Por eso el bronce guarda **todas** las respuestas crudas — partidas, entradas de liga, maestrías y Data Dragon — no sólo las partidas. Con eso, la plata se reconstruye 100 % offline.
 
 ## Antes de cada entrega
@@ -130,7 +132,7 @@ Leerlas cuando la tarea lo pida — no hace falta cargarlas todas de entrada.
 | `references/criterios-fuente.md` | Al defender el dataset o al discutir si algo cumple. Los 7 criterios verbatim. |
 | `references/airflow-catedra.md` | Antes de escribir o tocar un DAG. Imports de Airflow 3, argumentos del `@dag`, mapeo dinámico, sensores, branching, errores frecuentes. |
 | `references/riot-api.md` | Al tocar `include/lol/riot.py`, `seeds.py` o `ddragon.py`. Endpoints, routing, rate limits, rotación de keys y las trampas conocidas. |
-| `references/dataset-schema.md` | Al tocar `schema.py` o `transform.py`, o al explicar una columna. Las 137 columnas y cómo se deriva cada una. |
+| `references/dataset-schema.md` | Al tocar `schema.py`, `transform.py` o `timeline.py`, o al explicar una columna. Las 137 columnas, las 35 del dataset al minuto N y cómo se deriva cada una. |
 | `references/eda-hipotesis.md` | Al escribir análisis, hipótesis o gráficos. El semáforo con sus cortes, las seis casillas, las tres plantillas, los tres movimientos, el chequeo de fuga y el estilo de la cátedra. |
 
 ## Mantener esto vivo
