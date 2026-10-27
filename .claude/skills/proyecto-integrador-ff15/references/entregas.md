@@ -8,6 +8,7 @@ Fuente: `Documentacion/Kit de arranque - Proyecto Integrador 2026.pdf` y la pág
 - [Cómo funciona la evaluación](#cómo-funciona-la-evaluación)
 - [Instrucciones para la Entrega 1 (verbatim)](#instrucciones-para-la-entrega-1-verbatim)
 - [Instrucciones para la Entrega 2 (verbatim)](#instrucciones-para-la-entrega-2-verbatim)
+- [La Entrega 3 (resumen de la consigna)](#la-entrega-3-resumen-de-la-consigna)
 - [Errores de años anteriores](#errores-de-años-anteriores)
 
 ---
@@ -19,7 +20,7 @@ Fuente: `Documentacion/Kit de arranque - Proyecto Integrador 2026.pdf` y la pág
 | Definición | 12/08 | Grupo, pregunta y fuente de datos |
 | **1 · Ingeniería de datos** | **miércoles 9/9** | Pipeline automatizado que produce tu dataset |
 | **2 · Análisis exploratorio** | **miércoles 23/9** | Exploración, hipótesis y hallazgos |
-| 3 · Modelado | 14/10 | Objetivo predictivo, modelos comparados y métricas |
+| **3 · Modelado** | **miércoles 28/10** | Objetivo predictivo, modelos comparados y métricas |
 | 4 · Visualización e integración | 04/11 | Visualizaciones y aplicación funcionando |
 | Exposición final | 18/11 | Proyecto completo y demo en vivo |
 | Recuperación | 25/11 | Para los grupos que la necesiten |
@@ -220,6 +221,26 @@ Los TPs prácticos (sobre el dataset FIFA que provee la cátedra) son el entrena
 > **El método completo** —semáforo, plantillas, movimientos, estilo— está en [`eda-hipotesis.md`](eda-hipotesis.md).
 
 ---
+
+## La Entrega 3 (resumen de la consigna)
+
+Fuente: `Documentacion/Consignas de Entrega 3/` (página del campus, modificada el 14/10/2026). El Kit decía 14/10; vale el campus: **miércoles 28 de octubre, la clase completa, 25 minutos por grupo** con el docente, en privado.
+
+La pregunta: *«¿tenés un modelo que dice algo que los datos solos no decían, y podés explicar por qué es ese y no otro?»*. **El modelo que se elige acá es el que usa la aplicación de la Entrega 4.**
+
+Con objetivo (nuestro caso), antes del primer modelo: la métrica declarada, el piso (`DummyRegressor`) con la misma validación, pedazos que imitan el uso (al azar si las filas son independientes; `GroupKFold` si se repiten por entidad; `TimeSeriesSplit` si hay tiempo), y todo adentro de un pipeline. La comparación: el simple primero (lineal), al menos dos familias más con media y desvío —**si el complejo no le gana al simple por más que el desvío, se queda el simple**—, el ajuste del elegido con la tabla completa, y las columnas que se probaron y no sirvieron. El final: medido **una vez** en el test, dónde se equivoca (real contra predicho y por tramo del objetivo) y en qué se apoya (coeficientes o permutación), con el chequeo de fuga de la columna que más pesa.
+
+| Min. | Momento |
+|---|---|
+| 0–2 | Qué cambió (dos oraciones) |
+| 2–7 | El planteo |
+| 7–16 | El resultado |
+| 16–22 | Preguntas dirigidas |
+| 22–25 | Devolución |
+
+Se aprueba si: el notebook corre entero con semilla y salidas; todo está en un pipeline; métrica declarada, piso medido, ≥ 3 modelos por validación cruzada con media y desvío, el elegido ajustado, el test mirado una vez y el final leído; el grupo dice qué probó y no anduvo; las respuestas no vienen de una sola persona. Tres formas de perder los 25 minutos: el número que da demasiado bien, el zoológico, que hable uno solo.
+
+Cómo lo resolvimos: Parte IX de `docs/documentacion-proyecto.html` y `docs/guion-defensa-entrega3.pdf`.
 
 ## Errores de años anteriores
 

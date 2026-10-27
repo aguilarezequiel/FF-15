@@ -5,11 +5,21 @@ El análisis de las Unidades 2 y siguientes. Una carpeta por entrega.
 ```
 notebooks/
 ├── requirements.txt          · el stack de análisis, con versiones exactas
-└── entrega-2/
-    ├── eda_entrega2.ipynb    · el entregable de la Entrega 2, ya ejecutado
+├── entrega-2/
+│   ├── eda_entrega2.ipynb    · el entregable de la Entrega 2, ya ejecutado
+│   └── datos/
+│       └── lol_2026-09-06.csv  · 19.145 × 137, la corrida del 5–6/9
+└── entrega-3/
+    ├── modelado_entrega3.ipynb · el entregable de la Entrega 3, ya ejecutado
     └── datos/
-        └── lol_2026-09-06.csv  · 19.145 × 137, la corrida del 5–6/9
+        ├── lol_min5_2026-10-26.csv   · 19.145 × 35, estado al minuto 5
+        ├── lol_min10_2026-10-26.csv  · 19.008 × 35, el del modelo final
+        ├── lol_min15_2026-10-26.csv  · 18.878 × 35, corrido y no modelado
+        └── calidad_minutoN.md        · el chequeo de eventos de cada corrida
 ```
+
+El notebook de la Entrega 3 lee además el CSV de `entrega-2/datos/`. En Colab, los
+cuatro CSV van juntos en una carpeta `datos/`.
 
 ## Por qué el CSV está versionado acá
 
@@ -52,7 +62,9 @@ salidas guardadas**. Para regenerarlas sin abrir Jupyter:
     --ExecutePreprocessor.timeout=900 notebooks/entrega-2/eda_entrega2.ipynb
 ```
 
-Tarda alrededor de un minuto. Si alguna celda falla, `nbconvert` corta y
+Tarda alrededor de un minuto. El de la Entrega 3 se regenera igual, cambiando la ruta
+por `notebooks/entrega-3/modelado_entrega3.ipynb`, y tarda unos minutos (casi todo es
+la grilla del bosque). Si alguna celda falla, `nbconvert` corta y
 devuelve error, así que un exit code 0 es la garantía de que el notebook corre
 entero.
 

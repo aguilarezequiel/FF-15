@@ -186,7 +186,11 @@ def chequeo_contra_partida(match_data: dict, timeline: dict) -> dict:
 
     Contra qué se compara cada uno:
 
-    * kills, torres, monstruos épicos y primera sangre → `teams[].objectives`
+    * torres, monstruos épicos y primera sangre → `teams[].objectives`
+    * kills → `kills` de cada jugador, sumado. No `objectives.champion`:
+      ese total son las muertes del rival, y cuenta también las
+      ejecuciones (torre o súbdito), que no son de nadie y que acá no se
+      cuentan. Contra él, toda partida con una ejecución daba distinto.
     * placas → `challenges.turretPlatesTaken` de cada jugador, sumado
     * wards → `wardsPlaced` / `wardsKilled` de cada jugador, sumado
     """
@@ -212,7 +216,7 @@ def chequeo_contra_partida(match_data: dict, timeline: dict) -> dict:
         monstruos = [v.get("kills") for k, v in obj.items()
                      if k not in _OBJETIVOS_NO_MONSTRUO]
         esperado[team] = {
-            "kills": total_objetivo(team, "champion"),
+            "kills": total_jugadores(team, lambda p: p.get("kills")),
             "towers": total_objetivo(team, "tower"),
             "elite_monsters": (None if not obj or None in monstruos
                                else sum(monstruos)),

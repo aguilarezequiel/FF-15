@@ -13,7 +13,8 @@
 | Datasets | `lol_AAAA-MM-DD.csv` — condiciones iniciales, 137 columnas · `lol_minN_AAAA-MM-DD.csv` — estado de la partida al minuto N (timeline de match-v5), 35 columnas. Se unen por `match_id` |
 | Stack | Apache Airflow 3.3 · Astro Runtime 3.3-4 · Astro CLI · Docker |
 | Entrega 1 | miércoles 9/9, franja 14:55 – 15:15 — **presentada** |
-| Entrega 2 | miércoles 23/9, la clase completa · 20 min con el docente, en privado |
+| Entrega 2 | miércoles 23/9, la clase completa · 20 min con el docente, en privado — **presentada** |
+| Entrega 3 | miércoles 28/10 · 25 min con el docente, en privado · modelo final: `Ridge(alpha=100)` con las 137 columnas + el estado al **minuto 10** (decisión del grupo, 27/10). Es el que usa la app de la Entrega 4 |
 
 ---
 
@@ -116,6 +117,8 @@ python -m venv .venv                                    # el entorno del anális
 .venv\Scripts\pip install -r notebooks/requirements.txt
 .venv\Scripts\jupyter lab
 .venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-2/eda_entrega2.ipynb
+.venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-3/modelado_entrega3.ipynb
+python docs/generar_pdf.py guion-defensa-entrega3.html   # el guion de la defensa de la E3
 ```
 
 ## Antes de cada entrega
@@ -149,3 +152,9 @@ El método —el semáforo con sus cortes, las seis casillas de una ficha, las t
 
 - `../airflow-fifa` — proyecto de la cátedra. Se imita el estilo, **no** sus partes desactualizadas (tests rotos, README viejo); están listadas en `references/airflow-catedra.md`.
 - `../FF15` — prototipo previo del grupo, funcional pero sin Airflow. Sirve como referencia de la lógica de extracción. **Tiene API keys hardcodeadas y pusheadas a un repo público**: no copiar ese patrón, y no reutilizar esas keys.
+
+### Y para la Entrega 3
+
+El notebook `notebooks/entrega-3/modelado_entrega3.ipynb` se verifica corriéndolo entero (comando de arriba): sin celdas en error, con las salidas guardadas y `SEMILLA = 42`. Lee el CSV de condiciones iniciales con el patrón `lol_2*.csv` (en `entrega-3/datos/` también hay `lol_min*`); en Colab, los cuatro CSV van en `datos/`.
+
+Lo que no se toca sin preguntar: la partición del test (20 %, estratificada por grupo de elo, separada una vez), la regla de la cátedra para elegir (el complejo gana sólo por más que el desvío), y las columnas del minuto que quedaron fuera (placas, wards y primera sangre: ver V.8 y IX.6 del documento integral). El detalle completo está en la Parte IX; el reparto de la defensa, en `docs/guion-defensa-entrega3.pdf`.

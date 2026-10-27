@@ -120,12 +120,13 @@ la de la Entrega 2, con el análisis exploratorio y las ocho hipótesis.</p>
 <h3>Estado a la fecha de esta versión</h3>
 <table>
 <tr><th>Aspecto</th><th>Estado</th></tr>
-<tr><td>Pipeline</td><td>Trece tareas en dos ramas. Las <strong>nueve de la rama principal</strong> están verificadas en verde con datos reales de la API. Las <strong>cuatro de la rama del timeline</strong> (agregadas el 25/10) parsean y pasan los tests, pero <strong>todavía no corrieron contra Riot</strong>.</td></tr>
+<tr><td>Pipeline</td><td>Trece tareas en dos ramas. Las <strong>nueve de la rama principal</strong> están verificadas en verde con datos reales de la API. Las <strong>cuatro de la rama del timeline</strong> (agregadas el 25/10) <strong>corrieron el 26/10</strong> sobre el bronce de 19.145 partidas, en la máquina de quien lo tiene, con los minutos de corte 5, 10 y 15.</td></tr>
 <tr><td>Corridas</td><td>La recolección grande corrió del 5/9 11:53 al 6/9 09:33 (≈21 h 40 min). La corrida final que produjo el entregable tardó <strong>15 minutos</strong> de punta a punta, porque el bronce ya estaba en disco.</td></tr>
 <tr><td>Bronce acumulado</td><td><strong>19.145</strong> partidas crudas, <strong>290.654</strong> perfiles de jugador, 1.651 partidas descartadas. <strong>1,1&nbsp;GB</strong> en disco (233&nbsp;MB de partidas, 850&nbsp;MB de perfiles).</td></tr>
 <tr><td>Dataset (capa plata)</td><td><strong>19.145 filas × 137 columnas</strong>, 11&nbsp;MB. Clave única, cero nulos, ninguna columna vacía. <strong>Supera 19 veces</strong> el mínimo de 1.000 filas que pide la consigna.</td></tr>
-<tr><td>Calidad de código</td><td>18/18 tests en verde (11 del DAG y los esquemas, 7 del corte del timeline) · <code>astro dev parse</code> limpio · <code>ruff</code> sin hallazgos en el código nuevo; queda un aviso <code>B023</code> en <code>land_bronze</code>, anterior al 25/10, que es un falso positivo (la <code>lambda</code> se consume dentro de la misma vuelta del bucle).</td></tr>
-<tr><td>Rama del timeline (25/10)</td><td>Es la corrección 2 del docente a la Entrega 2: como las condiciones iniciales solas predicen poco la duración, el DAG baja también la <strong>línea de tiempo</strong> de cada partida (endpoint H) y arma un segundo dataset, <code>lol_min5_AAAA-MM-DD.csv</code>, con el estado de la partida en el <strong>minuto 5</strong>: 35 columnas, unido al principal por <code>match_id</code>. Las 137 columnas no cambian. <strong>Falta correrlo</strong> sobre el bronce de 19.145 partidas, en la máquina de quien lo tiene. Ver III.4, IV.4.6, IV.5, V.8 y VI.8.</td></tr>
+<tr><td>Calidad de código</td><td>19 tests: 11 del DAG y los esquemas, y 8 del corte del timeline. Los 8 del timeline pasan después del cambio del 27/10 (corridos con <code>pytest</code> en el venv, porque <code>timeline.py</code> no importa Airflow); <strong>la corrida completa con <code>astro dev pytest</code> no se repitió</strong> después de ese cambio · <code>astro dev parse</code> limpio · <code>ruff</code> sin hallazgos en el código nuevo; queda un aviso <code>B023</code> en <code>land_bronze</code>, anterior al 25/10, que es un falso positivo (la <code>lambda</code> se consume dentro de la misma vuelta del bucle).</td></tr>
+<tr><td>Rama del timeline (25/10)</td><td>Es la corrección 2 del docente a la Entrega 2: como las condiciones iniciales solas predicen poco la duración, el DAG baja también la <strong>línea de tiempo</strong> de cada partida (endpoint H) y arma un segundo dataset, <code>lol_minN_AAAA-MM-DD.csv</code>, con el estado de la partida en el <strong>minuto N</strong>: 35 columnas, unido al principal por <code>match_id</code>. Las 137 columnas no cambian. Corrió el 26/10: <strong>19.145 filas al minuto 5, 19.008 al 10 y 18.878 al 15</strong>, ninguna partida sin timeline. Los tres CSV y sus reportes están versionados en <code>notebooks/entrega-3/datos/</code>. El chequeo de eventos encontró <strong>tres problemas</strong>, todos explicados en V.8: los wards cuentan objetos que dejan habilidades de campeones, las placas no se pudieron verificar, y el chequeo de asesinatos comparaba contra un total que incluye las ejecuciones (corregido el 27/10, falta volver a correr la plata para ver el número nuevo). Ver III.4, IV.4.6, IV.5, V.8 y VI.8.</td></tr>
+<tr><td>Modelado (Entrega 3, 28/10)</td><td><strong>Completo.</strong> <code>notebooks/entrega-3/modelado_entrega3.ipynb</code>, 126 celdas, ejecutado sin errores, con las salidas guardadas y la semilla 42. Sin el minuto, el mejor modelo —<code>Ridge(alpha=1000)</code>— erra 315,5 s en el test contra 325,5 del piso: las condiciones iniciales predicen muy poco. <strong>El modelo final suma el estado de la partida al minuto 10</strong> (decisión del grupo, 27/10): <code>Ridge(alpha=100)</code>, 297,3 ± 3,0 s en validación cruzada y <strong>294,7 s en el test</strong>, contra 317,6 del piso y 307,0 del mejor sin el minuto, sobre las mismas 3.798 partidas. El minuto 5 se midió y no mejora por más que el desvío. Placas, wards y primera sangre quedan fuera. Ver la Parte IX.</td></tr>
 <tr><td>Bug corregido (2026-09-05)</td><td><code>land_bronze</code> fallaba con <code>HTTP 400</code> en las seis plataformas: el pool de keys rotaba de key en cada request individual, y un <code>puuid</code> sólo lo puede leer la key que lo emitió. Fix: afinidad key↔puuid en <code>RiotClient</code> — ver 4.1.</td></tr>
 <tr><td>Incidente superado (2026-09-06)</td><td>La máquina entró en hibernación a las 03:19 con cuatro tareas <code>land_bronze</code> a mitad de camino. Los procesos murieron; <strong>el bronce no perdió un solo archivo</strong>. Airflow relanzó las tareas solo a las 07:16 y el dataset se generó igual. Es la mejor evidencia práctica de por qué el bronce va a disco y es append-only — ver 7.7.</td></tr>
 <tr><td>Limitación conocida</td><td><strong>Sesgo de muestreo por tier.</strong> Cada plataforma quedó con partidas de un rango casi puro y distinto (elo medio de 1.627 en NA1 a 3.231 en LA1). Está medido y declarado en 7.5; no invalida el dataset, pero condiciona qué conclusiones se pueden sacar de él.</td></tr>
@@ -135,7 +136,7 @@ la de la Entrega 2, con el análisis exploratorio y las ocho hipótesis.</p>
 <tr><td>Perfil del objetivo</td><td>Asimetría <strong>−0,039</strong> y curtosis 0,579: simétrico, <strong>no necesita transformarse</strong>. Sin desbalance —la banda más poblada, 25 a 30 minutos, es el 29,9 %—. Truncado a izquierda en 300 s por el filtro de remakes, y con un escalón de <strong>714 partidas</strong> en los 900 s: el minuto 15, cuando el juego habilita la rendición. Ver 8.2.</td></tr>
 <tr><td>Decisiones de columna tomadas</td><td>De las 137 columnas, <strong>82 no entran como feature y 54 sí</strong>, más el objetivo. Treinta salen por las fichas: los diez <code>player_winrate</code> (H6), los diez <code>is_main</code> y los dos <code>mains_count</code> (H2), los cuatro <code>avg_defense</code> y <code>avg_magic</code> (H7), los dos <code>total_base_armor</code> (H5) y los dos <code>count_flash</code> (H8). Salen además los diez <code>champ_name</code> por redundar con <code>champ_id</code>, los cuarenta códigos <code>sum1</code>, <code>sum2</code>, <code>rune_primary</code> y <code>rune_sub</code>, y <code>match_id</code> y <code>roles_inferidos</code>. De las 34 columnas de agregados de equipo quedan 24, y H3 las colapsa en <strong>12 sumas</strong>. Ver 8.5.</td></tr>
 <tr><td>Decisión que se cerró</td><td>La columna <code>es_unranked</code> que quedaba pendiente en 5.5 <strong>no hace falta</strong> para este objetivo: las partidas con jugadores imputados duran 38 segundos más, separación 0,067, zona roja. Se midió sin ficha propia en una versión anterior del notebook; esa celda se quitó al simplificarlo y el número queda como respuesta oral. Ver 8.5.</td></tr>
-<tr><td>Lo que falta</td><td>Nada bloqueante para la Entrega 2. Queda ensayar la defensa con el guion <code>docs/guion-defensa-entrega2.pdf</code> (reparto en 8.6), subir a Colab la versión reordenada del notebook, y resolver los cuatro pendientes de 8.7 —entre ellos, verificar contra el bronce las 26 partidas con 9 o 10 jugadores de elo imputado. Para la Entrega 3: correr la rama del timeline sobre el bronce grande y <strong>leer el chequeo de eventos del reporte antes de modelar</strong> con esos datos (VI.8).</td></tr>
+<tr><td>Lo que falta</td><td>Nada bloqueante para la Entrega 3. Queda ensayar la defensa con el guion <code>docs/guion-defensa-entrega3.pdf</code> (reparto en IX.8), y dejar el notebook abierto en Colab con las salidas guardadas. Fuera de la entrega: volver a correr la plata del timeline para ver el número nuevo del chequeo de asesinatos, y pedir el tiempo de esa corrida y el peso de <code>bronze/timelines/</code> (Cierre).</td></tr>
 </table>
 
 <div class="toc">
@@ -231,6 +232,19 @@ la de la Entrega 2, con el análisis exploratorio y las ocho hipótesis.</p>
       <li>Banco de preguntas probables</li>
     </ol>
   </li>
+  <li>Parte IX · La Entrega 3: el modelado
+    <ol>
+      <li>Qué pide la Entrega 3 y qué se entrega</li>
+      <li>Las dos correcciones de la Entrega 2</li>
+      <li>El planteo: métrica, piso, partición y pipeline</li>
+      <li>La comparación y el ajuste, sin el minuto</li>
+      <li>El test del modelo sin el minuto, dónde se equivoca y en qué se apoya</li>
+      <li>El estado al minuto 10: el modelo final</li>
+      <li>Lo que no anduvo, y lo que quedó inconcluso</li>
+      <li>Cómo se estructuran los 25 minutos, y el reparto</li>
+      <li>Banco de preguntas probables</li>
+    </ol>
+  </li>
   <li>Anexo · Glosario</li>
 </ol>
 </div>
@@ -272,7 +286,7 @@ explorarlos, modelarlos, visualizarlos y comunicar los hallazgos en una aplicaci
 <tr><td>Definición</td><td>12/08</td><td>Grupo, pregunta y fuente de datos</td></tr>
 <tr><td><strong>1 · Ingeniería de datos</strong></td><td><strong>miércoles 9/9</strong></td><td>Pipeline automatizado que produce tu dataset</td></tr>
 <tr><td><strong>2 · Análisis exploratorio</strong></td><td><strong>23/09</strong></td><td>Exploración, hipótesis y hallazgos</td></tr>
-<tr><td>3 · Modelado</td><td>14/10</td><td>Objetivo predictivo, modelos comparados y métricas</td></tr>
+<tr><td><strong>3 · Modelado</strong></td><td><strong>miércoles 28/10</strong></td><td>Objetivo predictivo, modelos comparados y métricas. 25 minutos con el docente. El Kit de arranque decía 14/10; vale la del campus (IX.1)</td></tr>
 <tr><td>4 · Visualización e integración</td><td>04/11</td><td>Visualizaciones y aplicación funcionando</td></tr>
 <tr><td>Exposición final</td><td>18/11</td><td>Proyecto completo y demo en vivo</td></tr>
 <tr><td>Recuperación</td><td>25/11</td><td>Para los grupos que la necesiten</td></tr>
@@ -1179,7 +1193,7 @@ vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más 
 │   │   ├── seeds.py            93 líneas · recorrido del ranking
 │   │   ├── schema.py          138 líneas · las 137 columnas, las 35 del minuto N
 │   │   ├── transform.py       191 líneas · JSON crudo → fila
-│   │   └── timeline.py        241 líneas · timeline crudo → fila al minuto N
+│   │   └── timeline.py        245 líneas · timeline crudo → fila al minuto N
 │   └── output/                           · SALIDAS · gitignoreado
 │       ├── bronze/                       · capa bronce
 │       ├── silver/_parciales/            · plata por plataforma
@@ -1191,21 +1205,23 @@ vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más 
 ├── notebooks/                            · EL ANÁLISIS (Unidades 2+)
 │   ├── requirements.txt                  · el stack de análisis, versiones exactas
 │   ├── entrega-2/
-│   │   ├── eda_entrega2.ipynb  174 celdas · el EDA, ejecutado
+│   │   ├── eda_entrega2.ipynb  167 celdas · el EDA, ejecutado
 │   │   └── datos/lol_2026-09-06.csv      · el CSV congelado, versionado
 │   └── entrega-3/
-│       ├── modelado_entrega3.ipynb       · el modelado, ejecutado
-│       └── datos/lol_min5_AAAA-MM-DD.csv · el dataset al minuto 5, versionado (cuando llegue)
+│       ├── modelado_entrega3.ipynb 126 celdas · el modelado, ejecutado
+│       └── datos/                        · lol_min5, lol_min10 y lol_min15 (2026-10-26),
+│                                           con sus calidad_minutoN.md, versionados
 │
 ├── tests/
 │   ├── dags/test_dag_integrity.py 100 líneas · 11 tests
-│   └── test_timeline.py       125 líneas · 7 tests, sin Airflow
+│   └── test_timeline.py       137 líneas · 8 tests, sin Airflow
 │
 ├── docs/                                 · LA DOCUMENTACIÓN INTEGRAL
 │   ├── documentacion-proyecto.html       · este documento (fuente editable)
-│   ├── documentacion-proyecto.pdf        · este documento (89 páginas)
+│   ├── documentacion-proyecto.pdf        · este documento (101 páginas)
 │   ├── informe-sesgo-muestreo.{html,pdf} · el anexo sobre el sesgo por tier
 │   ├── guion-defensa-entrega2.{html,pdf} · el guión de la defensa de la Entrega 2
+│   ├── guion-defensa-entrega3.{html,pdf} · el guión de la defensa de la Entrega 3
 │   └── generar_pdf.py                    · regenera el PDF con Chrome
 │
 └── Documentacion/                        · material de la cátedra</div>
@@ -1643,7 +1659,7 @@ solo pedido.</p>
   igual; lo que cambió es que ahora es visible.</strong></p>
 </div>
 
-<h4>4.6 <code>timeline.py</code> · 241 líneas · del timeline crudo al minuto N</h4>
+<h4>4.6 <code>timeline.py</code> · 245 líneas · del timeline crudo al minuto N</h4>
 
 <p>Es puro, como <code>transform.py</code>: recibe la partida y su línea de tiempo tal como las guardó
 el bronce y devuelve una fila de <code>schema.columnas_minuto</code>. El <strong>minuto de corte es un
@@ -1672,11 +1688,25 @@ y el <code>puuid</code> viene encriptado distinto para cada key (la trampa del 4
   <strong>dueño</strong> de la torre —el que la pierde— y le anota el punto al rival. Al escribirlo no
   había un timeline real a mano para confirmarlo, así que en vez de confiar se agregó
   <code>chequeo_contra_partida</code>: recorre la partida <strong>entera</strong> y compara cada conteo
-  con el total que trae el detalle de la partida —kills, torres, monstruos y primera sangre contra
-  <code>teams[].objectives</code>; placas contra <code>challenges.turretPlatesTaken</code>; wards contra
-  <code>wardsPlaced</code> y <code>wardsKilled</code>—. Si una lectura estuviera al revés, esa métrica no
-  coincidiría en ninguna partida, y se vería en el reporte del minuto (VI.8). Hay un test que lo
-  prueba: dar vuelta las torres en un caso sintético hace saltar el chequeo.</p>
+  con el total que trae el detalle de la partida —torres, monstruos y primera sangre contra
+  <code>teams[].objectives</code>; kills contra la suma de <code>kills</code> de los jugadores; placas
+  contra <code>challenges.turretPlatesTaken</code>; wards contra <code>wardsPlaced</code> y
+  <code>wardsKilled</code>—. Si una lectura estuviera al revés, esa métrica no coincidiría en ninguna
+  partida, y se vería en el reporte del minuto (VI.8). Hay un test que lo prueba: dar vuelta las torres
+  en un caso sintético hace saltar el chequeo. <strong>Con datos reales, las torres coincidieron en el
+  100 % de las partidas</strong>: la lectura del <code>teamId</code> como dueño de la torre es la
+  correcta (V.8).</p>
+</div>
+
+<div class="nota">
+  <span class="etiqueta">Lo que enseñó la primera corrida: un chequeo que falla no siempre es una lectura mala</span>
+  <p>Hasta el 27/10 los kills se comparaban contra <code>teams[].objectives.champion.kills</code>, y
+  coincidían en el 84,7 % de las partidas. En las 20 partidas de cola 420 del bronce local, ese total
+  coincide siempre con las <strong>muertes del rival</strong>, y en 4 de los 40 equipos supera por uno a
+  la suma de los kills de sus jugadores: cuenta las ejecuciones, que no son de nadie y que el módulo, a
+  propósito, no cuenta. El error estaba en el total de referencia, no en la lectura del evento. El
+  chequeo ahora compara contra los kills de los jugadores; el porcentaje nuevo sale la próxima vez que
+  se corra la plata. La misma duda queda abierta para las placas (V.8).</p>
 </div>
 
 <p>Dos decisiones más, que salen de la misma regla de no mentir con un cero:</p>
@@ -1922,13 +1952,14 @@ coincide en todas las partidas, además lo deja como <em>warning</em> en el log.
 <p>Los dos últimos son los más valiosos: son <em>tests de regresión</em> sobre bugs reales. Si alguien
 en el futuro simplifica esa lógica sin entenderla, el test lo frena.</p>
 
-<h4><code>tests/test_timeline.py</code> · 7 tests</h4>
+<h4><code>tests/test_timeline.py</code> · 8 tests</h4>
 <p>No importa Airflow —<code>timeline.py</code> es puro—, así que se prueba con una partida y un
 timeline sintéticos armados con la forma de match-v5. Verifica que se tome el primer cuadro que alcanza
 el corte, que los eventos posteriores al corte no cuenten, que una ejecución (<code>killerId</code> 0)
 no sea primera sangre, que sin primera sangre antes del corte el segundo quede vacío, que una partida
 más corta que el corte quede afuera, y que el chequeo contra la partida coincida cuando todo está bien
-y <strong>salte cuando las torres se leen al revés</strong>. Lo que no puede verificar un test
+y <strong>salte cuando las torres se leen al revés</strong>, y que los asesinatos se comparen contra los
+de los jugadores y no contra <code>objectives.champion</code>, que incluye las ejecuciones. Lo que no puede verificar un test
 sintético es que la forma real de la fuente sea ésa: eso lo verifica el chequeo con datos reales.</p>
 
 <div class="nota">
@@ -2271,8 +2302,9 @@ partida basura se volvería a bajar cada vez que otro jugador semilla la mencion
 
 <p>Es un <strong>segundo dataset</strong>, aparte del de condiciones iniciales. Lo pidió el docente como
 corrección 2 de la Entrega 2: si las diferencias entre equipos no alcanzaban para predecir la duración
-—y no alcanzaron—, armar un dataset con el estado de la partida a los 5 y a los 10 minutos. Se empieza
-por el minuto 5; el 10 sale de volver a correr la plata con <code>minuto_corte=10</code>.</p>
+—y no alcanzaron—, armar un dataset con el estado de la partida a los 5 y a los 10 minutos. Cada minuto
+sale de volver a correr la plata con otro <code>minuto_corte</code>, sin pedir nada a Riot. El 26/10 se
+corrieron el 5, el 10 y el 15.</p>
 
 <div class="aviso">
   <span class="etiqueta">Cambia la pregunta, y hay que decirlo</span>
@@ -2321,12 +2353,51 @@ diferencia no significa nada. Las tres columnas que completan las 35 son de la p
 antes del minuto 5, no hay segundo que anotar. No es un dato perdido, es la ausencia del evento, y las
 dos banderas valen 0. La validación falla si aparece un nulo en cualquier otra columna.</p>
 
-<div class="nota">
-  <span class="etiqueta">Lo que todavía no sabemos de este dataset</span>
-  <p>Cuántas filas va a tener, cuánto pesa el bronce de timelines y si las lecturas de los eventos
-  coinciden con el detalle de la partida: todo eso se mide en la primera corrida sobre el bronce
-  grande y se anota acá. Hasta entonces, esos números <strong>no existen</strong> y no hay que citarlos.</p>
+<h4>La primera corrida (26/10)</h4>
+
+<p>Corrió sobre el bronce de 19.145 partidas, en la máquina de quien lo tiene, con tres minutos de
+corte. Los números salen de los tres reportes <code>calidad_minutoN.md</code>, versionados en
+<code>notebooks/entrega-3/datos/</code>:</p>
+
+<table>
+<tr><th>Minuto</th><th>Filas</th><th>Sin timeline en bronce</th><th>Terminan antes del corte</th><th>Clave única</th></tr>
+<tr><td>5</td><td>19.145</td><td>0</td><td>0</td><td>sí</td></tr>
+<tr><td>10</td><td>19.008</td><td>0</td><td>137</td><td>sí</td></tr>
+<tr><td>15</td><td>18.878</td><td>0</td><td>267</td><td>sí</td></tr>
+</table>
+
+<p>Al minuto 5 hay seis columnas constantes: torres y monstruos épicos valen cero en todas las partidas.
+<code>first_blood_s</code> está vacía en el 1,2 % de las partidas al minuto 5 y en una sola al minuto 10.</p>
+
+<p><strong>El chequeo de los eventos contra el detalle de la partida</strong>, sobre la partida entera
+(por eso da casi igual en los tres reportes):</p>
+
+<table>
+<tr><th>Métrica</th><th>Coinciden</th><th>Qué significa</th></tr>
+<tr><td><code>towers</code></td><td>100 %</td><td>La lectura del <code>teamId</code> como dueño de la torre es correcta.</td></tr>
+<tr><td><code>elite_monsters</code></td><td>100 %</td><td>Correcta.</td></tr>
+<tr><td><code>first_blood</code></td><td>99,8 %</td><td>Correcta.</td></tr>
+<tr><td><code>kills</code></td><td>84,7 %</td><td>El total de referencia estaba mal elegido: <code>objectives.champion</code> cuenta las ejecuciones y el módulo no (IV.4.6). Corregido el 27/10; falta el número nuevo.</td></tr>
+<tr><td><code>wards_killed</code></td><td>79,5 %</td><td>Contaminada: ver abajo.</td></tr>
+<tr><td><code>wards_placed</code></td><td>29,5 %</td><td>Contaminada: ver abajo.</td></tr>
+<tr><td><code>plates</code></td><td>0,3–0,6 %</td><td><strong>Sin verificar</strong>: no se sabe si el error está en la lectura del evento o en el total de referencia (<code>challenges.turretPlatesTaken</code>). No se usa.</td></tr>
+</table>
+
+<div class="aviso">
+  <span class="etiqueta">Los wards cuentan objetos que dejan las habilidades de algunos campeones</span>
+  <p>Otros desarrolladores que trabajan con la API reportan que habilidades como los hongos de Teemo
+  o las trampas de Jhin y Nidalee llegan como eventos <code>WARD_PLACED</code>, con el tipo de ward
+  <code>UNDEFINED</code> (RiotGames/developer-relations, issue 96; Minonka, PR 131). El módulo cuenta
+  todos los eventos sin mirar el tipo. Nuestros datos lo confirman: al minuto 10, un equipo con
+  <strong>Warwick «coloca» 206,6 wards</strong>, contra una media de 30,2; con Yorick, 125,2; con Zyra,
+  109,0. El rival de Illaoi «destruye» 16,4 wards, contra 2,4 de media. No se verificó qué objeto
+  genera cada campeón. La corrección sería filtrar los eventos por tipo de ward en
+  <code>timeline.py</code> y volver a correr la plata. No se hizo: ninguna columna de wards se mueve con
+  la duración (|Pearson| ≤ 0,03), así que quedaron fuera del modelo.</p>
 </div>
+
+<p><strong>Lo que todavía no se midió:</strong> cuánto tardó la corrida y cuánto pesa
+<code>bronze/timelines/</code>. Hay que pedírselo a quien corrió y anotarlo acá y en VI.8.</p>
 
 <h2 class="parte"><span class="n">Parte VI</span>Guía de ejecución</h2>
 
@@ -2375,7 +2446,7 @@ Added Connection: riot_api</pre>
 <tr><td><code>astro dev stop</code></td><td>Apagarlo sin borrar nada.</td></tr>
 <tr><td><code>astro dev restart</code></td><td><strong>Sólo</strong> si se tocó <code>requirements.txt</code>, <code>packages.txt</code>, el <code>Dockerfile</code> o <code>airflow_settings.yaml</code>. Cambiar un <code>.py</code> no lo necesita.</td></tr>
 <tr><td><code>astro dev parse</code></td><td>Verificar que los DAGs no tengan errores de sintaxis.</td></tr>
-<tr><td><code>astro dev pytest</code></td><td>Correr los 18 tests.</td></tr>
+<tr><td><code>astro dev pytest</code></td><td>Correr los 19 tests.</td></tr>
 <tr><td><code>astro dev logs -f</code></td><td>Ver los logs de los contenedores.</td></tr>
 </table>
 
@@ -2676,7 +2747,9 @@ unos 15 minutos), así que deja los dos datasets.</p>
   detalle de la partida»</strong>. Es lo primero. Si una métrica coincide en el 100 % o cerca, la
   lectura del evento es correcta. Si coincide <strong>casi nunca</strong>, la lectura está mal
   —probablemente al revés— y esa métrica <strong>no se usa</strong> hasta corregir
-  <code>timeline.py</code>, que se arregla y se reprocesa sin volver a pedir nada.</li>
+  <code>timeline.py</code>, que se arregla y se reprocesa sin volver a pedir nada. Antes de corregir,
+  revisar también el total contra el que se compara: en la primera corrida, los kills fallaban porque
+  la referencia contaba las ejecuciones, no por un error de lectura (V.8).</li>
   <li>Cuántas partidas quedaron sin timeline o afuera por durar menos: la primera tabla del mismo
   reporte.</li>
   <li>El peso de <code>bronze/timelines/</code>, para anotarlo en V.7.</li>
@@ -2686,8 +2759,9 @@ unos 15 minutos), así que deja los dos datasets.</p>
 <p>Como <code>include/output/</code> está gitignoreado, el CSV que sale vive sólo en la máquina de quien
 corrió. Se copia a <strong><code>notebooks/entrega-3/datos/</code></strong> y se versiona, igual que el
 CSV congelado de la Entrega 2 viaja en <code>notebooks/entrega-2/datos/</code>: así el modelado corre sin
-Airflow y en Colab. Conviene versionar al lado el reporte <code>calidad_minuto5.md</code>, que es la
-evidencia de que los eventos se leyeron bien.</p>
+Airflow y en Colab. Conviene versionar al lado el reporte <code>calidad_minutoN.md</code>, que es la
+evidencia de cómo se leyeron los eventos. <strong>Hecho el 27/10</strong> con los minutos 5, 10 y 15 de
+la corrida del 26/10.</p>
 
 <h2 class="parte"><span class="n">Parte VII</span>La defensa de la Entrega 1</h2>
 
@@ -3567,6 +3641,331 @@ predecir»:</p>
 <tr><td>«¿Por qué la correlación entre servidores da verde y la de partidas da rojo?»</td><td>Porque son dos preguntas distintas. La de servidores compara seis promedios y responde «los servidores donde se juega mejor tienen partidas más cortas en promedio»; con seis puntos eso puede ser casualidad. Para predecir <em>una</em> partida manda el −0,161. Por servidor, partida a partida, va de −0,014 en NA1 a −0,254 en KR. Es respuesta oral: el control se quitó del notebook.</td></tr>
 </table>
 
+<h2 class="parte"><span class="n">Parte IX</span>La Entrega 3: el modelado</h2>
+
+<h3>1. Qué pide la Entrega 3 y qué se entrega</h3>
+
+<p>La Entrega 2 preguntaba si sabíamos qué tiene adentro el dataset. La Entrega 3 pregunta otra cosa,
+con las palabras de la consigna: <strong>«¿tenés un modelo que dice algo que los datos solos no decían,
+y podés explicar por qué es ese y no otro?»</strong>. Lo que se corrige no es el número final: «un
+modelo modesto, bien medido y bien explicado vale más que uno brillante que nadie sabe de dónde
+salió». Y una regla que ata esta entrega a la siguiente: <strong>el modelo que se elige acá es el que
+va a usar la aplicación de la Entrega 4</strong>.</p>
+
+<p>Se presenta el <strong>miércoles 28 de octubre</strong>: 25 minutos con el docente, en privado. El
+Kit de arranque decía 14/10; vale la fecha del campus, igual que en la Entrega 1.</p>
+
+<p>Nuestro proyecto tiene objetivo, así que es el caso «con objetivo» de la consigna, y se aprueba
+si se cumplen estas condiciones:</p>
+<ul>
+  <li>el notebook corre entero, con una semilla y las salidas guardadas;</li>
+  <li>todo lo que se le hace a los datos está adentro de un pipeline;</li>
+  <li>la métrica está declarada y el piso, medido;</li>
+  <li>hay al menos tres modelos comparados por validación cruzada, con media y desvío;</li>
+  <li>el elegido está ajustado, el test se miró una vez y el modelo final está leído;</li>
+  <li>el grupo puede decir qué probó y no anduvo, y las respuestas no vienen de una sola persona.</li>
+</ul>
+
+<p>El entregable es <strong><code>notebooks/entrega-3/modelado_entrega3.ipynb</code></strong>: 126
+celdas, ejecutado de arriba a abajo sin errores, con las salidas guardadas y la semilla
+<code>SEMILLA = 42</code> definida en la primera celda de código y pasada a todo lo que la acepta.
+Tiene trece secciones, de la 0 a la 12, y un cierre.</p>
+
+<div class="arbol">notebooks/
+├── requirements.txt                  · el mismo venv de la Entrega 2
+├── entrega-2/datos/lol_2026-09-06.csv · las 137 columnas, el mismo CSV congelado
+└── entrega-3/
+    ├── modelado_entrega3.ipynb       · el entregable, ejecutado
+    └── datos/
+        ├── lol_min5_2026-10-26.csv   · 19.145 × 35
+        ├── lol_min10_2026-10-26.csv  · 19.008 × 35 — el que usa el modelo final
+        ├── lol_min15_2026-10-26.csv  · 18.878 × 35 — corrido, no modelado
+        └── calidad_minuto{5,10,15}.md · el chequeo de eventos de cada corrida</div>
+
+<pre>.venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-3/modelado_entrega3.ipynb</pre>
+
+<p>Se ejecuta entero en unos minutos, casi todo en la grilla del bosque. La primera celda busca el CSV
+de condiciones iniciales con el patrón <code>lol_2*.csv</code> y no con <code>lol_*.csv</code>, porque
+en <code>entrega-3/datos/</code> también hay archivos <code>lol_min*</code>, y el patrón viejo se habría
+quedado con uno de ellos.</p>
+
+<div class="nota">
+  <span class="etiqueta">En Colab hacen falta los dos CSV en la misma carpeta</span>
+  <p>En Colab el notebook busca todo en <code>datos/</code>: el de condiciones iniciales
+  (<code>lol_2026-09-06.csv</code>) y los del minuto. Si hubiera que re-ejecutarlo, hay que subir los
+  cuatro CSV a esa carpeta. En la defensa no se ejecuta nada: las salidas ya están guardadas.</p>
+</div>
+
+<h3>2. Las dos correcciones de la Entrega 2</h3>
+
+<p>El docente marcó dos cosas, y la segunda era el plan B por si la primera no funcionaba.</p>
+
+<table>
+<tr><th>Corrección</th><th>Qué se hizo</th><th>Qué dio</th></tr>
+<tr><td><strong>1.</strong> Columnas de diferencias entre equipos conocidas antes de jugar, una
+hipótesis nueva sobre ellas, y todo el análisis por grupo de elo</td>
+<td>Veinte diferencias <code>|t1 − t2|</code>, en valor absoluto porque el lado es arbitrario (H3):
+los 17 agregados de equipo, más elo, winrate y log-maestría promediados por equipo. La ficha
+<strong>H9</strong>, «cuanto más desparejos, más corta». Tres grupos por elo medio de la partida, con
+los cortes del proxy de elo (Platino arranca en 2.000 y Master en 2.900).</td>
+<td><strong>Refutada</strong>, en total y en los tres grupos: |Pearson| máximo de 0,064 (la diferencia
+de elo) sobre todas las partidas, y de 0,100 por grupo (la de winrate, en Hierro–Oro). Las veinte,
+en rojo. Adentro del modelo tampoco suman: sacarlas lo empeora 0,4 s, con un desvío de 4,5.</td></tr>
+<tr><td><strong>2.</strong> Un dataset con el estado de la partida a los 5 y a los 10 minutos</td>
+<td>La rama del timeline del DAG (V.8), corrida el 26/10. Los minutos 5 y 10 se unen a las 137
+columnas en la Sección 11 del notebook.</td>
+<td><strong>El minuto 10 mejora el modelo por cinco desvíos</strong>, y el minuto 5 no. El proyecto se
+queda con el minuto 10 (IX.6).</td></tr>
+</table>
+
+<p>Los grupos de elo quedan parejos: <strong>6.559 partidas en Hierro–Oro, 5.609 en
+Platino–Diamante y 6.977 en Master–Challenger</strong>, con duraciones medianas de 1.821, 1.765 y
+1.679 segundos. Hay dos salvedades que conviene saber decir:</p>
+<ul>
+  <li>Sólo el 40,4 % de las partidas tiene a los diez jugadores dentro del mismo grupo, porque el
+  emparejamiento mezcla niveles vecinos.</li>
+  <li>El 0,5 % de los lugares de jugador tiene el elo por defecto, 1500, y por construcción suma
+  hacia Hierro–Oro.</li>
+</ul>
+
+<h3>3. El planteo: métrica, piso, partición y pipeline</h3>
+
+<table>
+<tr><th>Decisión</th><th>Qué se eligió</th><th>Por qué</th></tr>
+<tr><td>La métrica</td><td><strong>MAE</strong>, en segundos. R² al lado, como lectura secundaria.</td>
+<td>Se lee en las unidades del objetivo («le erramos por tantos segundos») y trata igual un error en
+cualquier tramo: en este problema ningún tramo de la duración es más caro que otro.</td></tr>
+<tr><td>El piso</td><td><code>DummyRegressor(strategy="median")</code>: <strong>328,4 ± 4,9
+segundos</strong> en validación cruzada.</td><td>Con el MAE, la constante que menos erra es la
+mediana. Por grupo, el piso no es el mismo: 364,9 s en Hierro–Oro, 309,0 en Platino–Diamante y 309,7
+en Master–Challenger. Cada grupo se compara contra el suyo.</td></tr>
+<tr><td>El test</td><td>20 %, separado <strong>una sola vez</strong>, con <code>random_state</code> y
+estratificado por grupo de elo: 3.829 partidas.</td><td>Como el resultado se lee por grupo, ningún
+grupo puede quedar con menos partidas de prueba por azar.</td></tr>
+<tr><td>La validación</td><td><code>KFold</code> de cinco pedazos, <strong>al azar</strong>, sobre el
+entrenamiento.</td><td>Una fila es una partida y la clave no se repite; no hay fecha en el dataset,
+así que no hay «antes y después» para un <code>TimeSeriesSplit</code>.</td></tr>
+<tr><td>El pipeline</td><td><code>derivar</code> (dos transformadores propios unidos con
+<code>FeatureUnion</code>) → <code>preparar</code> (mediana y escalado para las numéricas, one-hot
+para la plataforma) → <code>modelo</code>.</td><td>La consigna lo pide sin excepciones: lo que se
+calcula afuera del pipeline, sobre el dataset entero, ya vio el test.</td></tr>
+</table>
+
+<div class="aviso">
+  <span class="etiqueta">La limitación de la validación, declarada</span>
+  <p>Lo que sí se repite y no está en las columnas es <strong>el jugador semilla</strong>: el DAG baja
+  hasta 15 partidas de cada jugador que toma de la escalera, así que un mismo jugador puede quedar de
+  los dos lados de un corte. Se corregiría con <code>GroupKFold</code>, pero el identificador del
+  jugador semilla no llegó al CSV. Se declara y se vigila: si hubiera inflado la validación, el test
+  saldría peor que ella. No pasó, ni sin el minuto (315,5 contra 319,3) ni con él (294,7 contra
+  297,3).</p>
+</div>
+
+<p>Lo que entra al modelo sale de la tabla de candidatas de la Entrega 2 (VIII.5): <strong>35 columnas
+derivadas</strong>, que son las 12 sumas <code>t1 + t2</code> de agregados (H3), el elo medio de la
+partida (H4), la log-maestría media (H2), la plataforma y las 20 diferencias de H9. Después del
+one-hot son 40. No entran los <code>champ_id</code> (173 valores por posición, ninguna composición
+repetida), los hechizos y runas como códigos, ni <code>roles_inferidos</code>.</p>
+
+<h3>4. La comparación y el ajuste, sin el minuto</h3>
+
+<table>
+<tr><th>Familia (valores por defecto)</th><th>MAE cv</th><th>Desvío</th><th>MAE train</th><th>Lectura</th></tr>
+<tr><td>Piso (mediana)</td><td>328,4</td><td>4,9</td><td>328,4</td><td>el rival</td></tr>
+<tr><td><strong>Regresión lineal (Ridge)</strong></td><td><strong>319,4</strong></td><td>4,5</td><td>318,3</td><td>le gana al piso por 9 s, dos desvíos; R² 0,051</td></tr>
+<tr><td>Árbol de decisión</td><td>467,8</td><td>5,4</td><td>0,0</td><td>memoriza: 139 s peor que el piso</td></tr>
+<tr><td>Random forest</td><td>321,0</td><td>3,9</td><td>118,6</td><td>empata con la lineal y sobreajusta</td></tr>
+<tr><td>Gradient boosting</td><td>320,0</td><td>4,3</td><td>300,0</td><td>empata</td></tr>
+</table>
+
+<p><strong>El ajuste</strong> movió a todos hacia el mismo lugar. Con curvas de validación y una
+grilla por familia sobre el pipeline entero:</p>
+<ul>
+  <li>el árbol limitado a profundidad 3 pasa a 322,5;</li>
+  <li>el bosque y el boosting llegan a 319,1;</li>
+  <li>la lineal queda en 319,3, plana entre <code>alpha</code> 0,01 y 1.000.</li>
+</ul>
+<p>El mejor de las grillas, el boosting, le saca a la lineal 0,3 segundos con un desvío de 4,3. Con la
+regla de la cátedra —el complejo tiene que ganarle al simple por más que el desvío— <strong>se queda
+la lineal</strong>, <code>Ridge(alpha=1000)</code>. Además es la que menos tarda, la única cuyos pesos
+se leen directo y la que menos sobreajusta.</p>
+
+<p><strong>Las columnas que probamos.</strong> Sacarle a la lineal las veinte diferencias la empeora
+0,4 s; la plataforma, 1,0; las dos juntas, 1,5. Todo por debajo del desvío.</p>
+
+<p><strong>Lo que probamos para que no conteste siempre el centro</strong> (Sección 7):</p>
+<ul>
+  <li><strong>Pesos por banda de duración</strong>, el <code>class_weight</code> llevado a regresión.
+  Con fuerza 1, las partidas de más de 40 minutos mejoran (818 → 743 s) pero el MAE total sube a 324,0.
+  Las de menos de 20 <em>empeoran</em> (755 → 782): ninguna condición inicial anticipa una partida
+  corta. Se queda sin pesos.</li>
+  <li><strong>Curvas de elo</strong> (<code>SplineTransformer</code>) y una pendiente de elo por
+  servidor. La relación del elo con la duración es una U invertida, con el máximo cerca de 2.000, pero
+  dibujarla mejora 0,2 s con un desvío de 4,2. No entran.</li>
+</ul>
+
+<h3>5. El test del modelo sin el minuto, dónde se equivoca y en qué se apoya</h3>
+
+<p><strong>En el test, 315,5 segundos contra 325,5 del piso</strong>: 10,0 de ganancia, R² 0,041, en
+línea con los 319,3 de la validación cruzada. Por grupo, gana 13,4 s en Master–Challenger, 8,9 en
+Hierro–Oro y 7,0 en Platino–Diamante.</p>
+
+<ul>
+  <li><strong>Dónde se equivoca: en las puntas.</strong> Sus predicciones van de 1.430 a 2.026 s, con
+  un desvío de 89; lo real va de 310 a 3.850, con un desvío de 421. Erra 117 s entre los 25 y los 30
+  minutos, sobreestima en 762 las de menos de 20 y subestima en 824 las de más de 40. Las 142 partidas
+  del test que terminan entre 900 y 960 s (el escalón de la rendición) se erran por 782 s.</li>
+  <li><strong>En qué se apoya: en el elo, y casi en nada más.</strong> El coeficiente de
+  <code>elo_partida</code> es −77,2 s por desvío estándar, y desordenarlo sube el MAE del test 13,4 s,
+  más que toda la ganancia sobre el piso. La plataforma le sigue, con 2,7.</li>
+  <li><strong>El chequeo de fuga del elo.</strong> El elo se lee cuando se baja la partida, no antes de
+  que se juegue, así que incluye los puntos de esa partida: es un error de medición. Pero no contiene
+  la respuesta, porque ganar o perder mueve los puntos igual en una partida de 20 minutos que en una
+  de 40. Su Pearson con la duración es −0,161: nada que ver con una columna que da demasiado bien. En
+  Hierro–Oro la relación se da vuelta (+0,042).</li>
+</ul>
+
+<h3>6. El estado al minuto 10: el modelo final</h3>
+
+<p>La Sección 11 une el estado de la partida a las 137 columnas como una <strong>tercera rama</strong>
+del paso <code>derivar</code>. Usa las mismas partidas de train y de test de la Sección 2; al minuto 10
+salen, de los dos lados, las 137 partidas que terminan antes.</p>
+
+<h4>Qué columnas del minuto entran, y por qué</h4>
+<table>
+<tr><th>Métrica</th><th>¿Entra?</th><th>Por qué</th></tr>
+<tr><td>oro, experiencia, súbditos, nivel medio, asesinatos, torres, monstruos épicos</td><td><span class="ok">sí</span>, como <code>|t1 − t2|</code> y <code>t1 + t2</code>: 14 columnas</td><td>El mismo criterio que las 137 (H3). Al minuto 10, la diferencia de oro da Pearson −0,285, la de experiencia −0,250 y la de asesinatos −0,240: <strong>las tres en amarillo</strong>, las primeras columnas del proyecto que salen del rojo.</td></tr>
+<tr><td>placas</td><td><span class="no">no</span></td><td>Su chequeo coincide en menos del 1 % y la lectura no está verificada (V.8). Decisión del grupo.</td></tr>
+<tr><td>wards colocados y destruidos</td><td><span class="no">no</span></td><td>Cuentan objetos de habilidades de campeones: con Warwick, 206,6 al minuto 10 contra una media de 30,2. Y no se mueven con la duración (|Pearson| ≤ 0,03).</td></tr>
+<tr><td>primera sangre</td><td><span class="no">no</span></td><td>Ni el segundo (0,047) ni el equipo que la hizo (0,002) se mueven con la duración.</td></tr>
+</table>
+
+<h4>Los dos minutos, comparados</h4>
+<table>
+<tr><th></th><th>Minuto 5</th><th>Minuto 10</th></tr>
+<tr><td>Partidas (train / test)</td><td>15.316 / 3.829</td><td>15.210 / 3.798</td></tr>
+<tr><td>Piso, en validación cruzada</td><td>328,4</td><td>321,6</td></tr>
+<tr><td>El elegido sin el minuto, sobre las mismas partidas</td><td>319,3 ± 4,5</td><td>312,4 ± 2,4</td></tr>
+<tr><td>Ridge + el minuto</td><td>316,8 ± 4,3 (<code>alpha=1000</code>)</td><td><strong>297,3 ± 3,0</strong> (<code>alpha=100</code>)</td></tr>
+<tr><td>Boosting + el minuto</td><td>316,8 ± 3,7</td><td>297,5 ± 3,1</td></tr>
+<tr><td>Mejora sobre el elegido sin el minuto</td><td>2,5 s: <strong>menos que el desvío</strong></td><td><strong>15,0 s: cinco desvíos</strong></td></tr>
+<tr><td>R² en validación cruzada</td><td>0,067</td><td>0,140</td></tr>
+<tr><td>MAE en el test (piso · sin el minuto · con el minuto)</td><td>325,5 · 315,5 · 312,2</td><td>317,6 · 307,0 · <strong>294,7</strong></td></tr>
+</table>
+
+<p>En los dos minutos el boosting empata con la lineal y memoriza más (6 a 7 s de brecha entre train y
+validación, contra uno de la lineal): por la regla de la cátedra, se queda la lineal. Al minuto 10 la
+grilla elige <code>alpha=100</code>, en un empate con 1 y 10 (297,3); con 1.000 sube a 297,5.</p>
+
+<div class="clave">
+  <span class="etiqueta">Por qué el minuto 10 (decisión del grupo, 27/10)</span>
+  <ol style="margin-bottom:6pt">
+    <li><strong>Es el único que le gana al modelo sin el minuto por más que el ruido</strong>: 15,0 s
+    con un desvío de 3,0, contra 2,5 con un desvío de 4,3 del minuto 5.</li>
+    <li><strong>La elección sale de la validación cruzada, no del test.</strong> Cada test se miró una
+    vez, después de elegir, y confirmó el orden: 3,3 s de ganancia al minuto 5 y 12,3 al minuto 10.</li>
+    <li><strong>Se lee desde el juego</strong>: lo que aporta es cuánto se separó un equipo del otro en
+    oro y en experiencia. A los cinco minutos esa diferencia casi no se mueve con la duración (−0,130,
+    rojo); a los diez, −0,285.</li>
+  </ol>
+  <p><strong>Lo que cuesta:</strong> la pregunta cambia, porque el modelo predice a los diez minutos de
+  juego y no antes de empezar; no vale para las 137 partidas que terminan antes (0,7 %), y para
+  predecir necesita el estado de la partida al minuto 10, que sale del timeline de Match-V5. El minuto
+  15 se corrió pero no se modeló: el docente pidió el 5 y el 10.</p>
+</div>
+
+<h4>El modelo final, leído</h4>
+<p><strong><code>Ridge(alpha=100)</code> con el pipeline completo y la rama del minuto 10</strong>: 49
+columnas derivadas. En el test erra <strong>294,7 s</strong>, contra 317,6 del piso y 307,0 del mejor
+sin el minuto, sobre las mismas 3.798 partidas, con R² 0,129. Por grupo de elo mejora a los tres:</p>
+<ul>
+  <li>Hierro–Oro, de 343,5 a 324,4;</li>
+  <li>Platino–Diamante, de 287,5 a 280,2;</li>
+  <li>Master–Challenger, de 288,8 a 278,6.</li>
+</ul>
+<ul>
+  <li><strong>Dónde se equivoca.</strong> Abre las predicciones: el desvío pasa de 89 a 156 s y el
+  rango, de 1.424–2.036 a 1.080–2.146. Mejora todas las bandas menos la del centro: las de menos de 20
+  minutos pasan de 724 a 625 s de error, las de más de 40 de 814 a 774, y la de 25 a 30 empeora de 122
+  a 156. A diferencia de los pesos de la Sección 7, <strong>ahora la punta corta mejora</strong>: un
+  equipo que a los diez minutos ya se separó es la pista que antes faltaba. En el escalón de la
+  rendición (142 partidas entre 900 y 960 s), el error baja de 791 a 660 y sigue siendo el tramo donde
+  más erra.</li>
+  <li><strong>En qué se apoya.</strong> Coeficientes, en segundos por desvío estándar:
+  <code>elo_partida</code> −83,3, <strong>diferencia de oro al minuto 10 −66,9</strong>, diferencia de
+  experiencia −40,5, plataforma LA2 +51,0 y KR −45,0, diferencia de monstruos épicos −15,7. En
+  importancia por permutación, el elo pesa 15,6 s y la diferencia de oro, 8,6. Es lo que afirmaba H9,
+  que no apareció en las condiciones iniciales y aparece cuando la partida ya empezó. La diferencia de
+  oro y la de experiencia se mueven juntas, así que el peso entre las dos no se reparte por separado.</li>
+  <li><strong>El chequeo de fuga.</strong> Las columnas del minuto 10 se conocen en el minuto 10,
+  antes de que la partida termine: no hay fuga, siempre que se prediga en ese minuto. Y no dan
+  demasiado bien: R² 0,129.</li>
+</ul>
+
+<h3>7. Lo que no anduvo, y lo que quedó inconcluso</h3>
+
+<table>
+<tr><th>Qué se probó</th><th>Qué dio</th><th>Qué se hizo</th></tr>
+<tr><td>H9: las veinte diferencias entre equipos, de a una</td><td>máximo |r| 0,064 en total y 0,100 por grupo: rojo</td><td>hipótesis refutada</td></tr>
+<tr><td>Las veinte diferencias adentro del modelo</td><td>0,4 s, con desvío de 4,5</td><td>se quedan, sin defenderlas como mejora</td></tr>
+<tr><td>Un árbol sin límite</td><td>467,8 s, 139 peor que el piso</td><td>limitado a profundidad 3</td></tr>
+<tr><td>Bosque y boosting ajustados</td><td>319,1, a 0,3 de la lineal</td><td>se queda la lineal</td></tr>
+<tr><td>Pesos por banda (<code>balanced</code>)</td><td>MAE 324,0 (+4,7)</td><td>sin pesos</td></tr>
+<tr><td>Curvas de elo y elo por servidor</td><td>0,2 s, con desvío de 4,2</td><td>no entran</td></tr>
+<tr><td>El estado al minuto 5</td><td>2,5 s, con desvío de 4,3</td><td>no es una diferencia; se elige el minuto 10</td></tr>
+<tr><td>Los wards del timeline</td><td>contaminados; |r| ≤ 0,03</td><td>fuera del modelo</td></tr>
+<tr><td>Boosting con el minuto</td><td>0,1 s mejor al 5, 0,2 peor al 10</td><td>se queda la lineal</td></tr>
+</table>
+
+<p><strong>Lo que quedó inconcluso:</strong></p>
+<ol>
+  <li>El número nuevo del chequeo de asesinatos, que sale al volver a correr la plata.</li>
+  <li>Los wards contados bien, filtrando por tipo de ward.</li>
+  <li>Las placas, sin verificar.</li>
+  <li>La validación por jugador semilla (<code>GroupKFold</code>), que necesita que ese identificador
+  llegue al CSV.</li>
+  <li>Por qué las partidas más largas son las del nivel medio-bajo: la U invertida del elo.</li>
+</ol>
+
+<h3>8. Cómo se estructuran los 25 minutos, y el reparto</h3>
+
+<table>
+<tr><th>Min.</th><th>Momento</th><th>Quién</th><th>Qué mostramos</th></tr>
+<tr><td>0–2</td><td>Qué cambió</td><td>Facundo Aracena</td><td>Las dos correcciones de la Entrega 2, y que el objetivo no cambió. Sección 0.</td></tr>
+<tr><td>2–4:30</td><td rowspan="2">El planteo</td><td>Rodrigo «Toto» Viluron</td><td>Qué se predice, la métrica y el piso. Secciones 1 (en una frase) y 2.</td></tr>
+<tr><td>4:30–7</td><td>Anthony «Cocha» Cochachin</td><td>La partición, la validación y su limitación, y el pipeline. Secciones 2 y 3.</td></tr>
+<tr><td>7–11:30</td><td rowspan="2">El resultado</td><td><strong>Ezequiel Aguilar</strong></td><td>La comparación, el ajuste, lo que probamos y el test del modelo sin el minuto, con dónde se equivoca y en qué se apoya. Secciones 4 a 10.</td></tr>
+<tr><td>11:30–16</td><td><strong>Matías Telo</strong></td><td>El minuto 10: qué entra, la comparación con el 5, por qué se eligió, y el modelo final leído. Sección 11.</td></tr>
+<tr><td>16–22</td><td>Preguntas dirigidas</td><td>quien le toque</td><td>A integrantes puntuales, sobre cualquier parte.</td></tr>
+<tr><td>22–25</td><td>Devolución</td><td>—</td><td>Qué corregir antes de la Entrega 4.</td></tr>
+</table>
+
+<p>El resultado es lo más importante de la entrega, y por eso lo exponen Ezequiel y Matías. El guion
+completo, con lo que dice cada uno, lo que se muestra y un banco de preguntas con quién arranca cada
+una, está en <strong><code>docs/guion-defensa-entrega3.pdf</code></strong>. Igual que en la Entrega 2,
+el reparto dice quién empieza a hablar, no quién tiene que saber: «la pregunta sobre la validación
+puede caerle a quien armó las columnas».</p>
+
+<h3>9. Banco de preguntas probables</h3>
+
+<p>Las seis primeras son las que la consigna dice que se preguntan.</p>
+
+<table>
+<tr><th>Pregunta</th><th>Respuesta</th></tr>
+<tr><td>«¿Por qué esa métrica?»</td><td>El MAE se lee en segundos y trata igual un error en cualquier tramo, y en este problema ningún tramo es más caro. La Sección 7 lo muestra: si importara no perderse las partidas largas, los pesos por banda serían la decisión correcta, pero habría que declarar otra métrica.</td></tr>
+<tr><td>«¿Cuánto le gana al piso, y es mucho o poco?»</td><td>El modelo final, 22,9 s en el test (294,7 contra 317,6), un 7 %, con R² 0,129. Es poco para predecir una partida puntual: sigue errando casi cinco minutos en promedio. Pero le gana al modelo de condiciones iniciales por cinco desvíos, y nada de lo que probamos antes lo había logrado. Sin el minuto, 10 s: casi adivinar el centro.</td></tr>
+<tr><td>«¿Por qué los pedazos al azar, y qué pasaría si…?»</td><td>Las filas son partidas únicas y no hay fecha. El riesgo es el jugador semilla repetido: si inflara la validación, el test saldría peor. Salió en línea, y apenas mejor, en los dos modelos.</td></tr>
+<tr><td>«¿Por qué ese modelo y no uno más complejo?»</td><td>Al minuto 10, el boosting da 297,5 ± 3,1 contra 297,3 ± 3,0 de la lineal: pierde por 0,2 y memoriza más. Sin el minuto, le saca 0,3 con un desvío de 4,3. La regla de la cátedra deja la lineal en los dos casos.</td></tr>
+<tr><td>«Un tramo donde erra mucho, explicado desde el juego»</td><td>Las partidas que terminan entre 900 y 960 s: es el minuto 15, cuando se habilita la rendición. Es una votación de los jugadores después de una desventaja. Sin el minuto, ninguna columna la puede ver (782 s de error). Con el minuto 10 el error baja a 660 s, porque la ventaja ya armada la anticipa en parte.</td></tr>
+<tr><td>«La columna que más pesa: ¿cómo descartaste una fuga?»</td><td>El elo: se lee después de jugar, así que tiene error de medición, pero ganar o perder mueve los puntos igual sin importar cuánto duró la partida, y su Pearson es −0,161. La diferencia de oro al minuto 10 se conoce en el minuto 10, antes del final.</td></tr>
+<tr><td>«¿Por qué el minuto 10 y no el 5?»</td><td>Por la validación cruzada: 15,0 s de mejora con desvío 3,0, contra 2,5 con desvío 4,3. El test se miró después y confirmó el orden.</td></tr>
+<tr><td>«¿Y por qué no el 15, que tendría más señal?»</td><td>El docente pidió el 5 y el 10, y el grupo midió esos dos. El 15 está corrido y versionado, pero no modelado. Cuanto más tarde, más señal pero menos anticipación, y deja afuera más partidas (267 al minuto 15).</td></tr>
+<tr><td>«¿Eso no es cambiar la pregunta del proyecto?»</td><td>Sí, y lo declaramos. Con condiciones iniciales la respuesta es «casi no se puede» (Secciones 2 a 10). La pregunta nueva, «cuánto dura sabiendo cómo va al minuto 10», es el plan B que propuso el docente. Por eso el dataset del minuto está aparte de las 137 columnas.</td></tr>
+<tr><td>«¿Por qué sacaron los wards?»</td><td>Porque no son sólo wards. Riot registra como ward objetos de habilidades de campeones: con Warwick, 206,6 wards al minuto 10, contra 30,2 de media. Además no se mueven con la duración. Corregirlo es filtrar por tipo de ward; no se hizo.</td></tr>
+<tr><td>«El chequeo de kills dio 84,7 %. ¿Están bien los asesinatos?»</td><td>El problema era la referencia: <code>objectives.champion</code> cuenta las muertes del rival, ejecuciones incluidas, y nosotros contamos como el marcador del juego. En el bronce local, 4 de 40 equipos tienen exactamente uno de diferencia. Ya se corrigió el chequeo; el número nuevo sale con la próxima corrida.</td></tr>
+<tr><td>«¿Por qué la lineal empeora en la banda de 25 a 30 con el minuto?»</td><td>Porque abre las predicciones: deja de contestar siempre el centro. Gana en las puntas y pierde un poco en el medio, como los pesos de la Sección 7. La diferencia es que ahora el total mejora.</td></tr>
+</table>
+
 <h2 class="parte"><span class="n">Anexo</span>Glosario</h2>
 
 <p>Términos que aparecen en este documento, en el código y en las clases.</p>
@@ -3642,35 +4041,50 @@ predecir»:</p>
 <tr><td><strong><code>429</code></strong></td><td>Código HTTP de «demasiados pedidos». El cliente castiga esa key en ese host y sigue con otra.</td></tr>
 </table>
 
-<h2 class="parte"><span class="n">Cierre</span>Qué falta y hacia dónde sigue</h2>
-
-<h3>Lo que falta para cerrar la Entrega 2</h3>
+<h3>Del modelado (Entrega 3)</h3>
 <table>
-<tr><th></th><th>Tarea</th><th>Quién</th></tr>
-<tr><td><s>1</s></td><td><s>Armar el notebook con las seis fases, las fichas y la tabla de candidatas.</s> <strong>Hecho:</strong> 167 celdas tras la simplificación del 21/9 y el reordenamiento del 22/9, ejecutado sin errores, ocho fichas.</td><td>Quien analiza</td></tr>
-<tr><td>2</td><td>Que <strong>todo el grupo</strong> lea la parte VIII y pueda recorrer <strong>cualquiera</strong> de las ocho fichas. El docente elige dos al azar y pregunta a integrantes puntuales.</td><td>Todos</td></tr>
-<tr><td>3</td><td>Tener claro el hallazgo de 8.4 y sus dos precisiones. Es lo que más se va a preguntar y lo que peor queda si se contesta «no dio nada» sin el número.</td><td>Todos</td></tr>
-<tr><td>4</td><td>Pedirle a quien tiene el bronce grande que verifique las 26 partidas con 9 o 10 jugadores imputados (pendiente 2 de 8.7). Es el único pendiente que se puede cerrar antes del 23/9.</td><td>Quien tiene el bronce</td></tr>
-<tr><td>5</td><td>Subir a Google Colab la versión reordenada del notebook (la del 22/9) y dejarla <strong>abierta antes de entrar</strong>, con las salidas guardadas a la vista. No hace falta ejecutarla; la consigna lo dice explícito: si hay que correrlo delante del docente, son minutos que no se recuperan.</td><td>Quien lleva la notebook</td></tr>
-<tr><td>6</td><td>Ensayar con el guion <code>docs/guion-defensa-entrega2.pdf</code>: turnos cronometrados y el banco de preguntas.</td><td>Los cuatro que exponen</td></tr>
+<tr><th>Término</th><th>Qué es</th></tr>
+<tr><td><strong>MAE</strong></td><td>Error absoluto medio: cuántos segundos se erra, en promedio, sin importar el signo. La métrica declarada del proyecto.</td></tr>
+<tr><td><strong>R²</strong></td><td>Qué fracción de la variación del objetivo explica el modelo. 0 es el piso; el modelo final da 0,129 en el test.</td></tr>
+<tr><td><strong>Piso</strong></td><td>Un modelo que no mira ninguna columna (<code>DummyRegressor</code>). Con el MAE contesta siempre la mediana. Sin él, el número del modelo no significa nada.</td></tr>
+<tr><td><strong>Validación cruzada</strong></td><td>Partir el entrenamiento en pedazos (acá cinco, con <code>KFold</code>), entrenar con cuatro y medir con el quinto, rotando. Da una media y un desvío; todo se elige con ella.</td></tr>
+<tr><td><strong>Desvío</strong> (de la validación)</td><td>Cuánto varía el MAE entre pedazos: el ruido de la medición. La regla de la cátedra: un modelo más complejo tiene que ganarle al simple por más que el desvío.</td></tr>
+<tr><td><strong>Test</strong></td><td>El 20 % de las partidas, separado una vez al principio y mirado una vez al final. Si se mira, se cambia algo y se vuelve a mirar, ya no es un test.</td></tr>
+<tr><td><strong>Pipeline</strong></td><td>El objeto de scikit-learn que encadena derivar columnas, imputar, escalar, codificar y el modelo. Todo lo que aprende de los datos aprende sólo del entrenamiento.</td></tr>
+<tr><td><strong>Ridge</strong></td><td>Una regresión lineal con regularización: <code>alpha</code> achica los coeficientes. El modelo simple, y el elegido.</td></tr>
+<tr><td><strong>Gradient boosting</strong></td><td>Una familia de árboles que se suman uno detrás de otro, cada uno corrigiendo al anterior. El retador más fuerte; empató con la lineal.</td></tr>
+<tr><td><strong>Grilla</strong> (<code>GridSearchCV</code>)</td><td>Probar todas las combinaciones de hiperparámetros con validación cruzada y quedarse con la mejor.</td></tr>
+<tr><td><strong>Importancia por permutación</strong></td><td>Desordenar una columna del test y medir cuánto empeora el MAE. Lo que empeora es lo que el modelo necesitaba de ella.</td></tr>
+<tr><td><strong>Fuga</strong></td><td>Una columna que contiene la respuesta, o que no existiría al momento de predecir. Su síntoma es un número que da demasiado bien.</td></tr>
+<tr><td><strong>Timeline</strong></td><td>La línea de tiempo de una partida en Match-V5: un cuadro por minuto y la lista de eventos. De ahí sale el estado al minuto 10.</td></tr>
 </table>
 
-<div class="clave">
-  <span class="etiqueta">Para la Entrega 2 no hace falta Airflow</span>
-  <p>El notebook lee el CSV congelado que viaja en <code>notebooks/entrega-2/datos/</code>, así que
-  corre sin levantar Docker. En la defensa se muestra desde Google Colab con las salidas guardadas;
-  para volver a ejecutarlo en una máquina local alcanza con el venv. Eso saca del camino
-  el riesgo que más caro salió en la Entrega 1: depender de que el entorno arranque.</p>
-</div>
+<h2 class="parte"><span class="n">Cierre</span>Qué falta y hacia dónde sigue</h2>
+
+<h3>Lo que falta para cerrar la Entrega 3</h3>
+<table>
+<tr><th></th><th>Tarea</th><th>Quién</th></tr>
+<tr><td><s>1</s></td><td><s>Modelar, comparar, ajustar y leer el modelo, con el estado al minuto 5 y al 10.</s> <strong>Hecho:</strong> 126 celdas, ejecutado sin errores. El modelo final es <code>Ridge(alpha=100)</code> con el minuto 10 (IX.6).</td><td>Quien analiza</td></tr>
+<tr><td>2</td><td>Que <strong>los cinco</strong> lean la Parte IX entera. Las preguntas son dirigidas: la de la validación le puede caer a quien expuso el minuto 10.</td><td>Todos</td></tr>
+<tr><td>3</td><td>Subir a Google Colab el notebook ejecutado, con la carpeta <code>datos/</code> con los cuatro CSV, y dejarlo <strong>abierto antes de entrar</strong>. No se ejecuta nada en la defensa.</td><td>Quien lleva la notebook</td></tr>
+<tr><td>4</td><td>Ensayar con el guion <code>docs/guion-defensa-entrega3.pdf</code>: los cinco turnos cronometrados y el banco de preguntas.</td><td>Los cinco que exponen</td></tr>
+</table>
+
+<h3>Lo que quedó de la Entrega 2</h3>
+<p>Se presentó, y el docente marcó las dos correcciones que resuelve la Entrega 3 (IX.2). De los
+pendientes de VIII.7 siguen abiertos dos: verificar contra el bronce las 26 partidas con 9 o 10
+jugadores de elo imputado, y leer el elo y la maestría antes de que empiece la partida.</p>
 
 <h3>La rama del timeline: lo que falta</h3>
 <table>
 <tr><th></th><th>Tarea</th><th>Quién</th></tr>
-<tr><td>1</td><td>Correr <code>lol_ingest</code> con <code>buscar_partidas_nuevas=false</code> sobre el bronce de 19.145 partidas (VI.8).</td><td>Quien tiene el bronce</td></tr>
-<tr><td>2</td><td>Leer el chequeo de eventos del reporte del minuto 5 y anotar en V.8 qué métricas coinciden; si alguna no, corregir <code>timeline.py</code> y reprocesar sin red.</td><td>Quien opera</td></tr>
-<tr><td>3</td><td>Anotar los números reales: filas del dataset al minuto 5, tiempo de la corrida, peso de <code>bronze/timelines/</code>.</td><td>Quien opera</td></tr>
-<tr><td>4</td><td>Copiar <code>lol_min5_*.csv</code> a <code>notebooks/entrega-3/datos/</code> y versionarlo (VI.8).</td><td>Quien opera</td></tr>
-<tr><td>5</td><td>Decidir si se corre también el minuto 10 (<code>minuto_corte=10</code>; no pide nada a Riot).</td><td>El grupo</td></tr>
+<tr><td><s>1</s></td><td><s>Correr <code>lol_ingest</code> con <code>buscar_partidas_nuevas=false</code> sobre el bronce de 19.145 partidas (VI.8).</s> <strong>Hecho el 26/10.</strong></td><td>Quien tiene el bronce</td></tr>
+<tr><td><s>2</s></td><td><s>Leer el chequeo de eventos y anotar en V.8 qué métricas coinciden.</s> <strong>Hecho:</strong> torres, monstruos y primera sangre bien; wards contaminados y placas sin verificar, fuera del modelo; el chequeo de kills, corregido (V.8).</td><td>Quien opera</td></tr>
+<tr><td>3</td><td>Anotar el tiempo de la corrida y el peso de <code>bronze/timelines/</code>. <strong>Las filas ya están</strong> (V.8); los otros dos números hay que pedírselos a quien corrió.</td><td>Quien tiene el bronce</td></tr>
+<tr><td><s>4</s></td><td><s>Copiar los CSV del minuto a <code>notebooks/entrega-3/datos/</code> y versionarlos (VI.8).</s> <strong>Hecho el 27/10</strong>, con sus reportes.</td><td>Quien opera</td></tr>
+<tr><td><s>5</s></td><td><s>Decidir si se corre también el minuto 10.</s> <strong>Se corrieron el 5, el 10 y el 15.</strong> El notebook de la E3 modela el 5 y el 10.</td><td>El grupo</td></tr>
+<tr><td><s>6</s></td><td><s>Decidir con qué minuto se queda el proyecto.</s> <strong>El minuto 10</strong> (decisión del grupo, 27/10; IX.6).</td><td>El grupo</td></tr>
+<tr><td>7</td><td>Volver a correr la plata del timeline (sin red: <code>buscar_partidas_nuevas=false</code>) para ver el número nuevo del chequeo de kills.</td><td>Quien tiene el bronce</td></tr>
 </table>
 
 <h3>Lo que quedó de la Entrega 1</h3>
@@ -3708,14 +4122,14 @@ tienen su lugar natural en las entregas siguientes:</p>
   <td>Resuelta en la <strong>Parte VIII</strong>. Las tres preguntas que estaban anotadas acá quedaron contestadas con un número: <code>es_unranked</code> no hace falta (separación 0,067), <code>roles_inferidos</code> vale 0 en el 99,91 % de las filas y sale como feature, y ninguna variable se correlaciona con la duración por encima de −0,161. El sesgo por tier se midió y es el que explica por qué la correlación entre los seis promedios de servidor da −0,682 mientras la correlación partida a partida da −0,161.</td>
 </tr>
 <tr>
-  <td><strong>3 · Modelado</strong><br>14/10</td>
+  <td><strong>3 · Modelado</strong><br>28/10 · <em>hecha</em></td>
   <td>Comparar modelos de regresión sobre <code>game_duration_s</code> y medir su desempeño.</td>
-  <td>La Entrega 2 dejó el terreno preparado: <strong>82 de las 137 columnas no entran como feature</strong>, cada una con su razón, y las 34 columnas de agregados de equipo quedan en 12 sumas (8.5). Las dos preguntas que estaban anotadas acá ya tienen respuesta parcial —<code>is_main</code> sale, y <code>player_elo</code> entra aunque sea débil— y aparecen tres nuevas: si la señal está en las <strong>combinaciones</strong> de columnas y no en ninguna sola (8.4), cómo tratar el <strong>escalón de los 900 segundos</strong>, y cómo ganarle al rival que dejó medido el análisis: <strong>predecir 1.748 segundos siempre</strong>.</td>
+  <td>Resuelta en la <strong>Parte IX</strong>. Las preguntas que estaban anotadas acá tienen respuesta. Las combinaciones de columnas de condiciones iniciales tampoco predicen: ningún modelo le gana a la lineal y la lineal le gana al piso por 10 s. El escalón de los 900 s es el tramo donde más se erra, con el minuto y sin él. El rival de predecir siempre el centro quedó superado por 22,9 s recién con el estado de la partida al minuto 10.</td>
 </tr>
 <tr>
   <td><strong>4 · Visualización</strong><br>04/11</td>
   <td>Visualizaciones y una aplicación funcionando.</td>
-  <td>El mismo CSV alimenta los agregados de la app.</td>
+  <td>La consigna de la Entrega 3 lo fija: <strong>la app usa el modelo elegido</strong>, <code>Ridge(alpha=100)</code> con las 137 columnas y el estado de la partida al minuto 10. Para predecir necesita ese estado, que sale del timeline (V.8). Los agregados de la app salen de los mismos CSV.</td>
 </tr>
 </table>
 

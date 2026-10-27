@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FF-15 · Guión de la defensa · Entrega 3</title>
+<style>
+@page { size: A4; margin: 18mm 16mm 16mm 16mm; }
+:root{
+  --tinta:#16191d; --suave:#4a5158; --linea:#d8dde2; --fondo:#f6f8fa;
+  --acento:#0b5fa5; --alerta:#a3341f; --verde:#4a7c2f; --ambar:#b7791f;
+}
+*{box-sizing:border-box}
+body{font-family:"Charter","Georgia","Times New Roman",serif;color:var(--tinta);
+  font-size:10.5pt; line-height:1.55; margin:0;}
+h1,h2,h3,h4{font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;line-height:1.25;
+  color:var(--tinta); page-break-after:avoid;}
+h1{font-size:23pt;margin:0 0 6pt;letter-spacing:-.4pt}
+h2{font-size:16pt;margin:22pt 0 8pt;padding-bottom:4pt;border-bottom:2px solid var(--acento)}
+h3{font-size:12.5pt;margin:16pt 0 5pt;color:var(--acento)}
+h4{font-size:10.5pt;margin:12pt 0 4pt;text-transform:uppercase;letter-spacing:.6pt;color:var(--suave)}
+p{margin:0 0 8pt;text-align:justify}
+ul,ol{margin:0 0 9pt;padding-left:18pt}
+li{margin-bottom:4pt}
+code{font-family:"Cascadia Mono","Consolas","DejaVu Sans Mono",monospace;font-size:9pt;
+  background:var(--fondo);padding:1px 3px;border-radius:3px;border:1px solid var(--linea)}
+table{width:100%;border-collapse:collapse;margin:0 0 11pt;font-size:9.2pt;page-break-inside:avoid}
+th{background:var(--fondo);text-align:left;font-family:"Segoe UI",Arial,sans-serif;
+  font-size:8.8pt;text-transform:uppercase;letter-spacing:.4pt;color:var(--suave);
+  padding:5pt 6pt;border-bottom:1.5px solid var(--acento)}
+td{padding:5pt 6pt;border-bottom:1px solid var(--linea);vertical-align:top}
+tr:last-child td{border-bottom:none}
+
+.portada{height:245mm;display:flex;flex-direction:column;justify-content:center;
+  page-break-after:always;text-align:center}
+.portada .materia{font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;letter-spacing:2.5pt;
+  text-transform:uppercase;color:var(--suave);margin-bottom:14pt}
+.portada h1{font-size:30pt;margin-bottom:10pt}
+.portada .sub{font-size:13pt;color:var(--suave);font-style:italic;margin-bottom:26pt;
+  max-width:135mm;margin-left:auto;margin-right:auto;text-align:center}
+.portada .meta{font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;color:var(--suave);line-height:1.9}
+.portada .equipo{font-family:"Segoe UI",Arial,sans-serif;font-size:10.5pt;color:var(--tinta);
+  line-height:1.8;margin-top:20pt;border-top:1px solid var(--linea);
+  border-bottom:1px solid var(--linea);padding:12pt 0;max-width:120mm;margin-left:auto;margin-right:auto}
+
+.seccion{page-break-before:always;border-top:4px solid var(--acento);padding-top:10pt;margin-top:0}
+.seccion .n{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;letter-spacing:2pt;
+  text-transform:uppercase;color:var(--acento);display:block;margin-bottom:2pt}
+
+.nota,.aviso,.clave{padding:8pt 11pt;margin:0 0 11pt;border-radius:4px;font-size:9.6pt;page-break-inside:avoid}
+.nota{background:#eef4fa;border-left:3px solid var(--acento)}
+.aviso{background:#fdf2ee;border-left:3px solid var(--alerta)}
+.clave{background:#f2f7ee;border-left:3px solid var(--verde)}
+.nota p:last-child,.aviso p:last-child,.clave p:last-child{margin-bottom:0}
+.etiqueta{font-family:"Segoe UI",Arial,sans-serif;font-size:8.5pt;font-weight:600;
+  text-transform:uppercase;letter-spacing:.7pt;display:block;margin-bottom:3pt}
+.nota .etiqueta{color:var(--acento)} .aviso .etiqueta{color:var(--alerta)} .clave .etiqueta{color:var(--verde)}
+
+.turno{border:1.5px solid var(--acento);border-radius:5px;margin:0 0 14pt;overflow:hidden;page-break-inside:avoid}
+.turno.nueva{page-break-before:always}
+.turno > .cab{background:var(--acento);color:#fff;padding:6pt 10pt;
+  font-family:"Segoe UI",Arial,sans-serif;display:flex;justify-content:space-between;align-items:baseline}
+.turno > .cab .quien{font-size:12.5pt;font-weight:600;letter-spacing:-.2pt}
+.turno > .cab .reloj{font-size:10pt;font-family:"Cascadia Mono","Consolas",monospace;opacity:.95}
+.turno > .cuerpo{padding:9pt 11pt}
+.turno.ficha-p{border-color:var(--alerta)} .turno.ficha-p > .cab{background:var(--alerta)}
+.turno.ficha-s{border-color:var(--ambar)} .turno.ficha-s > .cab{background:var(--ambar)}
+.turno.ficha-r{border-color:#6b7178} .turno.ficha-r > .cab{background:#6b7178}
+.turno .tema{font-family:"Segoe UI",Arial,sans-serif;font-size:9.5pt;color:var(--suave);
+  margin:0 0 8pt;padding-bottom:6pt;border-bottom:1px solid var(--linea)}
+.pantalla{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;background:#fff;
+  border:1px dashed var(--linea);border-radius:3px;padding:6pt 9pt;margin:0 0 9pt;color:var(--suave)}
+.pantalla b{color:var(--tinta)}
+.decir{background:#fffdf5;border-left:3px solid #c9a227;padding:9pt 12pt;margin:0 0 9pt;
+  border-radius:0 4px 4px 0}
+.decir p{margin:0 0 7pt;text-align:left}
+.decir p:last-child{margin-bottom:0}
+.decir .etiqueta{color:#8a6d10}
+.pase{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;color:var(--verde);
+  font-weight:600;margin:0;padding-top:5pt;border-top:1px solid var(--linea)}
+.anclas{font-size:9.2pt;margin:0 0 9pt}
+.anclas ul{margin:0;padding-left:16pt}
+.anclas li{margin-bottom:2pt}
+
+.pregunta{background:var(--fondo);border:1px solid var(--linea);border-radius:4px;
+  padding:8pt 11pt;margin:0 0 9pt;page-break-inside:avoid}
+.pregunta .q{font-family:"Segoe UI",Arial,sans-serif;font-weight:600;font-size:10pt;
+  color:var(--acento);margin-bottom:5pt;display:block}
+.pregunta p{margin-bottom:6pt}
+.pregunta p:last-child{margin-bottom:0}
+.duenio{font-family:"Segoe UI",Arial,sans-serif;font-size:8pt;text-transform:uppercase;
+  letter-spacing:.5pt;color:var(--suave);float:right;font-weight:600;
+  background:#fff;border:1px solid var(--linea);border-radius:10px;padding:1pt 7pt;margin-left:8pt}
+.corta{font-weight:600}
+.mas{font-size:9.3pt;color:var(--suave);border-top:1px dotted var(--linea);padding-top:5pt;margin-top:5pt}
+.mas b{color:var(--tinta)}
+
+.ok{color:#2d6a1f;font-weight:600} .no{color:var(--alerta);font-weight:600} .am{color:var(--ambar);font-weight:600}
+.pie{margin-top:20pt;padding-top:8pt;border-top:1px solid var(--linea);
+  font-size:8.5pt;color:var(--suave);font-family:"Segoe UI",Arial,sans-serif}
+
+.linea-tiempo{border:1px solid var(--linea);border-radius:4px;overflow:hidden;
+  display:flex;margin:0 0 12pt;font-family:"Segoe UI",Arial,sans-serif;font-size:8.2pt;text-align:center}
+.linea-tiempo div{padding:7pt 3pt;border-right:1px solid #fff;color:#fff;line-height:1.35}
+.linea-tiempo div:last-child{border-right:none}
+.lt1{background:#0b5fa5;flex:2} .lt2{background:#1d74bd;flex:2.5}
+.lt3{background:#2f89d3;flex:2.5} .lt4{background:#4a9edd;flex:.9}
+.lt5{background:#b7791f;flex:5.1} .lt6{background:#a3341f;flex:5}
+.lt7{background:#6b7178;flex:2}
+.linea-tiempo b{display:block;font-size:9pt}
+.t1{background:#0b5fa5;flex:2} .t2{background:#1d74bd;flex:2.5} .t3{background:#2f89d3;flex:2.5}
+.t4{background:#a3341f;flex:4.5} .t5{background:#b7791f;flex:4.5} .t6{background:#6b7178;flex:6}
+.t7{background:#8a9097;flex:3}
+.pantalla ul{margin:3pt 0 0;padding-left:16pt} .pantalla li{margin-bottom:1pt}
+.pregunta ol{margin:4pt 0 0;padding-left:16pt}
+</style>
+</head>
+<body>
+
+<!-- ============================ PORTADA ============================ -->
+<div class="portada">
+  <div class="materia">UTN FRM · Ingeniería en Sistemas de Información · Ciencia de Datos 2026</div>
+  <h1>Guión de la defensa</h1>
+  <p class="sub">Entrega 3 · Modelado · Veinticinco minutos, cinco voces, y la pregunta de la
+  consigna: ¿tenemos un modelo que dice algo que los datos solos no decían, y podemos explicar por
+  qué es ése y no otro?</p>
+  <div class="meta">
+    <strong>Grupo 5K09-02</strong><br>
+    Proyecto FF-15 — predicción de la duración de una partida de League of Legends<br>
+    Exposición: miércoles 28 de octubre · 25 minutos con el docente, en privado<br>
+    Se muestra desde: <strong>Google Colab</strong>, con el notebook
+    <code>notebooks/entrega-3/modelado_entrega3.ipynb</code> ejecutado
+  </div>
+  <div class="equipo">
+    Facundo Aracena · Rodrigo «Toto» Viluron · Anthony «Cocha» Cochachin<br>
+    Ezequiel Aguilar · Matías Telo
+  </div>
+</div>
+
+<!-- ============================ 1 ============================ -->
+<div class="seccion">
+<span class="n">Sección 1</span>
+<h2 style="margin-top:0;border:none">Cómo usar este guión</h2>
+
+<p>La consigna lo repite: <strong>la evaluación es individual</strong>, y «que hable uno solo» es una
+de las tres formas de perder los 25 minutos. Por eso los primeros dieciséis minutos están repartidos
+en cinco turnos. <strong>El resultado, que es lo que más pesa, lo exponen Ezequiel y Matías</strong>:
+Ezequiel, el modelo con las condiciones iniciales; Matías, el estado de la partida al minuto 10, que
+es el modelo final.</p>
+
+<p>Cada turno tiene tres partes:</p>
+<ul>
+  <li><strong>Lo que se dice</strong>, sobre fondo amarillo, escrito para sonar hablado. No se lee el
+  día de la entrega: se ensaya hasta poder decirlo mirando la pantalla.</li>
+  <li><strong>Lo que se muestra</strong>, en el recuadro punteado.</li>
+  <li><strong>Los datos que lo sostienen</strong>, debajo, por si el docente frena en el medio.</li>
+</ul>
+<p>Todos los números salen de las salidas guardadas del notebook; ninguno es de memoria.</p>
+
+<table>
+<tr><th style="width:32%">Regla</th><th>Por qué</th></tr>
+<tr><td><strong>El reparto es para arrancar, no para saber</strong></td><td>La consigna: «la pregunta
+sobre la validación puede caerle a quien armó las columnas». Los cinco tienen que poder recorrer las
+secciones 2 a 11. El dueño de una pregunta del banco es quien empieza a hablar si el docente la
+tira al grupo; nada más.</td></tr>
+<tr><td><strong>Siempre con el número y su desvío</strong></td><td>«Le gana al piso» no dice nada.
+«Le gana por 22,9 segundos en el test, y en validación cruzada le gana al modelo sin el minuto por
+cinco desvíos» sí.</td></tr>
+<tr><td><strong>Nunca el test para elegir</strong></td><td>Todo se eligió con validación cruzada. Si
+preguntan por qué el minuto 10, la respuesta empieza por la validación cruzada; el test vino
+después, a confirmar.</td></tr>
+<tr><td><strong>Cada turno se cierra con el pase</strong></td><td>Una frase que nombra al que sigue.
+Evita el silencio entre turnos.</td></tr>
+<tr><td><strong>Si no sabés, decilo y devolvé algo</strong></td><td>Nunca inventar un número: se
+descubre en la repregunta. Y la consigna lo premia: «un grupo que muestra un resultado que no anduvo
+y entiende por qué se lleva una devolución útil».</td></tr>
+</table>
+
+<div class="clave">
+  <span class="etiqueta">La frase que resume la entrega</span>
+  <p>«<strong>Con lo que se sabe antes de empezar, la duración de una partida casi no se puede
+  predecir</strong>: el mejor modelo le gana a contestar siempre la mediana por diez segundos, y se
+  apoya en el nivel de los jugadores. <strong>A los diez minutos de juego ya dice algo</strong>: cuánto
+  se separaron los equipos en oro y en experiencia baja el error a 294,7 segundos, 22,9 menos que el
+  piso, y le gana al modelo sin el minuto por cinco desvíos. Ése es el modelo que elegimos, y la
+  pregunta cambia: predice a los diez minutos, no antes de empezar.»</p>
+</div>
+
+<h3>Las tres formas de perder los 25 minutos (de la consigna)</h3>
+<ul>
+  <li><strong>El número que da demasiado bien.</strong> → El nuestro da modesto (R² 0,129). Y la
+  columna que más pesa, el elo, tiene su chequeo de fuga hecho.</li>
+  <li><strong>El zoológico.</strong> → Cuatro familias, con media y desvío, ajustadas con grilla, y
+  elegidas por validación cruzada con la regla de la cátedra. Nunca por el test.</li>
+  <li><strong>Que hable uno solo.</strong> → Cinco turnos, y un dueño por pregunta del banco.</li>
+</ul>
+</div>
+
+<!-- ============================ 2 ============================ -->
+<div class="seccion">
+<span class="n">Sección 2</span>
+<h2 style="margin-top:0;border:none">Antes de entrar al aula</h2>
+
+<p>La consigna: «Llegá con esto ya hecho: los 25 minutos son para mostrar y explicar, no para esperar
+que termine una búsqueda». Y el notebook, «abierto antes de entrar».</p>
+
+<h4>La noche anterior (martes 27)</h4>
+<table>
+<tr><th>Qué</th><th style="width:22%">Quién</th></tr>
+<tr><td>☐ <code>git pull</code> y subir a Google Colab <strong>el notebook ejecutado</strong>, el del
+commit de la E3: 126 celdas, sin errores, con las salidas guardadas. Una copia anterior no tiene la
+elección del minuto 10.</td><td>Quien lleva la notebook</td></tr>
+<tr><td>☐ Abrirlo en Colab y comprobar que se ven las salidas: las tablas de las secciones 4, 6, 8 y
+11, y los gráficos.</td><td>Quien lleva la notebook</td></tr>
+<tr><td>☐ Simulacro completo: los cinco turnos cronometrados, y después preguntas del banco de la
+sección 6, tiradas por otro integrante a alguien que no es el dueño.</td><td>Los cinco</td></tr>
+<tr><td>☐ Cada uno lee la <strong>Parte IX</strong> del documento integral entera, no sólo su turno.</td><td>Los cinco</td></tr>
+</table>
+
+<h4>Quince minutos antes</h4>
+<table>
+<tr><th>Qué</th><th style="width:34%">Detalle</th></tr>
+<tr><td>☐ Colab abierto en el notebook, parado en el título, con el panel <strong>Índice</strong> de la
+barra izquierda desplegado.</td><td>Así se salta a cualquier sección con un clic.</td></tr>
+<tr><td>☐ <strong>No ejecutar ninguna celda.</strong> Las salidas ya están guardadas.</td><td>Si alguien
+re-ejecuta, la primera celda busca los CSV en <code>datos/</code>: hacen falta los cuatro (el de
+condiciones iniciales y los del minuto). Además, la grilla del bosque tarda minutos.</td></tr>
+<tr><td>☐ Zoom del navegador en 110–125 % y notificaciones silenciadas.</td><td>Se mira de cerca.</td></tr>
+<tr><td>☐ Este guión abierto en otro dispositivo, no en la pantalla que se muestra.</td><td></td></tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">Cómo se referencia el notebook en este guión</span>
+  <p>Por dos cosas que siempre se encuentran:</p>
+  <ul>
+    <li><strong>el título de la sección</strong>, tal como aparece en el Índice, por ejemplo «Sección 4
+    · La comparación…»;</li>
+    <li><strong>la primera línea de la celda de código</strong>, que en todo el notebook es un
+    comentario que dice qué se pregunta, por ejemplo <code># Las cuatro familias, cada una su propio
+    pipeline</code>.</li>
+  </ul>
+</div>
+</div>
+
+<!-- ============================ 3 ============================ -->
+<div class="seccion">
+<span class="n">Sección 3</span>
+<h2 style="margin-top:0;border:none">El reparto de un vistazo</h2>
+
+<div class="linea-tiempo">
+  <div class="t1"><b>Facundo</b>0:00–2:00</div>
+  <div class="t2"><b>Toto</b>2:00–4:30</div>
+  <div class="t3"><b>Cocha</b>4:30–7:00</div>
+  <div class="t4"><b>Ezequiel</b>7:00–11:30</div>
+  <div class="t5"><b>Matías</b>11:30–16:00</div>
+  <div class="t6"><b>Preguntas dirigidas</b>16:00–22:00</div>
+  <div class="t7"><b>Devolución</b>22–25</div>
+</div>
+
+<table>
+<tr><th>Quién</th><th>Reloj</th><th>Qué expone</th><th>Momento de la consigna</th></tr>
+<tr><td><strong>Facundo Aracena</strong></td><td>0:00 – 2:00</td><td>Qué cambió: las dos correcciones
+de la Entrega 2, la ficha H9 y su veredicto.</td><td>«Qué cambió» (0–2)</td></tr>
+<tr><td><strong>Rodrigo «Toto» Viluron</strong></td><td>2:00 – 4:30</td><td>Qué se predice, la métrica
+y por qué, y el piso, en total y por grupo.</td><td rowspan="2">«El planteo» (2–7)</td></tr>
+<tr><td><strong>Anthony «Cocha» Cochachin</strong></td><td>4:30 – 7:00</td><td>La partición, la
+validación y su limitación, y el pipeline.</td></tr>
+<tr><td><strong>Ezequiel Aguilar</strong></td><td>7:00 – 11:30</td><td>La comparación de familias, el
+ajuste, lo que probamos, y el test del modelo sin el minuto: dónde se equivoca, en qué se apoya y el
+chequeo de fuga.</td><td rowspan="2">«El resultado» (7–16)</td></tr>
+<tr><td><strong>Matías Telo</strong></td><td>11:30 – 16:00</td><td>El estado al minuto 10: qué columnas
+entran, la comparación con el minuto 5, por qué el 10, y el modelo final leído.</td></tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">Por qué este reparto</span>
+  <p>El resultado es lo que más se corrige y lo que más se pregunta, y por eso tiene dos voces. Cada
+  turno toca secciones contiguas del notebook, así que quien expone ya está parado en la pantalla que
+  sigue. Los tres primeros turnos son cortos porque la consigna les da cinco minutos entre los dos
+  momentos; el planteo se puede decir en una pantalla por idea.</p>
+</div>
+</div>
+
+<!-- ============================ 4 ============================ -->
+<div class="seccion">
+<span class="n">Sección 4</span>
+<h2 style="margin-top:0;border:none">Los primeros dieciséis minutos, turno por turno</h2>
+
+<!-- ---------------- TURNO 1 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">1 · Facundo Aracena</span><span class="reloj">0:00 → 2:00</span></div>
+  <div class="cuerpo">
+    <p class="tema">Qué cambió · las dos correcciones de la Entrega 2</p>
+    <div class="pantalla"><b>En Colab:</b> el título del notebook y <b>Sección 0 · Qué cambió desde la
+    Entrega 2</b>. Después, <b>Sección 1</b> → las celdas <code># El resumen que decide</code> y
+    <code># El resumen por grupo</code>.</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>Buenas, somos el grupo 5K09-02. Qué cambió desde la Entrega 2: <strong>el objetivo no</strong>.
+      Sigue siendo <code>game_duration_s</code>, en segundos, así que es regresión. <strong>Cambiaron
+      las columnas</strong>, por las dos correcciones que nos marcaron.</p>
+      <p>La primera era armar diferencias entre los dos equipos que se conozcan antes de jugar, una
+      hipótesis sobre ellas, y leer todo por grupo de elo. Armamos veinte diferencias, en valor
+      absoluto porque el lado t1 o t2 es arbitrario, y la hipótesis H9: cuanto más desparejos llegan
+      los equipos, más corta la partida. <strong>Salió refutada.</strong> La más fuerte es la de elo,
+      con <strong>−0,064</strong>; partido por grupo, el máximo es −0,100. Las veinte en rojo, en
+      total y en los tres grupos.</p>
+      <p>La segunda era el plan B: el estado de la partida a los 5 y a los 10 minutos. Lo construimos
+      en el pipeline, y <strong>el modelo final usa el del minuto 10</strong>. Eso lo cuenta Matías al
+      final. Toto sigue con el planteo.</p>
+    </div>
+    <div class="anclas"><strong>Los datos de este bloque, por si frenan acá:</strong>
+    <ul>
+      <li>Grupos por elo medio de la partida: Hierro–Oro 6.559, Platino–Diamante 5.609,
+      Master–Challenger 6.977. Duración mediana 1.821, 1.765 y 1.679 s.</li>
+      <li>Cortes: Platino arranca en 2.000 y Master en 2.900, del proxy de elo del pipeline. Esmeralda
+      queda en el grupo del medio.</li>
+      <li>Sólo el 40,4 % de las partidas tiene a los diez jugadores en el mismo grupo.</li>
+      <li>La diferencia de elo se debilita al subir el nivel: −0,076, −0,036 y −0,014.</li>
+      <li>Adentro del modelo, las veinte juntas tampoco suman: sacarlas lo empeora 0,4 s, con un
+      desvío de 4,5.</li>
+    </ul></div>
+    <p class="pase">→ Pase: «Toto sigue con el planteo.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 2 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">2 · Rodrigo «Toto» Viluron</span><span class="reloj">2:00 → 4:30</span></div>
+  <div class="cuerpo">
+    <p class="tema">El planteo, primera parte · qué se predice, la métrica y el piso</p>
+    <div class="pantalla"><b>En Colab:</b> <b>Sección 2</b> → «La métrica: el MAE, en segundos». Después,
+    al final de la <b>Sección 3</b>, <code># El piso, medido con la misma validación cruzada</code> y
+    <code># El piso por grupo…</code>.</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>Predecimos la duración en segundos, un número: es regresión. La métrica es el
+      <strong>MAE</strong>, el error absoluto medio. Elegimos ésa porque se lee directo, «le erramos
+      por tantos segundos», y porque trata igual un error en cualquier tramo. En este problema ningún
+      tramo es más caro que otro. El R² va al lado, como lectura secundaria.</p>
+      <p>El piso es un <code>DummyRegressor</code> con la mediana, porque con el MAE la constante que
+      menos erra es la mediana. Medido con la misma validación cruzada que todo lo demás da
+      <strong>328,4 segundos, con un desvío de 4,9</strong>: contestar siempre lo mismo erra cinco
+      minutos y medio. Es el número contra el que se lee todo.</p>
+      <p>Por grupo, el piso no es el mismo: <strong>364,9 en Hierro–Oro</strong> contra 309 en los
+      otros dos. Las partidas de nivel bajo son más dispersas, así que adivinarlas cuesta más. Por eso
+      cada grupo se compara contra su propio piso. Cocha cuenta cómo partimos los datos.</p>
+    </div>
+    <div class="anclas"><strong>Los datos de este bloque:</strong>
+    <ul>
+      <li>Piso por grupo: 364,9 · 309,0 · 309,7. R² del piso: 0, por definición.</li>
+      <li>Si preguntan por el RMSE: castiga más los errores grandes, y en este problema las partidas
+      largas no son más caras de errar que las cortas. El MAE se defiende en segundos.</li>
+      <li>La Sección 7 muestra qué pasaría si las puntas importaran más: con pesos por banda, las de
+      más de 40 minutos mejoran (818 → 743) y el total empeora a 324,0. Habría que declarar otra
+      métrica.</li>
+    </ul></div>
+    <p class="pase">→ Pase: «Cocha cuenta cómo partimos los datos.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 3 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">3 · Anthony «Cocha» Cochachin</span><span class="reloj">4:30 → 7:00</span></div>
+  <div class="cuerpo">
+    <p class="tema">El planteo, segunda parte · la partición, la validación y el pipeline</p>
+    <div class="pantalla"><b>En Colab:</b> <b>Sección 2</b> → «La partición…»
+    (<code># El objetivo, las columnas crudas, y la partición</code>) y «La validación: cinco pedazos al
+    azar…» (<code># Los cinco pedazos del entrenamiento</code>). Después, <b>Sección 3</b> →
+    <code># Qué le llega al modelo…</code>.</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>El test es el <strong>20 %, 3.829 partidas</strong>, separado una sola vez, con la semilla y
+      estratificado por grupo de elo, para que ningún grupo quede con menos partidas de prueba por
+      azar. No se mira hasta el final.</p>
+      <p>Todo lo que se elige se elige con <strong>validación cruzada de cinco pedazos</strong> sobre el
+      entrenamiento. Los pedazos van al azar, con <code>KFold</code>, porque una fila es una partida, la
+      clave no se repite y no hay fecha para hacer un corte temporal. Lo que sí se repite, y no está en
+      las columnas, es <strong>el jugador semilla</strong>: el DAG baja hasta quince partidas de cada
+      jugador de la escalera, así que el mismo jugador puede quedar de los dos lados. Lo correcto sería
+      <code>GroupKFold</code>, pero ese identificador no llegó al CSV. Lo declaramos y lo vigilamos: si
+      inflara la validación, el test daría peor. Dio en línea.</p>
+      <p>Y todo va adentro de un pipeline de tres pasos. <strong>Derivar</strong> arma, desde las 137
+      columnas crudas, lo que decidió la Entrega 2: las doce sumas de agregados, el elo medio, la
+      log-maestría, la plataforma y las veinte diferencias. Son 35 columnas. <strong>Preparar</strong>
+      imputa con la mediana, escala y codifica la plataforma: llegan 40 al modelo, con cero nulos. Nada
+      se calcula afuera. Ezequiel con los resultados.</p>
+    </div>
+    <div class="anclas"><strong>Los datos de este bloque:</strong>
+    <ul>
+      <li>Train y test con la misma proporción por grupo: 34,3 % · 29,3 % · 36,4 %. En el test, 1.312,
+      1.122 y 1.395 partidas.</li>
+      <li>Cada pedazo entrena con unas 12.250 partidas y valida con unas 3.060.</li>
+      <li>Test contra validación: 315,5 contra 319,3 sin el minuto; 294,7 contra 297,3 con él.</li>
+      <li>No entran: los <code>champ_id</code> (173 por posición, ninguna composición repetida), los
+      hechizos y runas como códigos, y <code>roles_inferidos</code>.</li>
+    </ul></div>
+    <p class="pase">→ Pase: «Ezequiel con los resultados.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 4 ---------------- -->
+<div class="turno nueva">
+  <div class="cab"><span class="quien">4 · Ezequiel Aguilar</span><span class="reloj">7:00 → 11:30</span></div>
+  <div class="cuerpo">
+    <p class="tema">El resultado, primera parte · el modelo con las condiciones iniciales</p>
+    <div class="pantalla"><b>En Colab:</b>
+    <ul>
+      <li><b>Sección 4</b>: <code># Las cuatro familias…</code> y el gráfico de media ± desvío.</li>
+      <li><b>Sección 6</b>: <code># Las cuatro búsquedas…</code> y <code># La regla de la cátedra,
+      escrita…</code>.</li>
+      <li><b>Sección 8</b>: <code># El elegido y el piso…</code>.</li>
+      <li><b>Sección 9</b>: <code># El error por banda…</code> y <code># El escalón de los quince
+      minutos…</code>.</li>
+      <li><b>Sección 10</b>: <code># Importancia por permutación…</code>.</li>
+    </ul></div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>Primero el simple: una regresión lineal <code>Ridge</code> con el pipeline completo. Contra
+      ella, un árbol, un bosque y un boosting, con los mismos cinco pedazos. <strong>La lineal da 319,4
+      ± 4,5</strong>: le gana al piso por nueve segundos, dos desvíos. El árbol sin límite memoriza:
+      cero en train y 467,8 en validación, peor que el piso. El bosque y el boosting empatan con la
+      lineal: 321 y 320, con barras que se superponen.</p>
+      <p>Después ajustamos cada familia con curvas de validación y una grilla, y todas llegan al mismo
+      lugar, alrededor de 319. El mejor de las grillas es el boosting, y le saca a la lineal
+      <strong>0,3 segundos con un desvío de 4,3</strong>. Con la regla de la cátedra se queda la
+      lineal, con <code>alpha</code> 1.000; además es la que menos sobreajusta y la única que se lee
+      directo.</p>
+      <p>Probamos dos cosas para que no conteste siempre el centro: pesos por banda de duración, que
+      mejoran las partidas largas pero suben el total a 324, y curvas para el elo, que mejoran 0,2
+      segundos, ruido. Ninguna entra.</p>
+      <p>Recién ahí miramos el test, una vez: <strong>315,5 contra 325,5 del piso</strong>, diez
+      segundos, R² 0,041. <strong>Dónde se equivoca: en las puntas.</strong> Predice entre 1.430 y
+      2.026 segundos cuando lo real va de 310 a 3.850. El peor tramo son las partidas que terminan
+      entre 900 y 960 segundos, el minuto 15, cuando se habilita la rendición: 782 segundos de error.
+      Ninguna condición inicial puede ver una rendición, porque se decide adentro de la partida.</p>
+      <p><strong>En qué se apoya: en el elo, y casi en nada más.</strong> Desordenarlo le sube el error
+      13,4 segundos, más que toda la ganancia. ¿Es una fuga? El elo se lee después de jugar, así que
+      tiene un error de medición, pero ganar o perder mueve los puntos igual en una partida de 20
+      minutos que en una de 40: no trae la duración escrita. Conclusión: <strong>con las condiciones
+      iniciales casi no se puede</strong>. Matías cuenta qué pasa cuando miramos adentro de la
+      partida.</p>
+    </div>
+    <div class="anclas"><strong>Los datos de este bloque:</strong>
+    <ul>
+      <li>Brecha train–validación: lineal 1,1 · boosting 20 · bosque 202. Ajustados: árbol profundidad 3
+      → 322,5; bosque 319,1 (hojas de 50); boosting 319,1 (<code>learning_rate</code> 0,1, 7 hojas);
+      lineal 319,3, plana entre <code>alpha</code> 0,01 y 1.000.</li>
+      <li>Columnas: sacar las veinte diferencias empeora 0,4 s; la plataforma, 1,0; las dos, 1,5. Todo
+      debajo del desvío.</li>
+      <li>Por grupo, en el test: gana 13,4 s en Master–Challenger, 8,9 en Hierro–Oro, 7,0 en
+      Platino–Diamante.</li>
+      <li>Bandas: erra 117 s entre 25 y 30 minutos; sobreestima 762 las de menos de 20 y subestima 824
+      las de más de 40.</li>
+      <li>Coeficientes: <code>elo_partida</code> −77,2 s por desvío; LA2 +47,1; KR −41,5. Pearson del elo
+      con la duración: −0,161. En Hierro–Oro se da vuelta (+0,042): la U invertida de la Sección 7.</li>
+      <li>Pesos con fuerza 1: las de menos de 20 <em>empeoran</em> (755 → 782). No había ninguna pista
+      de una partida corta.</li>
+    </ul></div>
+    <p class="pase">→ Pase: «Matías cuenta qué pasa cuando miramos adentro de la partida.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 5 ---------------- -->
+<div class="turno nueva">
+  <div class="cab"><span class="quien">5 · Matías Telo</span><span class="reloj">11:30 → 16:00</span></div>
+  <div class="cuerpo">
+    <p class="tema">El resultado, segunda parte · el estado al minuto 10, el modelo final</p>
+    <div class="pantalla"><b>En Colab:</b> <b>Sección 11</b>, en orden:
+    <ul>
+      <li><code># Los CSV del minuto 5 y del minuto 10…</code></li>
+      <li><code># Cada columna del minuto contra la duración…</code></li>
+      <li><code># Wards colocados al minuto 10…</code></li>
+      <li><code># Por minuto: el piso y el elegido sin el minuto…</code></li>
+      <li>«Con cuál nos quedamos: el minuto 10»</li>
+      <li><code># El test, una vez por minuto…</code></li>
+      <li><code># El error por banda de duración, sin el minuto y con él…</code></li>
+      <li><code># Los coeficientes del modelo final…</code></li>
+    </ul></div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>La segunda corrección era mirar la partida ya empezada. Agregamos al DAG una rama que baja la
+      línea de tiempo de cada partida al bronce y la corta en la plata, en un dataset aparte por
+      minuto, que se une por <code>match_id</code>. Va aparte porque <strong>cambia la
+      pregunta</strong>: ya no es cuánto va a durar antes de empezar, sino sabiendo cómo va al minuto
+      10. Al minuto 10 quedan 19.008 partidas: 137 terminan antes y no tienen estado en ese minuto.</p>
+      <p>Antes de modelar medimos cada columna con el semáforo. Al minuto 10, la diferencia de oro da
+      <strong>−0,285</strong>, la de experiencia −0,250 y la de asesinatos −0,240: <strong>amarillo,
+      las primeras columnas del proyecto que salen del rojo</strong>, y con el signo de H9. Lo que no
+      apareció en las condiciones iniciales aparece cuando la partida empezó. Al minuto 5, todo
+      rojo.</p>
+      <p>Dejamos tres cosas afuera. Las placas, porque su chequeo no se pudo verificar. Los wards,
+      porque no son sólo wards: Riot cuenta como ward objetos de habilidades de algunos campeones. Con
+      Warwick en el equipo salen 206 wards a los diez minutos, contra 30 de media, y además no se mueven
+      con la duración. Y la primera sangre, que tampoco se mueve. Entran oro, experiencia, súbditos,
+      nivel, asesinatos, torres y monstruos, como diferencia y como total, igual que las 137.</p>
+      <p>Comparamos sobre las mismas partidas de train y test. <strong>Al minuto 5 la mejora es de
+      2,5 segundos, con un desvío de 4,3: no es una diferencia. Al minuto 10, 15 segundos con un
+      desvío de 3: cinco desvíos.</strong> El boosting vuelve a empatar con la lineal, así que se queda
+      la lineal. Por eso elegimos el minuto 10, y lo elegimos con la validación cruzada, no con el
+      test.</p>
+      <p>El test, mirado una vez: <strong>294,7 segundos</strong>, contra 307 sin el minuto y 317,6 del
+      piso, sobre las mismas partidas. Dónde se equivoca: abre las predicciones y mejora las puntas;
+      las de menos de 20 minutos pasan de 724 a 625 de error. La rendición sigue siendo el peor tramo,
+      con 660. En qué se apoya: en el elo y en la diferencia de oro al minuto 10, con −66,9 segundos
+      por desvío. No es fuga, porque se conoce en el minuto 10. Y el costo, declarado: predice a los
+      diez minutos de juego y no vale para las partidas que terminan antes. Es el modelo que va a usar
+      la Entrega 4.</p>
+    </div>
+    <div class="anclas"><strong>Los datos de este bloque:</strong>
+    <ul>
+      <li>Modelo final: <code>Ridge(alpha=100)</code> + pipeline + rama del minuto: 49 columnas
+      derivadas. <code>alpha</code> 1, 10 y 100 empatan en 297,3; con 1.000, 297,5.</li>
+      <li>Validación cruzada al minuto 10: piso 321,6 · sin el minuto 312,4 ± 2,4 · lineal + minuto
+      297,3 ± 3,0 · boosting + minuto 297,5 ± 3,1. R² 0,056 → 0,140.</li>
+      <li>Test al minuto 10, R² 0,129. Por grupo: Hierro–Oro 343,5 → 324,4; Platino–Diamante 287,5 →
+      280,2; Master–Challenger 288,8 → 278,6.</li>
+      <li>Al minuto 5, en el test: 312,2 contra 315,5. Ganancia 3,3 s; al minuto 10, 12,3 s.</li>
+      <li>Desvío de las predicciones: 89 → 156 s. La banda de 25 a 30 empeora (122 → 156): abrir las
+      predicciones cuesta en el centro.</li>
+      <li>Permutación: elo 15,6 s; diferencia de oro 8,6; experiencia 2,4; plataforma 2,4.</li>
+      <li>Coeficientes: elo −83,3; diferencia de oro −66,9; LA2 +51,0; KR −45,0; experiencia −40,5;
+      monstruos −15,7.</li>
+      <li>El chequeo de calidad del timeline: torres y monstruos coinciden 100 %; kills 84,7 %, porque
+      la referencia contaba ejecuciones (ya corregido); wards 29,5 % y 79,5 %; placas 0,3–0,6 %.</li>
+    </ul></div>
+    <p class="pase">→ Cierre: «Ése es el modelo. ¿Qué querés que profundicemos?»</p>
+  </div>
+</div>
+</div>
+
+<!-- ============================ 5 ============================ -->
+<div class="seccion">
+<span class="n">Sección 5</span>
+<h2 style="margin-top:0;border:none">Lo que la consigna dice que se pregunta</h2>
+
+<p>Son seis, y la consigna las escribe tal cual. Cada una tiene un dueño que arranca si el docente la
+tira al grupo; si se la hace a otro, contesta ése.</p>
+
+<div class="pregunta"><span class="duenio">Toto</span><span class="q">«¿Por qué esa métrica? ¿Qué error
+es más caro en tu problema, y la métrica lo ve?»</span>
+<p class="corta">Ningún tramo de la duración es más caro que otro, y el MAE trata igual a todos los
+errores y se lee en segundos.</p>
+<p class="mas">Si importara no errarle a las partidas largas, habría que pesar las puntas. Lo
+probamos en la Sección 7: las de más de 40 minutos mejoran de 818 a 743, pero el MAE total sube a
+324,0. Con el MAE declarado, sin pesos.</p></div>
+
+<div class="pregunta"><span class="duenio">Matías</span><span class="q">«¿Cuánto le gana tu modelo al
+piso, y eso es mucho o poco para lo que querés hacer?»</span>
+<p class="corta">22,9 segundos en el test (294,7 contra 317,6), un 7 %, con R² 0,129. Para predecir una
+partida puntual es poco: sigue errando casi cinco minutos en promedio.</p>
+<p class="mas">Lo que sí es claro es el salto: al modelo sin el minuto le gana por cinco desvíos en
+validación cruzada. Con condiciones iniciales solas, la ganancia sobre el piso era de 10 s.</p></div>
+
+<div class="pregunta"><span class="duenio">Cocha</span><span class="q">«¿Por qué los pedazos se arman
+así, y qué le pasaría al número si los armaras al azar?»</span>
+<p class="corta">Están armados al azar, porque cada fila es una partida única y no hay fecha. El
+riesgo es el jugador semilla repetido, que no está en las columnas.</p>
+<p class="mas">Si inflara la validación, el test saldría peor que ella, y salió en línea: 315,5
+contra 319,3, y 294,7 contra 297,3. No se puede descartar del todo sin <code>GroupKFold</code>, y para eso
+el identificador del jugador semilla tiene que llegar al CSV.</p></div>
+
+<div class="pregunta"><span class="duenio">Ezequiel</span><span class="q">«¿Por qué ese modelo y no uno
+más complejo?»</span>
+<p class="corta">Porque el complejo no le gana por más que el desvío. Al minuto 10, el boosting da 297,5
+± 3,1 contra 297,3 ± 3,0 de la lineal; sin el minuto, le sacaba 0,3 con un desvío de 4,3.</p>
+<p class="mas">Además, el boosting memoriza más: 6 a 7 s de brecha entre train y validación, contra
+uno de la lineal. Y la lineal se lee: los coeficientes tienen signo.</p></div>
+
+<div class="pregunta"><span class="duenio">Ezequiel</span><span class="q">«Un tramo donde erra mucho, y
+una explicación desde tu dominio.»</span>
+<p class="corta">Las partidas que terminan entre los 900 y los 960 segundos: el minuto 15, cuando el
+juego habilita la rendición.</p>
+<p class="mas">Sin el minuto se erran por 782 s, porque una rendición es una votación después de una
+desventaja armada adentro de la partida, y ninguna condición inicial la ve. Con el minuto 10 el error
+baja a 660: la ventaja ya armada la anticipa en parte. Sigue siendo el peor tramo.</p></div>
+
+<div class="pregunta"><span class="duenio">Matías</span><span class="q">«La columna que más pesa, y qué
+hiciste para descartar que sea una fuga.»</span>
+<p class="corta">El elo. Se lee al bajar la partida, así que incluye los puntos de esa partida: tiene
+error de medición. Pero ganar o perder mueve los puntos igual en una partida corta que en una larga,
+así que no trae la duración escrita. Su Pearson es −0,161.</p>
+<p class="mas">La segunda, la diferencia de oro al minuto 10, se conoce en el minuto 10, antes del
+final. Y nada da demasiado bien: R² 0,129.</p></div>
+</div>
+
+<!-- ============================ 6 ============================ -->
+<div class="seccion">
+<span class="n">Sección 6</span>
+<h2 style="margin-top:0;border:none">Banco de preguntas dirigidas</h2>
+
+<h3>Sobre el minuto 10</h3>
+
+<div class="pregunta"><span class="duenio">Matías</span><span class="q">«¿Por qué el minuto 10 y no el
+5?»</span>
+<p class="corta">Por la validación cruzada: el 10 mejora 15,0 s con un desvío de 3,0; el 5, 2,5 con un
+desvío de 4,3, que no es una diferencia. El test se miró después y confirmó el orden.</p></div>
+
+<div class="pregunta"><span class="duenio">Facundo</span><span class="q">«¿Y por qué no el 15, que
+tendría más señal?»</span>
+<p class="corta">El docente pidió el 5 y el 10, y medimos esos dos. El 15 está corrido y versionado,
+pero no modelado.</p>
+<p class="mas">Cuanto más tarde, más señal, pero menos anticipación, y más partidas afuera: 267 al
+minuto 15, contra 137 al 10.</p></div>
+
+<div class="pregunta"><span class="duenio">Facundo</span><span class="q">«¿Eso no es cambiar la
+pregunta del proyecto?»</span>
+<p class="corta">Sí, y lo declaramos. Con condiciones iniciales la respuesta es «casi no se puede»
+(secciones 2 a 10). La pregunta nueva —cuánto dura sabiendo cómo va al minuto 10— es el plan B que
+propuso el docente.</p>
+<p class="mas">Por eso el dataset del minuto está aparte de las 137 columnas: mezclarlo escondería que
+la pregunta cambió.</p></div>
+
+<div class="pregunta"><span class="duenio">Toto</span><span class="q">«¿Por qué sacaron los wards?»</span>
+<p class="corta">Porque no son sólo wards. Riot registra como ward objetos de habilidades de campeones:
+con Warwick en el equipo, 206,6 al minuto 10, contra una media de 30,2; quien juega contra Illaoi
+«destruye» 16,4, contra 2,4. Además, no se mueven con la duración (|r| ≤ 0,03).</p>
+<p class="mas">Corregirlo es filtrar los eventos por tipo de ward y volver a correr la plata. No se
+hizo, porque no aportaban.</p></div>
+
+<div class="pregunta"><span class="duenio">Cocha</span><span class="q">«El chequeo de asesinatos dio
+84,7 %. ¿Están bien?»</span>
+<p class="corta">Sí. El problema era la referencia: <code>objectives.champion</code> cuenta las muertes
+del rival con las ejecuciones (torre o súbdito) incluidas, y nosotros contamos como el marcador del
+juego, sin ellas.</p>
+<p class="mas">En el bronce local, en 4 de 40 equipos ese total supera por uno a los kills de sus
+jugadores. El chequeo ya compara contra los jugadores; el número nuevo sale con la próxima
+corrida.</p></div>
+
+<div class="pregunta"><span class="duenio">Matías</span><span class="q">«¿Cómo bajaron el timeline?
+¿Vuelven a pedir todo si cambian el minuto?»</span>
+<p class="corta">No. El timeline va entero al bronce, una request por partida, y es append-only. El
+corte en el minuto se hace en la plata, con el parámetro <code>minuto_corte</code>: cambiar de minuto no
+le pide nada a Riot.</p></div>
+
+<div class="pregunta"><span class="duenio">Cocha</span><span class="q">«¿Por qué empeora la banda de 25
+a 30 minutos con el minuto 10?»</span>
+<p class="corta">Porque el modelo abre las predicciones y deja de contestar siempre el centro: gana en
+las puntas y pierde un poco en el medio (122 → 156). La diferencia con los pesos de la Sección 7 es que
+ahora el total mejora.</p></div>
+
+<h3>Sobre el modelo y la validación</h3>
+
+<div class="pregunta"><span class="duenio">Ezequiel</span><span class="q">«¿Qué hace el
+<code>alpha</code> de Ridge, y por qué 100?»</span>
+<p class="corta">Achica los coeficientes: más <code>alpha</code>, más regularización. Al minuto 10,
+1, 10 y 100 empatan en 297,3; la grilla se queda con 100. Sin el minuto daba lo mismo entre 0,01 y
+1.000.</p>
+<p class="mas">No hay varianza para quitar: la brecha entre train y validación es de un segundo.</p></div>
+
+<div class="pregunta"><span class="duenio">Toto</span><span class="q">«¿Por qué el árbol da cero en
+train?»</span>
+<p class="corta">Porque sin límite de profundidad cada partida termina en su propia hoja: memoriza.
+En validación erra 467,8, peor que el piso. Limitado a profundidad 3, llega a 322,5.</p></div>
+
+<div class="pregunta"><span class="duenio">Cocha</span><span class="q">«¿Por qué entra la plataforma?»</span>
+<p class="corta">Se conoce antes de jugar, porque sale del prefijo de <code>match_id</code>, y era la
+categórica más asociada al objetivo en la Entrega 2 (η² 0,020).</p>
+<p class="mas">Sacarla empeora 1,0 s, menos que el desvío: no se defiende como mejora. Los
+coeficientes repiten las medias por servidor: LA2 alarga, KR acorta.</p></div>
+
+<div class="pregunta"><span class="duenio">Facundo</span><span class="q">«¿Por qué las diferencias en
+valor absoluto?»</span>
+<p class="corta">Porque t1 y t2 son los <code>teamId</code> 100 y 200, que Riot asigna sin criterio (H3
+de la Entrega 2). El signo no significa nada; lo que significa es cuánto se separan.</p></div>
+
+<div class="pregunta"><span class="duenio">Toto</span><span class="q">«¿Qué son los pesos por banda, y
+por qué no los usaron?»</span>
+<p class="corta">El <code>class_weight</code> llevado a regresión: las partidas de bandas poco pobladas
+pesan más al entrenar. Con fuerza 1 el MAE sube a 324,0. Es un intercambio, y con el MAE declarado
+gana no usarlos.</p>
+<p class="mas">Lo que enseñó: las de menos de 20 minutos empeoraron, porque ninguna condición inicial
+anticipa una partida corta. Con el minuto 10, en cambio, mejoran.</p></div>
+
+<div class="pregunta"><span class="duenio">Facundo</span><span class="q">«En Hierro–Oro el elo da
+positivo. ¿Cómo se explica?»</span>
+<p class="corta">La relación del elo con la duración es una U invertida, con el máximo cerca de elo
+2.000: sube hasta ahí y después baja. Por eso dentro de Hierro–Oro da +0,042.</p>
+<p class="mas">Dibujarla con curvas mejora 0,2 s, nada. Por qué las partidas más largas son las del
+nivel medio-bajo es una pregunta que el notebook no contesta.</p></div>
+
+<div class="pregunta"><span class="duenio">Ezequiel</span><span class="q">«¿Qué quedó
+inconcluso?»</span>
+<p class="corta">Cinco cosas:</p>
+<ol>
+  <li>el número nuevo del chequeo de asesinatos;</li>
+  <li>los wards contados bien, filtrados por tipo;</li>
+  <li>las placas, sin verificar;</li>
+  <li>la validación por jugador semilla;</li>
+  <li>la causa de la U invertida del elo.</li>
+</ol></div>
+
+<div class="pie">
+  <p><strong>FF-15 · Guión de la defensa de la Entrega 3 · Grupo 5K09-02</strong><br>
+  Fuente editable: <code>docs/guion-defensa-entrega3.html</code> · Regenerar el PDF:
+  <code>python docs/generar_pdf.py guion-defensa-entrega3.html</code> · El detalle de todo lo que se
+  dice está en la Parte IX de <code>docs/documentacion-proyecto.pdf</code>.</p>
+</div>
+</div>
+
+</body>
+</html>

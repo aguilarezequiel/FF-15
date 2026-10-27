@@ -14,15 +14,18 @@ MIN = timeline.MS_POR_MINUTO
 
 def _partida(duracion=1500):
     participantes = [{"participantId": i, "teamId": 100 if i <= 5 else 200,
+                      "kills": 1 if i in (1, 2, 7) else 0,
                       "wardsPlaced": 1, "wardsKilled": 0,
                       "challenges": {"turretPlatesTaken": 1 if i == 1 else 0}}
                      for i in range(1, 11)]
+    # objectives.champion.kills son las muertes del rival: el 200 suma la
+    # ejecución del jugador 3, que no figura en los kills de ningún jugador
     objetivos = {
         100: {"champion": {"first": False, "kills": 2},
               "tower": {"first": True, "kills": 1},
               "inhibitor": {"first": False, "kills": 0},
               "dragon": {"first": True, "kills": 1}},
-        200: {"champion": {"first": True, "kills": 1},
+        200: {"champion": {"first": True, "kills": 2},
               "tower": {"first": False, "kills": 0},
               "inhibitor": {"first": False, "kills": 0},
               "dragon": {"first": False, "kills": 0}},
@@ -115,6 +118,15 @@ def test_chequeo_contra_partida_coincide():
     assert resultado["wards_killed"] is True
     assert resultado["kills"] is True
     assert resultado["first_blood"] is True
+
+
+def test_chequeo_de_kills_compara_con_los_jugadores():
+    """Los kills se comparan con los de los jugadores, no con objectives:
+    si un jugador no tiene el kill que le da el timeline, salta."""
+    partida = _partida()
+    jugador_7 = partida["info"]["participants"][6]
+    jugador_7["kills"] = 0
+    assert timeline.chequeo_contra_partida(partida, _timeline())["kills"] is False
 
 
 def test_chequeo_detecta_una_lectura_al_reves():

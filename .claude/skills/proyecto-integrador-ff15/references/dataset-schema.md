@@ -177,7 +177,12 @@ Columnas: `match_id`, `game_duration_s`, y por cada métrica `t1_{m}_mN`, `t2_{m
 
 El equipo de cada `participantId` sale del **detalle de la partida**, no del `puuid` (encriptado por key; partida y timeline pueden venir con keys distintas).
 
-**Lectura sin verificar al escribirla:** que `teamId` en torres y placas es el dueño de la torre. `timeline.chequeo_contra_partida` recorre la partida entera y compara contra `teams[].objectives` (kills, torres, monstruos, primera sangre), `challenges.turretPlatesTaken` (placas) y `wardsPlaced`/`wardsKilled`. El resultado queda en `reports/calidad_minutoN.md`. Una métrica que no coincide casi nunca no se usa hasta corregir el módulo.
+**Lectura de `teamId` como dueño de la torre:** verificada en torres (100 % en la corrida del 26/10); en placas, **sin verificar**. `timeline.chequeo_contra_partida` recorre la partida entera y compara contra `teams[].objectives` (torres, monstruos, primera sangre), la suma de `kills` de los jugadores (kills), `challenges.turretPlatesTaken` (placas) y `wardsPlaced`/`wardsKilled`. **No usar `objectives.champion.kills` como referencia de kills**: son las muertes del rival e incluyen las ejecuciones, que el módulo no cuenta; contra él el chequeo daba 84,7 % sin que la lectura estuviera mal (corregido el 27/10). El resultado queda en `reports/calidad_minutoN.md`. Una métrica que no coincide casi nunca no se usa hasta corregir el módulo.
+
+**Lo que mostró la primera corrida (26/10, minutos 5, 10 y 15; CSV y reportes en `notebooks/entrega-3/datos/`):** 19.145 / 19.008 / 18.878 filas, ninguna sin timeline. Chequeo: torres y monstruos 100 %, primera sangre 99,8 %, kills 84,7 % (referencia mal elegida, ver arriba), `wards_killed` 79,5 %, `wards_placed` 29,5 %, placas 0,3–0,6 %.
+
+- **Los wards están contaminados**: `WARD_PLACED`/`WARD_KILL` incluyen objetos de habilidades de campeones (reportado en RiotGames/developer-relations #96 y Minonka PR #131 con `wardType: "UNDEFINED"`). Con Warwick en el equipo, 206,6 wards al minuto 10 contra 30,2 de media; el rival de Illaoi destruye 16,4 contra 2,4. La corrección sería filtrar por `wardType`; no se hizo. **Fuera del modelo**, igual que las placas y la primera sangre (decisión del usuario, 27/10).
+- Al minuto 5, torres y monstruos épicos son constantes (cero).
 
 Quedan afuera: las que no pasan la admisión del principal, las que duran ≤ N minutos, las que no tienen timeline en Riot (404, indexadas en `bronze/descartadas/sin_timeline_plataforma=X.txt`) y aquellas cuyo timeline no llega al minuto. Único nulo permitido: `first_blood_s_mN` (no hubo primera sangre antes del corte).
 

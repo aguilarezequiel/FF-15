@@ -7,7 +7,7 @@
 
 Pipeline de Apache Airflow que construye el dataset del proyecto a partir de la **API oficial de Riot Games**, usando exclusivamente variables conocidas **antes de que la partida empiece**.
 
-Desde la Entrega 3 arma además un **segundo dataset**, aparte: el estado de la partida en el **minuto 5**, sacado de la línea de tiempo de cada partida. Cambia la pregunta —«¿cuánto dura, sabiendo cómo iba en el minuto 5?»— y por eso no se mezcla con las 137 columnas de condiciones iniciales.
+Desde la Entrega 3 arma además un **segundo dataset**, aparte: el estado de la partida en el **minuto N** (se corrieron el 5, el 10 y el 15), sacado de la línea de tiempo de cada partida. Cambia la pregunta —«¿cuánto dura, sabiendo cómo iba en el minuto N?»— y por eso no se mezcla con las 137 columnas de condiciones iniciales.
 
 ---
 
@@ -128,7 +128,7 @@ df.columns[df.isna().all()]                     # vacío
 
 `validate` además hace fallar el DAG si la clave repite, si falta una columna obligatoria, si aparece una columna 100 % nula o si el target se sale del rango plausible. **No se publica un dataset roto.**
 
-El dataset al minuto N deja su propio reporte en `include/output/reports/calidad_minutoN.md`. Lo más importante ahí es la tabla **«Los eventos contra el detalle de la partida»**: cada evento del timeline se cuenta sobre la partida entera y se compara con el total final que trae la partida. Si una métrica no coincide, el evento se está leyendo mal y no se usa hasta corregirlo.
+El dataset al minuto N deja su propio reporte en `include/output/reports/calidad_minutoN.md`. Lo más importante ahí es la tabla **«Los eventos contra el detalle de la partida»**: cada evento del timeline se cuenta sobre la partida entera y se compara con el total final que trae la partida. Si una métrica no coincide, no se usa hasta entender por qué: puede ser el evento leído mal o el total de referencia mal elegido (en la primera corrida, los kills fallaban porque la referencia contaba las ejecuciones).
 
 ### Completar los timelines de un bronce que ya existe
 
@@ -225,6 +225,20 @@ Lo que el análisis dejó decidido, en tres líneas:
 - **Salen 24 columnas** con un número detrás, y los 34 agregados de equipo se
   colapsan en 17 sumas porque los rótulos `t1`/`t2` son arbitrarios.
 
+## El modelado (Entrega 3)
+
+`notebooks/entrega-3/modelado_entrega3.ipynb`, ejecutado y con las salidas guardadas. Lee el mismo
+CSV congelado y los CSV del minuto que viajan en `notebooks/entrega-3/datos/`.
+
+- **Con las condiciones iniciales solas, casi no se puede.** El mejor modelo, una `Ridge`, erra
+  315,5 s en el test contra 325,5 del piso (contestar siempre la mediana). Ningún árbol le gana por
+  más que el desvío.
+- **El modelo final suma el estado de la partida al minuto 10**: `Ridge(alpha=100)`, 294,7 s en el
+  test contra 317,6 del piso y 307,0 sin el minuto, sobre las mismas partidas. Se apoya en el elo y
+  en la diferencia de oro a los diez minutos. El minuto 5 no mejora por más que el desvío.
+- **Cambia la pregunta**: predice a los diez minutos de juego, y no vale para las 137 partidas que
+  terminan antes. Placas, wards y primera sangre del timeline quedaron fuera del modelo.
+
 ## Probar
 
 ```bash
@@ -237,7 +251,7 @@ ruff check .        # estilo
 
 Para entender el proyecto entero —la teoría de la materia, el recorrido archivo por archivo,
 la guía de ejecución y la preparación de la defensa— está
-**[`docs/documentacion-proyecto.pdf`](docs/documentacion-proyecto.pdf)** (89 páginas).
+**[`docs/documentacion-proyecto.pdf`](docs/documentacion-proyecto.pdf)** (101 páginas).
 
 Se edita en `docs/documentacion-proyecto.html` y se regenera con `python docs/generar_pdf.py`.
 Es un documento vivo: cada avance del proyecto se refleja ahí, agregando lo nuevo y borrando
@@ -258,7 +272,7 @@ include/output/       · bronce, plata y entregables (gitignoreado)
 notebooks/            · el análisis de las Unidades 2+
   ├── requirements.txt      · el stack de análisis, en un venv aparte
   ├── entrega-2/            · el EDA, ya ejecutado, con el CSV congelado al lado
-  └── entrega-3/            · el modelado; en datos/ va el CSV del minuto 5
+  └── entrega-3/            · el modelado; en datos/ van los CSV de los minutos 5, 10 y 15
 tests/                · astro dev pytest
 docs/                 · la documentación integral (HTML fuente + PDF)
 Documentacion/        · material de la cátedra
