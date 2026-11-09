@@ -242,6 +242,19 @@ Se aprueba si: el notebook corre entero con semilla y salidas; todo está en un 
 
 Cómo lo resolvimos: Parte IX de `docs/documentacion-proyecto.html` y `docs/guion-defensa-entrega3.pdf`.
 
+### Las correcciones de la Entrega 3 (pedidas por el docente; resueltas el 9/11)
+
+No hay consigna escrita en `Documentacion/`: las cuatro correcciones las transmitió el usuario. El criterio de fondo del docente: **un modelo útil para el jugador**.
+
+1. **Clasificación**: en qué banda de 3 minutos termina la partida, sabiendo lo del minuto 10.
+2. **Distribución del error con gráficos**, no sólo números.
+3. **Probar el MSE**, o buscar una métrica mejor.
+4. **Expresar bien el R²**.
+
+Decisiones del grupo (no reabrir sin preguntar): **el problema pasa a ser de clasificación** y el modelo final es una **regresión logística** (la más simple, y da una probabilidad por banda: «62 % de que termine entre 24 y 33 minutos»); 12 bandas, de 3 min entre 15 y 45 más `<15` y `45+`; se comparan la versión sin pesos y la `balanced` contra el piso, y decide el **F1 macro**, con accuracy, ±1 banda, error en minutos y matriz de confusión al lado; el MSE y el R² se explican en una sección corta sobre la regresión de la E3; el notebook es **corto y con muchos gráficos** (estilo de las prácticas: curva de C, barras de error, matrices de confusión, métricas por banda, calibración, coeficientes, permutación). **Resultado**: queda la **sin pesos, `C=1`** (F1 macro 0,099 en el test, piso 0,025). En minutos casi no le gana al piso (38,0 % contra 37,0 % de partidas a menos de 3 minutos); lo que aporta son probabilidades calibradas que cambian de partida en partida (dice 56 %, pasa 56 %). `balanced` no le gana en F1, cae por debajo del piso en accuracy y rompe la calibración.
+
+Notebook: `notebooks/entrega-4/correcciones_entrega3.ipynb` (no es la Entrega 4: la app no se empezó). Detalle: Parte X de `docs/documentacion-proyecto.html`.
+
 ## Errores de años anteriores
 
 Del Kit de arranque, sección 5:

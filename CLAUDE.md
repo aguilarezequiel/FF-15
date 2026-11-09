@@ -9,12 +9,13 @@
 | Fuente | Riot Games API (`developer.riotgames.com`) + Data Dragon CDN |
 | Unidad de análisis | Una partida clasificatoria (cola 420), Season 16 |
 | Clave primaria | `match_id` |
-| Columna objetivo | `game_duration_s` — segundos, continua → regresión |
+| Columna objetivo | `game_duration_s` — segundos. Hasta la E3, regresión; desde las correcciones de la E3, el modelo final predice **la banda de 3 minutos** en la que termina → clasificación |
 | Datasets | `lol_AAAA-MM-DD.csv` — condiciones iniciales, 137 columnas · `lol_minN_AAAA-MM-DD.csv` — estado de la partida al minuto N (timeline de match-v5), 35 columnas. Se unen por `match_id` |
 | Stack | Apache Airflow 3.3 · Astro Runtime 3.3-4 · Astro CLI · Docker |
 | Entrega 1 | miércoles 9/9, franja 14:55 – 15:15 — **presentada** |
 | Entrega 2 | miércoles 23/9, la clase completa · 20 min con el docente, en privado — **presentada** |
-| Entrega 3 | miércoles 28/10 · 25 min con el docente, en privado · modelo final: `Ridge(alpha=100)` con las 137 columnas + el estado al **minuto 10** (decisión del grupo, 27/10). Es el que usa la app de la Entrega 4 |
+| Entrega 3 | miércoles 28/10 · 25 min con el docente, en privado — **presentada** · modelo final: `Ridge(alpha=100)` con las 137 columnas + el estado al **minuto 10** (decisión del grupo, 27/10). Es el que usa la app de la Entrega 4 |
+| Correcciones de la E3 | pedidas por el docente; hechas el 9/11 en `notebooks/entrega-4/correcciones_entrega3.ipynb`. **El modelo final pasa a ser una regresión logística sin pesos** (`C=1`) que predice la banda de 3 min y da una probabilidad por banda (decisión del grupo). Es el que usaría la app de la E4, que no se empezó |
 
 ---
 
@@ -112,12 +113,15 @@ Para completar los timelines de un bronce que ya existe sin agrandarlo: disparar
 `include/output/reports/calidad_minutoN.md` antes de modelar con esos datos. El CSV del minuto se
 copia a `notebooks/entrega-3/datos/` y se versiona, como el CSV congelado de la E2.
 
+El venv del análisis necesita **Python 3.12 o más nuevo** (`numpy==2.5.2` no se instala con 3.11); con el lanzador de Windows: `py -3.14 -m venv .venv`.
+
 ```bash
 python -m venv .venv                                    # el entorno del análisis
 .venv\Scripts\pip install -r notebooks/requirements.txt
 .venv\Scripts\jupyter lab
 .venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-2/eda_entrega2.ipynb
 .venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-3/modelado_entrega3.ipynb
+.venv\Scripts\jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 notebooks/entrega-4/correcciones_entrega3.ipynb
 python docs/generar_pdf.py guion-defensa-entrega3.html   # el guion de la defensa de la E3
 ```
 
@@ -158,3 +162,9 @@ El método —el semáforo con sus cortes, las seis casillas de una ficha, las t
 El notebook `notebooks/entrega-3/modelado_entrega3.ipynb` se verifica corriéndolo entero (comando de arriba): sin celdas en error, con las salidas guardadas y `SEMILLA = 42`. Lee el CSV de condiciones iniciales con el patrón `lol_2*.csv` (en `entrega-3/datos/` también hay `lol_min*`); en Colab, los cuatro CSV van en `datos/`.
 
 Lo que no se toca sin preguntar: la partición del test (20 %, estratificada por grupo de elo, separada una vez), la regla de la cátedra para elegir (el complejo gana sólo por más que el desvío), y las columnas del minuto que quedaron fuera (placas, wards y primera sangre: ver V.8 y IX.6 del documento integral). El detalle completo está en la Parte IX; el reparto de la defensa, en `docs/guion-defensa-entrega3.pdf`.
+
+### Y para las correcciones de la Entrega 3
+
+`notebooks/entrega-4/correcciones_entrega3.ipynb` usa las mismas clases, la misma partición y los mismos pedazos de la E3, con la banda de 3 minutos como objetivo. No copia CSV: lee `entrega-2/datos/` y `entrega-3/datos/`. Se ejecuta en unos veinte segundos. Al cerrar el kernel en Windows puede aparecer un `KeyError` de `joblib_memmapping_folder`: es la limpieza de joblib, no una celda en error.
+
+Decisiones del grupo que no se reabren sin preguntar: el problema es de **clasificación** (la banda de 3 min en la que termina la partida); 12 bandas, de 3 min entre 15 y 45 más `<15` y `45+`; el modelo final es la **regresión logística sin pesos, `C=1`** (la más simple y la que da probabilidades por banda; `balanced` se probó y se descartó); decide el F1 macro, con accuracy, ±1 banda, error en minutos y matriz de confusión al lado; al jugador se le muestra la probabilidad de su ventana de 3 bandas. El MSE y el R² sólo se explican, sobre la regresión de la E3. El notebook es corto a propósito: hay poco tiempo para mostrarlo. Detalle en la Parte X del documento integral.

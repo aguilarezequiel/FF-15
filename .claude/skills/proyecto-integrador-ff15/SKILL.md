@@ -15,7 +15,7 @@ description: Workflow completo del Proyecto Integrador de Ciencia de Datos (UTN 
 | Fuente | **Riot Games API** (`developer.riotgames.com`) + Data Dragon CDN |
 | Unidad de análisis | **Una partida clasificatoria** (cola 420) de LoL, Season 16 |
 | Clave primaria | `match_id` (ej. `LA2_1617259431`) |
-| Columna objetivo | `game_duration_s` — segundos, continua → **regresión** |
+| Columna objetivo | `game_duration_s` — segundos. Hasta la E3, **regresión**; desde sus correcciones, el modelo final predice la **banda de 3 minutos** → **clasificación** |
 | Stack | Apache Airflow **3.3** sobre **Astro Runtime 3.3-4**, orquestado con Astro CLI |
 | Repo | `github.com/aguilarezequiel/FF-15` |
 
@@ -61,15 +61,18 @@ astro dev logs -f        # logs de los contenedores
 astro dev stop           # apaga sin borrar
 ```
 
-El análisis vive en un entorno aparte, para no engordar la imagen de Airflow:
+El análisis vive en un entorno aparte, para no engordar la imagen de Airflow. Necesita **Python 3.12 o más nuevo** (`numpy==2.5.2` no se instala con 3.11; con el lanzador de Windows, `py -3.14 -m venv .venv`):
 
 ```bash
 python -m venv .venv
 .venv\Scripts\pip install -r notebooks/requirements.txt
 .venv\Scripts\jupyter lab
-# volver a ejecutar el notebook entero, con las salidas guardadas:
+# volver a ejecutar un notebook entero, con las salidas guardadas:
 .venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-2/eda_entrega2.ipynb
+.venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-4/correcciones_entrega3.ipynb
 ```
+
+El modelo final es una **regresión logística sin pesos** (`C=1`) con las 137 columnas y el estado al minuto 10: predice la banda de 3 minutos en la que termina la partida y da una probabilidad por banda. Las correcciones de la E3 que llevaron a eso están en `references/entregas.md`.
 
 Editar un `.py` de `dags/` o de `include/` **no** necesita restart: el dag-processor lo recoge solo en unos segundos.
 
