@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>FF-15 · Guión de la defensa · Entrega 4</title>
+<style>
+@page { size: A4; margin: 18mm 16mm 16mm 16mm; }
+:root{
+  --tinta:#16191d; --suave:#4a5158; --linea:#d8dde2; --fondo:#f6f8fa;
+  --acento:#0b5fa5; --alerta:#a3341f; --verde:#4a7c2f; --ambar:#b7791f;
+}
+*{box-sizing:border-box}
+body{font-family:"Charter","Georgia","Times New Roman",serif;color:var(--tinta);
+  font-size:10.5pt; line-height:1.55; margin:0;}
+h1,h2,h3,h4{font-family:"Segoe UI","Helvetica Neue",Arial,sans-serif;line-height:1.25;
+  color:var(--tinta); page-break-after:avoid;}
+h1{font-size:23pt;margin:0 0 6pt;letter-spacing:-.4pt}
+h2{font-size:16pt;margin:22pt 0 8pt;padding-bottom:4pt;border-bottom:2px solid var(--acento)}
+h3{font-size:12.5pt;margin:16pt 0 5pt;color:var(--acento)}
+h4{font-size:10.5pt;margin:12pt 0 4pt;text-transform:uppercase;letter-spacing:.6pt;color:var(--suave)}
+p{margin:0 0 8pt;text-align:justify}
+ul,ol{margin:0 0 9pt;padding-left:18pt}
+li{margin-bottom:4pt}
+code{font-family:"Cascadia Mono","Consolas","DejaVu Sans Mono",monospace;font-size:9pt;
+  background:var(--fondo);padding:1px 3px;border-radius:3px;border:1px solid var(--linea)}
+table{width:100%;border-collapse:collapse;margin:0 0 11pt;font-size:9.2pt;page-break-inside:avoid}
+th{background:var(--fondo);text-align:left;font-family:"Segoe UI",Arial,sans-serif;
+  font-size:8.8pt;text-transform:uppercase;letter-spacing:.4pt;color:var(--suave);
+  padding:5pt 6pt;border-bottom:1.5px solid var(--acento)}
+td{padding:5pt 6pt;border-bottom:1px solid var(--linea);vertical-align:top}
+tr:last-child td{border-bottom:none}
+
+.portada{height:245mm;display:flex;flex-direction:column;justify-content:center;
+  page-break-after:always;text-align:center}
+.portada .materia{font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;letter-spacing:2.5pt;
+  text-transform:uppercase;color:var(--suave);margin-bottom:14pt}
+.portada h1{font-size:30pt;margin-bottom:10pt}
+.portada .sub{font-size:13pt;color:var(--suave);font-style:italic;margin-bottom:26pt;
+  max-width:135mm;margin-left:auto;margin-right:auto;text-align:center}
+.portada .meta{font-family:"Segoe UI",Arial,sans-serif;font-size:10pt;color:var(--suave);line-height:1.9}
+.portada .equipo{font-family:"Segoe UI",Arial,sans-serif;font-size:10.5pt;color:var(--tinta);
+  line-height:1.8;margin-top:20pt;border-top:1px solid var(--linea);
+  border-bottom:1px solid var(--linea);padding:12pt 0;max-width:120mm;margin-left:auto;margin-right:auto}
+
+.seccion{page-break-before:always;border-top:4px solid var(--acento);padding-top:10pt;margin-top:0}
+.seccion .n{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;letter-spacing:2pt;
+  text-transform:uppercase;color:var(--acento);display:block;margin-bottom:2pt}
+
+.nota,.aviso,.clave{padding:8pt 11pt;margin:0 0 11pt;border-radius:4px;font-size:9.6pt;page-break-inside:avoid}
+.nota{background:#eef4fa;border-left:3px solid var(--acento)}
+.aviso{background:#fdf2ee;border-left:3px solid var(--alerta)}
+.clave{background:#f2f7ee;border-left:3px solid var(--verde)}
+.nota p:last-child,.aviso p:last-child,.clave p:last-child{margin-bottom:0}
+.etiqueta{font-family:"Segoe UI",Arial,sans-serif;font-size:8.5pt;font-weight:600;
+  text-transform:uppercase;letter-spacing:.7pt;display:block;margin-bottom:3pt}
+.nota .etiqueta{color:var(--acento)} .aviso .etiqueta{color:var(--alerta)} .clave .etiqueta{color:var(--verde)}
+
+.turno{border:1.5px solid var(--acento);border-radius:5px;margin:0 0 14pt;overflow:hidden;page-break-inside:avoid}
+.turno.nueva{page-break-before:always}
+.turno > .cab{background:var(--acento);color:#fff;padding:6pt 10pt;
+  font-family:"Segoe UI",Arial,sans-serif;display:flex;justify-content:space-between;align-items:baseline}
+.turno > .cab .quien{font-size:12.5pt;font-weight:600;letter-spacing:-.2pt}
+.turno > .cab .reloj{font-size:10pt;font-family:"Cascadia Mono","Consolas",monospace;opacity:.95}
+.turno > .cuerpo{padding:9pt 11pt}
+.turno.ficha-p{border-color:var(--alerta)} .turno.ficha-p > .cab{background:var(--alerta)}
+.turno.ficha-s{border-color:var(--ambar)} .turno.ficha-s > .cab{background:var(--ambar)}
+.turno.ficha-r{border-color:#6b7178} .turno.ficha-r > .cab{background:#6b7178}
+.turno .tema{font-family:"Segoe UI",Arial,sans-serif;font-size:9.5pt;color:var(--suave);
+  margin:0 0 8pt;padding-bottom:6pt;border-bottom:1px solid var(--linea)}
+.pantalla{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;background:#fff;
+  border:1px dashed var(--linea);border-radius:3px;padding:6pt 9pt;margin:0 0 9pt;color:var(--suave)}
+.pantalla b{color:var(--tinta)}
+.decir{background:#fffdf5;border-left:3px solid #c9a227;padding:9pt 12pt;margin:0 0 9pt;
+  border-radius:0 4px 4px 0}
+.decir p{margin:0 0 7pt;text-align:left}
+.decir p:last-child{margin-bottom:0}
+.decir .etiqueta{color:#8a6d10}
+.pase{font-family:"Segoe UI",Arial,sans-serif;font-size:9pt;color:var(--verde);
+  font-weight:600;margin:0;padding-top:5pt;border-top:1px solid var(--linea)}
+.anclas{font-size:9.2pt;margin:0 0 9pt}
+.anclas ul{margin:0;padding-left:16pt}
+.anclas li{margin-bottom:2pt}
+
+.pregunta{background:var(--fondo);border:1px solid var(--linea);border-radius:4px;
+  padding:8pt 11pt;margin:0 0 9pt;page-break-inside:avoid}
+.pregunta .q{font-family:"Segoe UI",Arial,sans-serif;font-weight:600;font-size:10pt;
+  color:var(--acento);margin-bottom:5pt;display:block}
+.pregunta p{margin-bottom:6pt}
+.pregunta p:last-child{margin-bottom:0}
+.duenio{font-family:"Segoe UI",Arial,sans-serif;font-size:8pt;text-transform:uppercase;
+  letter-spacing:.5pt;color:var(--suave);float:right;font-weight:600;
+  background:#fff;border:1px solid var(--linea);border-radius:10px;padding:1pt 7pt;margin-left:8pt}
+.corta{font-weight:600}
+.mas{font-size:9.3pt;color:var(--suave);border-top:1px dotted var(--linea);padding-top:5pt;margin-top:5pt}
+.mas b{color:var(--tinta)}
+
+.ok{color:#2d6a1f;font-weight:600} .no{color:var(--alerta);font-weight:600} .am{color:var(--ambar);font-weight:600}
+.pie{margin-top:20pt;padding-top:8pt;border-top:1px solid var(--linea);
+  font-size:8.5pt;color:var(--suave);font-family:"Segoe UI",Arial,sans-serif}
+
+.linea-tiempo{border:1px solid var(--linea);border-radius:4px;overflow:hidden;
+  display:flex;margin:0 0 12pt;font-family:"Segoe UI",Arial,sans-serif;font-size:8.2pt;text-align:center}
+.linea-tiempo div{padding:7pt 3pt;border-right:1px solid #fff;color:#fff;line-height:1.35}
+.linea-tiempo div:last-child{border-right:none}
+.lt1{background:#0b5fa5;flex:2} .lt2{background:#1d74bd;flex:2.5}
+.lt3{background:#2f89d3;flex:2.5} .lt4{background:#4a9edd;flex:.9}
+.lt5{background:#b7791f;flex:5.1} .lt6{background:#a3341f;flex:5}
+.lt7{background:#6b7178;flex:2}
+.linea-tiempo b{display:block;font-size:9pt}
+.t1{background:#0b5fa5;flex:2} .t2{background:#1d74bd;flex:2.5} .t3{background:#2f89d3;flex:2.5}
+.t4{background:#a3341f;flex:4.5} .t5{background:#b7791f;flex:4.5} .t6{background:#6b7178;flex:6}
+.t7{background:#8a9097;flex:3}
+.pantalla ul{margin:3pt 0 0;padding-left:16pt} .pantalla li{margin-bottom:1pt}
+.pregunta ol{margin:4pt 0 0;padding-left:16pt}
+</style>
+</head>
+<body>
+
+<!-- ============================ PORTADA ============================ -->
+<div class="portada">
+  <div class="materia">UTN FRM · Ingeniería en Sistemas de Información · Ciencia de Datos 2026</div>
+  <h1>Guión de la defensa</h1>
+  <p class="sub">Entrega 4 · Visualización y app · Veinticinco minutos, cinco voces, y la pregunta de la
+  consigna: ¿alguien que no estuvo en el proyecto puede entender lo que encontramos, creernos, y después
+  hacerle sus propias preguntas a los datos?</p>
+  <div class="meta">
+    <strong>Grupo 5K09-02</strong><br>
+    Proyecto FF-15 — predicción de la duración de una partida de League of Legends<br>
+    Exposición: miércoles 11 de noviembre · <strong>14:55 – 15:20</strong> · 25 minutos con el docente, en privado<br>
+    Se muestra desde: <strong>https://aguilarezequiel.github.io/FF-15/</strong>, y el repositorio en GitHub
+  </div>
+  <div class="equipo">
+    Facundo Aracena · Rodrigo «Toto» Viluron · Anthony «Cocha» Cochachin<br>
+    Ezequiel Aguilar · Matías Telo
+  </div>
+</div>
+
+<!-- ============================ 1 ============================ -->
+<div class="seccion">
+<span class="n">Sección 1</span>
+<h2 style="margin-top:0;border:none">Cómo usar este guión</h2>
+
+<p>La consigna lo repite: <strong>la evaluación es individual</strong>, y «que hable uno solo sigue
+siendo el error más caro». Por eso los primeros quince minutos están repartidos en cinco turnos, que
+siguen el orden de la app: primero el tallo, que guiamos nosotros, y después la copa, donde <strong>el
+docente toma el mouse</strong>.</p>
+
+<p>Cada turno tiene tres partes:</p>
+<ul>
+  <li><strong>Lo que se dice</strong>, sobre fondo amarillo, escrito para sonar hablado. No se lee el
+  día de la entrega: se ensaya hasta poder decirlo mirando la pantalla.</li>
+  <li><strong>Lo que se muestra</strong>, en el recuadro punteado.</li>
+  <li><strong>Los datos que lo sostienen</strong>, debajo, por si el docente frena en el medio.</li>
+</ul>
+<p>Todos los números salen de la app publicada, verificada contra el notebook. Cada turno se cierra
+con un pase que nombra al que sigue.</p>
+
+<table>
+<tr><th style="width:32%">Regla</th><th>Por qué</th></tr>
+<tr><td><strong>Recorrer la app como si el docente no conociera el proyecto</strong></td><td>Es lo que
+pide la consigna para el tallo. Se lee el título que afirma, se dice qué mirar en el gráfico, y se sigue.
+Lo técnico va en los «Cómo lo sabemos»: se abren sólo si el docente los pide.</td></tr>
+<tr><td><strong>El reparto es para arrancar, no para saber</strong></td><td>«La pregunta sobre un gráfico
+puede caerle a quien armó la publicación». Los cinco tienen que poder leer cualquier gráfico componente
+por componente (Sección 6).</td></tr>
+<tr><td><strong>En la copa, el mouse es del docente</strong></td><td>Matías explica qué hace cada control
+antes de soltarlo, y después el grupo contesta lo que aparezca. No se le quita el mouse.</td></tr>
+<tr><td><strong>Siempre con el número</strong></td><td>«Está calibrado» no dice nada. «Dice 66,6 % y
+pasa el 66,3 %» sí.</td></tr>
+<tr><td><strong>Lo que no logra se dice primero</strong></td><td>La consigna: «una historia honesta sobre un
+resultado modesto vale más que una aplicación brillante que no se sabe de dónde salió». Está en la app, en
+el recuadro «Lo que no logra, sin adornos».</td></tr>
+</table>
+
+<div class="clave">
+  <span class="etiqueta">La frase que resume la entrega (la oración de la portada)</span>
+  <p>«<strong>A los 10 minutos de juego, el modelo dice en qué ventana de 12 minutos va a terminar la
+  partida, y su probabilidad se cumple</strong>: en promedio dice 67 % y acierta el 66 %. Antes de jugar,
+  en cambio, casi nada anticipa cuánto va a durar.»</p>
+</div>
+
+<h3>Las tres formas de perder los 25 minutos (de la consigna)</h3>
+<ul>
+  <li><strong>El tablero sin historia.</strong> → La app tiene tallo: cada sección afirma una cosa, y la
+  copa viene después, cuando ya se sabe qué mirar.</li>
+  <li><strong>El notebook con otra ropa.</strong> → Un gráfico por sección del tallo, no todos los que se
+  hicieron. Las tablas van adentro de los «Cómo lo sabemos».</li>
+  <li><strong>La aplicación que sólo corre en una notebook.</strong> → Está publicada en GitHub Pages y se
+  abre desde cualquier navegador. Se prueba desde otra computadora la noche anterior.</li>
+</ul>
+</div>
+
+<!-- ============================ 2 ============================ -->
+<div class="seccion">
+<span class="n">Sección 2</span>
+<h2 style="margin-top:0;border:none">Antes de entrar al aula</h2>
+
+<p>La consigna: «Llegá con esto ya funcionando. Los 25 minutos son para mostrar y explicar, no para
+publicar ni para esperar que cargue un modelo». Y: «Que funcione en la notebook de alguien del grupo no
+alcanza».</p>
+
+<h4>La noche anterior (martes 10)</h4>
+<table>
+<tr><th>Qué</th><th style="width:22%">Quién</th></tr>
+<tr><td>☐ Abrir <code>https://aguilarezequiel.github.io/FF-15/</code> <strong>desde otra computadora y
+desde un celular</strong>, y recorrerla entera: que se dibujen los cinco gráficos y que «Probá» mueva las
+barras.</td><td>Alguien que no sea Matías</td></tr>
+<tr><td>☐ Simulacro completo: los cinco turnos cronometrados, y después preguntas del banco (Sección 6),
+tiradas por otro integrante a alguien que no es el dueño.</td><td>Los cinco</td></tr>
+<tr><td>☐ Cada uno lee la <strong>Parte XI</strong> del documento integral (la app) y la
+<strong>Parte X</strong> (las correcciones), no sólo su turno.</td><td>Los cinco</td></tr>
+<tr><td>☐ Cada uno elige un gráfico y lo explica en voz alta componente por componente: datos, marca,
+mapeo, transformaciones, escalas.</td><td>Los cinco</td></tr>
+</table>
+
+<h4>Quince minutos antes</h4>
+<table>
+<tr><th>Qué</th><th style="width:34%">Detalle</th></tr>
+<tr><td>☐ La app abierta en su URL pública, parada en la portada («00:00 · El proyecto»).</td><td>Cargó
+del todo cuando el gráfico de «Probá» muestra la frase dorada.</td></tr>
+<tr><td>☐ En otra pestaña, el repositorio en GitHub con el <strong>README</strong>, en la sección «La
+aplicación (Entrega 4)».</td><td>La consigna pide el repo abierto.</td></tr>
+<tr><td>☐ <strong>No regenerar ni pushear nada.</strong></td><td>Un push a <code>main</code> que toque
+<code>app/index.html</code> vuelve a publicar la página.</td></tr>
+<tr><td>☐ Zoom del navegador en 100–110 %, notificaciones silenciadas.</td><td>La app tiene la navegación
+a la izquierda; con mucho zoom se esconde.</td></tr>
+<tr><td>☐ Este guión abierto en otro dispositivo, no en la pantalla que se muestra.</td><td></td></tr>
+</table>
+
+<div class="aviso">
+  <span class="etiqueta">Si la URL no abre</span>
+  <p>Plan B: abrir <code>app/index.html</code> del repo clonado, con doble clic. Es el mismo archivo que se
+  publica. Necesita internet para las librerías de gráficos (jsDelivr), las fuentes y los íconos.
+  Decirlo de frente: «la URL es ésta, hoy no responde, mostramos el mismo archivo».</p>
+</div>
+</div>
+
+<!-- ============================ 3 ============================ -->
+<div class="seccion">
+<span class="n">Sección 3</span>
+<h2 style="margin-top:0;border:none">El reparto de un vistazo</h2>
+
+<div class="linea-tiempo">
+  <div class="t1"><b>Facundo</b>0:00–2:00</div>
+  <div class="t2"><b>Toto</b>2:00–4:30</div>
+  <div class="t3"><b>Cocha</b>4:30–7:00</div>
+  <div class="t4" style="flex:3"><b>Ezequiel</b>7:00–10:00</div>
+  <div class="t5" style="flex:5"><b>Matías · copa</b>10:00–15:00</div>
+  <div class="t6" style="flex:7"><b>Preguntas dirigidas</b>15:00–22:00</div>
+  <div class="t7"><b>Devolución</b>22–25</div>
+</div>
+
+<table>
+<tr><th>Quién</th><th>Reloj</th><th>Qué expone</th><th>Momento de la consigna</th></tr>
+<tr><td><strong>Facundo Aracena</strong></td><td>0:00 – 2:00</td><td>Qué cambió desde la Entrega 3: de
+segundos a bandas, la logística, los dos anchos y por qué el de 6.</td><td>«Qué cambió» (0–2)</td></tr>
+<tr><td><strong>Rodrigo «Toto» Viluron</strong></td><td>2:00 – 4:30</td><td>La portada y «Los datos».</td>
+<td rowspan="3">«El tallo» (2–10)</td></tr>
+<tr><td><strong>Anthony «Cocha» Cochachin</strong></td><td>4:30 – 7:00</td><td>«Lo que encontramos».</td></tr>
+<tr><td><strong>Ezequiel Aguilar</strong></td><td>7:00 – 10:00</td><td>«El modelo»: la calibración, la
+resolución y lo que no logra.</td></tr>
+<tr><td><strong>Matías Telo</strong></td><td>10:00 – 15:00</td><td>La copa: explica los controles de
+«Explorá» y de «Probá», le pasa el mouse al docente y contesta lo que aparezca.</td><td>«La copa» (10–15)</td></tr>
+</table>
+
+<div class="nota">
+  <span class="etiqueta">Por qué este reparto (propuesta: el grupo lo puede cambiar)</span>
+  <p>Sigue el de la Entrega 3: el modelo lo expone Ezequiel, y Matías se queda con lo último, que esta
+  vez es la copa porque armó la app y conoce cada control. Toto y Cocha toman una sección del tallo cada
+  uno. Si se cambia, se cambian sólo los nombres: los turnos siguen el orden de la app.</p>
+</div>
+</div>
+
+<!-- ============================ 4 ============================ -->
+<div class="seccion">
+<span class="n">Sección 4</span>
+<h2 style="margin-top:0;border:none">Los primeros quince minutos, turno por turno</h2>
+
+<!-- ---------------- TURNO 1 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">1 · Facundo Aracena</span><span class="reloj">0:00 → 2:00</span></div>
+  <div class="cuerpo">
+    <p class="tema">Qué cambió · lo que nos marcaron en la Entrega 3</p>
+    <div class="pantalla"><b>En la app:</b> la portada, «00:00 · El proyecto». No se toca nada todavía.</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>Buenas, somos el grupo 5K09-02. Qué cambió desde la Entrega 3: <strong>el modelo dejó de predecir
+      segundos</strong>. Nos marcaron pasar a clasificación, mirar la distribución del error con gráficos,
+      y explicar bien el MSE y el R². Ahora el modelo dice <strong>en qué banda de minutos termina la
+      partida</strong>, sabiendo cómo iba en el minuto 10, y es una <strong>regresión logística</strong>,
+      porque es la más simple y da una probabilidad para cada banda.</p>
+      <p>Probamos bandas de 6 y de 9 minutos. Para la app elegimos las de 6: al jugador le mostramos las
+      dos bandas seguidas más probables, una ventana de 12 minutos, y es la probabilidad mejor calibrada.
+      Toto arranca con la app.</p>
+    </div>
+    <div class="anclas"><strong>Los datos de este bloque, por si frenan acá:</strong>
+    <ul>
+      <li>Las bandas de 6: <code>&lt;15, 15-21, 21-27, 27-33, 33-39, 39-45, 45+</code>.</li>
+      <li>El Ridge de la E3 erraba 294,7 s en el test, con R² 0,129.</li>
+      <li>La logística sin pesos, <code>C=10</code>: F1 macro 0,159 en el test, contra 0,076 del piso.</li>
+      <li>Con 9 minutos: dice 53,9 % y pasa el 54,4 %, para una banda de 9 minutos. Con 6: dice 66,6 % y
+      pasa el 66,3 %, para una ventana de 12.</li>
+      <li>El detalle de las cuatro correcciones está en la Parte X del documento integral.</li>
+    </ul></div>
+    <p class="pase">→ Pase: «Toto arranca con la app.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 2 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">2 · Rodrigo «Toto» Viluron</span><span class="reloj">2:00 → 4:30</span></div>
+  <div class="cuerpo">
+    <p class="tema">La portada y «Los datos»</p>
+    <div class="pantalla"><b>En la app:</b> la portada (la pregunta, la oración y los tres números). Después,
+    clic en <b>«05:00 · Los datos»</b> en la navegación y el gráfico de barras por minuto.</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>La pregunta del proyecto es si se puede predecir cuánto dura una partida de League of Legends. La
+      respuesta la resume esta oración: <strong>a los 10 minutos, el modelo dice en qué ventana de 12
+      minutos termina la partida, y su probabilidad se cumple</strong>. Antes de jugar, casi nada la
+      anticipa. Los tres números: la mejor columna de antes de jugar explica el 2,6 % de la duración; el
+      modelo tiene un F1 de 0,159 contra 0,076 del piso; y dice 67 % y acierta el 66 %.</p>
+      <p>Los datos: 19.145 partidas clasificatorias de seis servidores, de la API de Riot, bajadas por
+      nuestro pipeline de Airflow. El título dice que <strong>la mayoría termina entre los minutos 21 y
+      33</strong>: es el 61 %. Y en el 15 hay un salto: del minuto 14 al 15 terminan 27 partidas, y del 15
+      al 16, 714. Es la rendición, que el juego habilita a los quince minutos. El color es la banda de 6
+      minutos, y es el mismo en toda la app. Cocha sigue con lo que encontramos.</p>
+    </div>
+    <div class="anclas"><strong>Los datos de este bloque, por si frenan acá</strong> (todo en el «Cómo lo
+    sabemos» de «Los datos»):
+    <ul>
+      <li>Una fila es una partida clasificatoria Solo/Duo (cola 420) de la Season 16; la clave es
+      <code>match_id</code>.</li>
+      <li>Filtros: 20.796 partidas bajadas → 19.145 pasan la admisión (1.651 descartadas: otra temporada,
+      remakes de menos de 5 minutos, o sin 10 jugadores en dos equipos de 5) → 19.008 llegan al minuto 10
+      → 15.210 de entrenamiento y 3.798 de test.</li>
+      <li>Fuga: ninguna de las 137 columnas se completa después de la partida. Reparos declarados: elo,
+      winrate y maestría se leen después de jugar (el winrate sale por H6), y el carril viene de un campo
+      post-partida.</li>
+      <li>Del timeline sólo entra lo que pasó hasta el minuto 10. Placas, wards y primera sangre quedan
+      afuera por calidad, no por fuga.</li>
+      <li>El gráfico: las 19.145 partidas, barras, <code>bin</code> de un minuto y <code>count</code>, el
+      minuto en x, la cantidad en y y la banda en color, con una regla en el 15.</li>
+    </ul></div>
+    <p class="pase">→ Pase: «Cocha sigue con lo que encontramos.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 3 ---------------- -->
+<div class="turno">
+  <div class="cab"><span class="quien">3 · Anthony «Cocha» Cochachin</span><span class="reloj">4:30 → 7:00</span></div>
+  <div class="cuerpo">
+    <p class="tema">«Lo que encontramos»</p>
+    <div class="pantalla"><b>En la app:</b> <b>«10:00 · Lo que encontramos»</b> y el gráfico de barras
+    horizontales (gris azulado contra turquesa).</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>El hallazgo del análisis es éste: <strong>antes de jugar, casi nada anticipa la duración; a los 10
+      minutos, la diferencia entre los equipos sí</strong>.</p>
+      <p>Cada barra es la correlación de una columna con la duración. Las gris azulado son lo que se sabe
+      antes de jugar: la más fuerte es el elo medio de la partida, y en la Entrega 2 dio −0,161. Todas
+      quedan en la franja roja, la zona del semáforo de la cátedra donde una correlación no alcanza para
+      afirmar nada. Las turquesa son lo que se sabe al minuto 10: la diferencia de oro llega a
+      <strong>−0,285</strong>. El signo es negativo: cuanto más se separó un equipo, más corta la partida,
+      porque el que va ganando cierra. Ezequiel sigue con el modelo.</p>
+    </div>
+    <div class="anclas"><strong>Los datos de este bloque, por si frenan acá:</strong>
+    <ul>
+      <li>Una hipótesis que se sostuvo, H6: el elo y el winrate son la misma columna (0,711, verde). Se
+      queda el elo y salen los diez winrate.</li>
+      <li>Una que no, H1: más tanques no alargan la partida (−0,008, rojo, con el signo al revés). Tampoco
+      H4, «a más elo, partidas más cortas» (−0,161, rojo), pero el elo igual entra al modelo.</li>
+      <li>Al minuto 5 la diferencia de oro casi no se mueve con la duración (−0,130); al 10, sí (−0,285).
+      Por eso el minuto 10.</li>
+      <li>En el gráfico el elo da −0,171 y no −0,161, porque está medido sobre las 19.008 partidas que
+      llegan al minuto 10. El −0,161 es de la E2, sobre las 19.145.</li>
+      <li>El gráfico: las 8 columnas más fuertes de cada familia; barra horizontal; |r| en x, columna en y,
+      familia en color; una franja roja para |r| &lt; 0,2.</li>
+    </ul></div>
+    <p class="pase">→ Pase: «Ezequiel sigue con el modelo.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 4 ---------------- -->
+<div class="turno nueva ficha-p">
+  <div class="cab"><span class="quien">4 · Ezequiel Aguilar</span><span class="reloj">7:00 → 10:00</span></div>
+  <div class="cuerpo">
+    <p class="tema">«El modelo» · la calibración, la resolución y lo que no logra</p>
+    <div class="pantalla"><b>En la app:</b> <b>«15:00 · El modelo»</b>, el gráfico de calibración (la línea
+    dorada sobre la diagonal) y el recuadro punteado «Lo que no logra, sin adornos».</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís</span>
+      <p>El modelo es una regresión logística: a cada banda de 6 minutos le da una probabilidad, y al
+      jugador le mostramos <strong>las dos bandas seguidas que más suman</strong>, una ventana de 12
+      minutos. Por ejemplo: «79 % de que termine entre los minutos 21 y 33».</p>
+      <p>El título dice que <strong>esas probabilidades se cumplen</strong>, y este gráfico lo prueba. Junta
+      las 3.798 partidas del test según la probabilidad que el modelo le dio a su ventana. En x, lo que
+      dice; en y, cuántas veces la partida terminó ahí. Si los puntos caen sobre la diagonal, la
+      probabilidad es creíble, y caen: en promedio dice 66,6 % y pasa el 66,3 %. El punto gris es el piso,
+      que también está calibrado pero le dice 61 % a todas las partidas por igual. El modelo, en cambio,
+      distingue: en el tercio de partidas en que más se anima acierta el 70,9 %, y en el que menos, el
+      60,0 %.</p>
+      <p>Y lo decimos sin adornos: <strong>como respuesta de una sola banda, casi no le gana al
+      piso</strong>. Acierta la banda exacta en el 36,9 % de las partidas, contra 36,2 % del piso. Con lo
+      que se sabe al minuto 10 no se separa bien una partida de 20 minutos de una de 40. Lo que aporta está
+      en las probabilidades. Matías les pasa la copa.</p>
+    </div>
+    <div class="anclas"><strong>Los datos de este bloque, por si frenan acá</strong> (todo en el «Cómo lo
+    sabemos» de «El modelo»):
+    <ul>
+      <li>Métrica: F1 macro, porque las bandas están desparejas (la del centro, 27-33, tiene el 36 %, y la
+      de menos de 15, el 0,7 %), y la accuracy premia contestar siempre el centro.</li>
+      <li>Piso: <code>DummyClassifier(strategy="prior")</code>. Test del 20 % estratificado por elo,
+      validación cruzada de 5 pedazos con semilla 42.</li>
+      <li>Validación cruzada: piso 0,075 ± 0,001; sin pesos (<code>C=10</code>) 0,171 ± 0,004; balanced
+      0,171 ± 0,004 pero accuracy 20,2 %. Por la regla de la cátedra empatan, y queda la sin pesos.</li>
+      <li>Test: F1 0,159 contra 0,076; ±1 banda 84,3 % contra 82,0 %; a menos de 3 minutos 37,5 % contra
+      36,5 %; error medio 5,145 min contra 5,306.</li>
+      <li>Contesta 5 de las 7 bandas, casi siempre 27-33. Fuera del centro sólo ve venir la corta, la de la
+      rendición.</li>
+      <li>En qué se apoya: la diferencia de oro al minuto 10 (desordenarla baja el F1 en 0,018, un 11 %),
+      después el servidor, la diferencia de asesinatos y el elo.</li>
+      <li>Fuga: lo del minuto 10 se conoce en el minuto 10, antes del final.</li>
+    </ul></div>
+    <p class="pase">→ Pase: «Matías les pasa la copa.»</p>
+  </div>
+</div>
+
+<!-- ---------------- TURNO 5 ---------------- -->
+<div class="turno ficha-s">
+  <div class="cab"><span class="quien">5 · Matías Telo</span><span class="reloj">10:00 → 15:00</span></div>
+  <div class="cuerpo">
+    <p class="tema">La copa · «Explorá» y «Probá el modelo», con el mouse en manos del docente</p>
+    <div class="pantalla"><b>En la app:</b> <b>«20:00 · Explorá las partidas»</b>: los tres controles, la
+    nube, «Dónde terminaron» y «La partida elegida». Después, <b>«25:00 · Probá el modelo»</b>.</div>
+    <div class="decir">
+      <span class="etiqueta">Lo que decís (antes de pasar el mouse)</span>
+      <p>Ésta es la parte que maneja usted. En «Explorá» está cada partida que llega al minuto 10: en x, la
+      diferencia de oro a los diez minutos; en y, cuánto duró; el color es la banda real. Arriba hay tres
+      filtros: servidor, grupo de elo y la <strong>probabilidad mínima de la ventana</strong>, que deja sólo
+      las partidas en las que el modelo estaba al menos así de seguro. Si la sube, el porcentaje de acierto
+      dorado sube: el modelo acierta más cuando está más seguro. Con el mouse encima ve qué dijo el modelo
+      de esa partida; con un clic, las probabilidades de sus siete bandas, con la ventana en dorado. Cada
+      partida la predijo un modelo que no la vio.</p>
+      <p>En «Probá» elige una partida real del test, mueve cómo iba al minuto 10 y ve qué dice el modelo. La
+      cuenta de la logística está escrita adentro del gráfico: nada se reentrena. Los deslizadores no se
+      salen de lo que vio el entrenamiento, y si arma algo imposible, como más diferencia de asesinatos que
+      asesinatos en total, la app avisa. El botón «¿Cuánto duró de verdad?» muestra si acertó.</p>
+    </div>
+    <div class="anclas"><strong>Si el docente no sabe por dónde empezar, proponerle:</strong>
+    <ul>
+      <li>En Explorá: subir la probabilidad mínima a 0,70 y mirar el porcentaje de acierto.</li>
+      <li>En Explorá: elegir un servidor y un grupo de elo, y hacer clic en una partida de la derecha (mucha
+      diferencia de oro).</li>
+      <li>En Probá: llevar la diferencia de oro al máximo y ver cómo la ventana se corre a las bandas
+      cortas. Después, «Volver a los valores reales».</li>
+      <li>En Probá: subir el elo medio: también empuja hacia partidas más cortas.</li>
+    </ul></div>
+    <p class="pase">→ Después de la copa: preguntas dirigidas. Cada uno contesta lo suyo, y si la pregunta va
+    al grupo, empieza el dueño en el banco de la Sección 6.</p>
+  </div>
+</div>
+</div>
+
+<!-- ============================ 5 ============================ -->
+<div class="seccion">
+<span class="n">Sección 5</span>
+<h2 style="margin-top:0;border:none">Lo que la consigna dice que se pregunta</h2>
+
+<p>«Esto no lo mide ningún script: se pregunta.» Son seis cosas, y cada una tiene un dueño para arrancar.</p>
+
+<div class="pregunta"><span class="duenio">Toto · Cocha · Ezequiel</span>
+  <span class="q">1 · Por qué cada título del tallo afirma lo que afirma, y qué número lo sostiene</span>
+  <ol>
+    <li><strong>Los datos</strong>: el 61 % termina entre 21 y 33; del 14 al 15 terminan 27 y del 15 al
+    16, 714.</li>
+    <li><strong>Lo que encontramos</strong>: lo mejor de antes de jugar es el elo, −0,161 (rojo); la
+    diferencia de oro al minuto 10 da −0,285.</li>
+    <li><strong>El modelo</strong>: dice 66,6 % y pasa el 66,3 %, y en el tercio en que más se anima
+    acierta el 70,9 % contra 60,0 %.</li>
+  </ol>
+</div>
+
+<div class="pregunta"><span class="duenio">Cualquiera</span>
+  <span class="q">2 · Un gráfico de la app, componente por componente</span>
+  <p>El esquema es siempre el mismo: <strong>datos</strong> (qué filas), <strong>marca</strong> (barra,
+  punto, línea), <strong>mapeo</strong> (qué variable va a x, a y, al color, al tamaño),
+  <strong>transformaciones</strong> (bin, count, filtros, cálculos) y <strong>escalas</strong> (de dónde a
+  dónde va cada eje, qué paleta). Ejemplo, el de calibración: datos, las 3.798 partidas del test agrupadas
+  en tramos de 10 puntos (sólo los que tienen 20 o más); marcas, línea y punto; x, la probabilidad que
+  dice; y, la frecuencia con que pasa; tamaño, la cantidad de partidas; color, modelo o piso; escalas de
+  30 a 90 % en los dos ejes. La tabla completa de los cinco gráficos está en XI.4.</p>
+</div>
+
+<div class="pregunta"><span class="duenio">Matías</span>
+  <span class="q">3 · Una decisión de diseño que cambiaste: qué tenía la primera versión y por qué no funcionaba</span>
+  <p>Hay varias, todas del armado de la app:</p>
+  <ul>
+    <li><strong>La calibración</strong>: en la primera versión el eje y arrancaba en 0 y los puntos quedaban
+    apretados arriba, sin que se viera la diagonal. Se fijaron los dos ejes de 30 a 90 %.</li>
+    <li><strong>Lo que encontramos</strong>: las barras salían en orden alfabético y no se veía el ranking.
+    Se ordenaron por |r|, de mayor a menor.</li>
+    <li><strong>Explorá</strong>: un clic en un lugar vacío dejaba la selección vacía, y entonces quedaban
+    resaltadas todas las partidas. Se cambió para que la selección vacía no resalte ninguna.</li>
+    <li><strong>La ventana dorada</strong>: primero era un borde condicional en las mismas barras, y no se
+    veía. Pasó a ser una capa aparte.</li>
+    <li><strong>Los datos</strong>: la anotación del minuto 15 tapaba las barras del centro. Pasó a la
+    izquierda de la línea.</li>
+  </ul>
+</div>
+
+<div class="pregunta"><span class="duenio">Matías</span>
+  <span class="q">4 · Qué componente del gráfico toca cada control de la copa</span>
+  <p>Servidor, grupo de elo y probabilidad mínima son <code>params</code> de Vega-Lite que entran en un
+  <strong>filtro</strong>: cambian qué filas llegan a la nube, a las barras de «Dónde terminaron» y al
+  porcentaje de acierto. La leyenda es una selección que baja la <strong>opacidad</strong> de las otras
+  bandas. El clic es una selección que <strong>filtra los datos</strong> del gráfico de la partida
+  elegida y dibuja el anillo dorado. En «Probá», cada deslizador es un <code>param</code> que entra en el
+  <strong>cálculo</strong> del logit.</p>
+</div>
+
+<div class="pregunta"><span class="duenio">Ezequiel · Matías</span>
+  <span class="q">5 · Cómo llega el modelo a la app, y qué pasa si el usuario carga un caso raro</span>
+  <p>Como fórmula. La logística es una suma de coeficientes por columnas, y después un softmax. Para cada
+  partida de ejemplo, el script guarda la parte que no cambia (la ordenada y las columnas de composición) y
+  los coeficientes de lo que se mueve, divididos por el desvío del escalado. El gráfico suma, aplica el
+  softmax y elige la ventana con transformaciones de Vega-Lite. El script comprueba que, con los valores
+  reales, da lo mismo que <code>predict_proba</code>. En el navegador la diferencia fue de 0,00005, por el
+  redondeo.</p>
+  <p class="mas"><b>Caso raro:</b> los deslizadores van del mínimo al máximo del entrenamiento, así que no
+  se puede salir del rango. Si la combinación es imposible (diferencia mayor que el total), la app avisa
+  que la probabilidad no es confiable.</p>
+</div>
+
+<div class="pregunta"><span class="duenio">Matías · Facundo</span>
+  <span class="q">6 · Cómo se regenera la app desde el repositorio si cambian los datos</span>
+  <p>Con un comando: <code>python app/build_app.py --desde-pipeline</code>. Lee el último CSV que dejó el
+  DAG, entrena con la misma partición y la misma semilla, y vuelve a escribir <code>app/index.html</code>.
+  Se commitea y el workflow de GitHub Actions lo publica solo. Con los CSV congelados, sin la opción,
+  además compara siete números con el notebook y no escribe nada si alguno difiere. Está en el README.</p>
+</div>
+</div>
+
+<!-- ============================ 6 ============================ -->
+<div class="seccion">
+<span class="n">Sección 6</span>
+<h2 style="margin-top:0;border:none">Banco de preguntas dirigidas</h2>
+
+<h3>Sobre lo que dice el modelo</h3>
+
+<div class="pregunta"><span class="duenio">Ezequiel</span>
+  <span class="q">«¿Qué significa que en promedio dice 67 % y acierta el 66 %?»</span>
+  <p class="corta">Que la probabilidad es creíble: cuando el modelo dice «alrededor de 67 %», la partida
+  termina en esa ventana alrededor del 67 % de las veces.</p>
+  <p class="mas"><b>Detalle:</b> el 66,6 % es el promedio de lo que el modelo le dio a su ventana en las
+  3.798 partidas del test; el 66,3 %, en cuántas la duración real cayó adentro. Es como un buen pronóstico
+  del tiempo: cuando dice «70 % de lluvia», llueve 7 de cada 10 de esos días. Si dijera 90 % y acertara el
+  66 %, estaría sobreconfiado, y los puntos quedarían debajo de la diagonal. <b>No quiere decir que acierte
+  siempre</b>: erra una de cada tres ventanas, pero avisa cuánto confiar.</p>
+</div>
+
+<div class="pregunta"><span class="duenio">Matías</span>
+  <span class="q">«¿Qué es la probabilidad mínima de la ventana?»</span>
+  <p class="corta">Un filtro por confianza: deja sólo las partidas en las que el modelo le dio al menos ese
+  porcentaje a su ventana.</p>
+  <p class="mas"><b>Detalle:</b> la ventana son las dos bandas seguidas que más suman, y su probabilidad es
+  esa suma: si dice 34 % a 21-27 y 45 % a 27-33, la ventana es «entre 21 y 33» con 79 %. En el test va de
+  44 % a 96 %. Al subir el filtro sube el acierto: del 60,0 % en el tercio en que menos se anima al 70,9 %
+  en el que más. Eso es la <b>resolución</b>, lo que el piso no tiene.</p>
+</div>
+
+<div class="pregunta"><span class="duenio">Ezequiel</span>
+  <span class="q">«Si el piso también está calibrado, ¿para qué sirve el modelo?»</span>
+  <p class="corta">Porque el piso le dice 61 % a todas las partidas, y el modelo cambia de partida en
+  partida y sigue siendo creíble.</p>
+  <p class="mas">Distingue las partidas en las que puede estar más seguro (acierta el 70,9 % en el tercio
+  alto, contra 60,0 % en el bajo). Y le gana en F1 macro: 0,159 contra 0,076.</p>
+</div>
+
+<div class="pregunta"><span class="duenio">Facundo</span>
+  <span class="q">«¿Por qué 6 minutos y no 9?»</span>
+  <p class="corta">Por la frase para el jugador: 12 minutos con 66,6 % de probabilidad calibrada, contra
+  una banda de 9 minutos con 53,9 %.</p>
+  <p class="mas">La accuracy no sirve para comparar anchos: la banda más ancha la sube sola, también la del
+  piso. El notebook compara los dos sin elegir; la elección fue del grupo para la app.</p>
+</div>
+
+<div class="pregunta"><span class="duenio">Ezequiel</span>
+  <span class="q">«¿Le gana al piso?»</span>
+  <p class="corta">En F1 macro, sí: 0,159 contra 0,076. Como banda exacta y en minutos, casi nada: 36,9 %
+  contra 36,2 %, y 37,5 % contra 36,5 % de partidas a menos de 3 minutos.</p>
+  <p class="mas">Está dicho en la app, en el recuadro «Lo que no logra». Lo que aporta son las
+  probabilidades.</p>
+</div>
+
+<h3>Sobre la app y el repositorio</h3>
+
+<div class="pregunta"><span class="duenio">Matías</span>
+  <span class="q">«¿Lo que muestra la app coincide con el notebook?»</span>
+  <p class="corta">Sí, y no por confianza: el script compara siete números con los guardados en el notebook y
+  no escribe la página si alguno difiere.</p>
+  <p class="mas">Los siete: <code>C=10</code>, F1 del test 0,159, F1 del piso 0,076, accuracy 0,369, ±1 banda
+  0,843, y la ventana: dice 0,666 y pasa 0,663.</p>
+</div>
+
+<div class="pregunta"><span class="duenio">Cocha</span>
+  <span class="q">«Las predicciones de Explorá, ¿las hizo un modelo que ya había visto esas partidas?»</span>
+  <p class="corta">No. Las 15.210 de entrenamiento salen de la validación cruzada, cada una de un modelo
+  entrenado sin su pedazo, y las 3.798 del test, del modelo final, que no las vio.</p>
+</div>
+
+<div class="pregunta"><span class="duenio">Toto</span>
+  <span class="q">«¿Por qué HTML y no Streamlit?»</span>
+  <p class="corta">Porque una logística se puede escribir adentro de la página, y así no hay un servidor que
+  mantener andando.</p>
+  <p class="mas">La consigna da las dos opciones. Con HTML, lo que se publica es un archivo, el mismo que se
+  verificó contra el notebook.</p>
+</div>
+
+<div class="pregunta"><span class="duenio">Cocha</span>
+  <span class="q">«¿Qué significa cada color?»</span>
+  <p class="corta">Lo mismo en toda la app: siete colores para las siete bandas, de celeste (la más corta) a
+  amarillo (la más larga); dorado, lo que dice el modelo; turquesa, lo que se sabe al minuto 10; gris
+  azulado, lo que se sabe antes de jugar; gris, el piso.</p>
+</div>
+
+<div class="pregunta"><span class="duenio">Matías</span>
+  <span class="q">«¿Por qué en Probá las diferencias no dicen qué equipo va adelante?»</span>
+  <p class="corta">Porque el modelo usa <code>|t1 − t2|</code>: sabe por cuánto se separaron, no
+  quién.</p>
+  <p class="mas">Viene de H3: azul y rojo son rótulos arbitrarios, y separarlos duplica la información sin
+  agregar nada a la duración.</p>
+</div>
+
+<div class="pregunta"><span class="duenio">Toto</span>
+  <span class="q">«¿Por qué el modelo no sirve para las partidas que terminan antes del minuto 10?»</span>
+  <p class="corta">Porque no tienen estado al minuto 10: son 137 de 19.145, el 0,7 %, y salen antes de
+  partir.</p>
+  <p class="mas">La pregunta cambió con la Entrega 3: el modelo predice a los diez minutos de juego, no
+  antes de empezar.</p>
+</div>
+
+<div class="clave">
+  <span class="etiqueta">Si no sabés</span>
+  <p>«No lo tengo, pero está en tal sección del documento integral» es mejor que un número inventado. La
+  Parte XI tiene la app sección por sección y su propio banco de preguntas; la Parte X, las correcciones.</p>
+</div>
+
+<p class="pie">FF-15 · Grupo 5K09-02 · Guión de la defensa de la Entrega 4 · generado con
+<code>python docs/generar_pdf.py guion-defensa-entrega4.html</code>. El reparto de los turnos es una
+propuesta: si el grupo lo cambia, se cambian los nombres en este archivo y se regenera el PDF.</p>
+</div>
+
+</body>
+</html>

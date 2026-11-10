@@ -127,6 +127,7 @@ python -m venv .venv                                    # el entorno del anális
 .venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-3/modelado_entrega3.ipynb
 .venv\Scripts\jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 notebooks/entrega-4/correcciones_entrega3.ipynb
 python docs/generar_pdf.py guion-defensa-entrega3.html   # el guion de la defensa de la E3
+python docs/generar_pdf.py guion-defensa-entrega4.html   # el guion de la defensa de la E4
 .venv\Scripts\python app/build_app.py                     # regenera la app de la E4 (verifica contra el notebook)
 ```
 

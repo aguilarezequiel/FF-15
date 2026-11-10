@@ -140,7 +140,7 @@ aplicación de la Entrega 4.</p>
 <tr><td>Perfil del objetivo</td><td>Asimetría <strong>−0,039</strong> y curtosis 0,579: simétrico, <strong>no necesita transformarse</strong>. Sin desbalance —la banda más poblada, 25 a 30 minutos, es el 29,9 %—. Truncado a izquierda en 300 s por el filtro de remakes, y con un escalón de <strong>714 partidas</strong> en los 900 s: el minuto 15, cuando el juego habilita la rendición. Ver 8.2.</td></tr>
 <tr><td>Decisiones de columna tomadas</td><td>De las 137 columnas, <strong>82 no entran como feature y 54 sí</strong>, más el objetivo. Treinta salen por las fichas: los diez <code>player_winrate</code> (H6), los diez <code>is_main</code> y los dos <code>mains_count</code> (H2), los cuatro <code>avg_defense</code> y <code>avg_magic</code> (H7), los dos <code>total_base_armor</code> (H5) y los dos <code>count_flash</code> (H8). Salen además los diez <code>champ_name</code> por redundar con <code>champ_id</code>, los cuarenta códigos <code>sum1</code>, <code>sum2</code>, <code>rune_primary</code> y <code>rune_sub</code>, y <code>match_id</code> y <code>roles_inferidos</code>. De las 34 columnas de agregados de equipo quedan 24, y H3 las colapsa en <strong>12 sumas</strong>. Ver 8.5.</td></tr>
 <tr><td>Decisión que se cerró</td><td>La columna <code>es_unranked</code> que quedaba pendiente en 5.5 <strong>no hace falta</strong> para este objetivo: las partidas con jugadores imputados duran 38 segundos más, separación 0,067, zona roja. Se midió sin ficha propia en una versión anterior del notebook; esa celda se quitó al simplificarlo y el número queda como respuesta oral. Ver 8.5.</td></tr>
-<tr><td>Lo que falta</td><td>Para la Entrega 4 (<strong>miércoles 11/11, de 14:55 a 15:20</strong>): abrir <code>https://aguilarezequiel.github.io/FF-15/</code> desde otra computadora, y que los cinco lean las Partes X y XI y recorran la app. Fuera de las entregas: volver a correr la plata del timeline para ver el número nuevo del chequeo de asesinatos, y pedir el tiempo de esa corrida y el peso de <code>bronze/timelines/</code> (Cierre).</td></tr>
+<tr><td>Lo que falta</td><td>Para la Entrega 4 (<strong>miércoles 11/11, de 14:55 a 15:20</strong>): abrir <code>https://aguilarezequiel.github.io/FF-15/</code> desde otra computadora, ensayar con <code>docs/guion-defensa-entrega4.pdf</code>, y que los cinco lean las Partes X y XI y recorran la app. Fuera de las entregas: volver a correr la plata del timeline para ver el número nuevo del chequeo de asesinatos, y pedir el tiempo de esa corrida y el peso de <code>bronze/timelines/</code> (Cierre).</td></tr>
 <tr><td>Entorno del análisis</td><td>El venv de <code>notebooks/requirements.txt</code> necesita <strong>Python 3.12 o más nuevo</strong>: <code>numpy==2.5.2</code> no se instala con 3.11. Se verificó el 9/11 con Python 3.14 (<code>py -3.14 -m venv .venv</code>).</td></tr>
 </table>
 
@@ -1258,6 +1258,7 @@ vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más 
 │   ├── informe-sesgo-muestreo.{html,pdf} · el anexo sobre el sesgo por tier
 │   ├── guion-defensa-entrega2.{html,pdf} · el guión de la defensa de la Entrega 2
 │   ├── guion-defensa-entrega3.{html,pdf} · el guión de la defensa de la Entrega 3
+│   ├── guion-defensa-entrega4.{html,pdf} · el guión de la defensa de la Entrega 4
 │   └── generar_pdf.py                    · regenera el PDF con Chrome
 │
 └── Documentacion/                        · material de la cátedra</div>
@@ -4389,6 +4390,11 @@ al construir la página; si no hay red, aparecen los nombres. El pie de página 
 proyecto no está respaldado por Riot Games.</p>
 
 <h3>5. Cómo se organizan los 25 minutos</h3>
+
+<p>El guión turno por turno, con lo que dice cada uno, está en <code>docs/guion-defensa-entrega4.pdf</code>.
+El reparto es una propuesta: Facundo, qué cambió; Toto, la portada y los datos; Cocha, lo que encontramos;
+Ezequiel, el modelo; Matías, la copa.</p>
+
 
 <table>
 <tr><th>Min.</th><th>Momento</th><th>Qué pasa</th></tr>
