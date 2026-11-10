@@ -9,13 +9,15 @@
 | Fuente | Riot Games API (`developer.riotgames.com`) + Data Dragon CDN |
 | Unidad de análisis | Una partida clasificatoria (cola 420), Season 16 |
 | Clave primaria | `match_id` |
-| Columna objetivo | `game_duration_s` — segundos. Hasta la E3, regresión; desde las correcciones de la E3, el modelo final predice **la banda de 3 minutos** en la que termina → clasificación |
+| Columna objetivo | `game_duration_s` — segundos. Hasta la E3, regresión; desde las correcciones de la E3, se predice **la banda de minutos** en la que termina → clasificación, con dos anchos: **6 y 9 minutos** |
 | Datasets | `lol_AAAA-MM-DD.csv` — condiciones iniciales, 137 columnas · `lol_minN_AAAA-MM-DD.csv` — estado de la partida al minuto N (timeline de match-v5), 35 columnas. Se unen por `match_id` |
 | Stack | Apache Airflow 3.3 · Astro Runtime 3.3-4 · Astro CLI · Docker |
 | Entrega 1 | miércoles 9/9, franja 14:55 – 15:15 — **presentada** |
 | Entrega 2 | miércoles 23/9, la clase completa · 20 min con el docente, en privado — **presentada** |
-| Entrega 3 | miércoles 28/10 · 25 min con el docente, en privado — **presentada** · modelo final: `Ridge(alpha=100)` con las 137 columnas + el estado al **minuto 10** (decisión del grupo, 27/10). Es el que usa la app de la Entrega 4 |
-| Correcciones de la E3 | pedidas por el docente; hechas el 9/11 en `notebooks/entrega-4/correcciones_entrega3.ipynb`. **El modelo final pasa a ser una regresión logística sin pesos** (`C=1`) que predice la banda de 3 min y da una probabilidad por banda (decisión del grupo). Es el que usaría la app de la E4, que no se empezó |
+| Entrega 3 | miércoles 28/10 · 25 min con el docente, en privado — **presentada** · modelo final: `Ridge(alpha=100)` con las 137 columnas + el estado al **minuto 10** (decisión del grupo, 27/10). Lo reemplazaron las correcciones de la E3 |
+| Correcciones de la E3 | pedidas por el docente; hechas el 9/11 con bandas de 3 min y rehechas el 10/11 con bandas de **6 y de 9 min** en `notebooks/entrega-4/correcciones_entrega3.ipynb`. **Quedan dos modelos finales, los dos una regresión logística sin pesos** (`C=10` con 6 min, `C=1` con 9), que dan una probabilidad por banda (decisión del grupo). **La app de la E4 usa el de 6 min** (decisión del grupo, 10/11) |
+| Entrega 4 | miércoles 11/11, la clase completa · 25 min con el docente, en privado · **franja del 5K09-02: 14:55 – 15:20**, llegar cinco minutos antes con la app abierta en su URL pública y el repo a mano. Se entrega una app web publicada, gráficos con Altair. Consigna en `Documentacion/Consignas de Entrega 4/`. **App hecha** (10/11): HTML en GitHub Pages, generada por `app/build_app.py` → `app/index.html`. Publicada en https://aguilarezequiel.github.io/FF-15/ (repo público desde el 10/11) |
+| Exposición final | 25/11 (según el instructivo de la E4), con la misma app |
 
 ---
 
@@ -88,6 +90,8 @@ dags/lol_ingest.py    · el flujo, y nada más
 include/lol/          · toda la lógica pesada, testeable sin Airflow
 include/output/       · bronce, plata y entregables (gitignoreado)
 notebooks/            · el análisis de las Unidades 2+, una carpeta por entrega
+app/                  · la app de la Entrega 4: build_app.py + plantilla.html → index.html
+.github/workflows/    · pages.yml publica app/ en GitHub Pages
 tests/                · astro dev pytest
 docs/                 · la documentación integral del proyecto (HTML + PDF)
 Documentacion/        · material de la cátedra — fuente de verdad de las consignas
@@ -123,6 +127,7 @@ python -m venv .venv                                    # el entorno del anális
 .venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-3/modelado_entrega3.ipynb
 .venv\Scripts\jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 notebooks/entrega-4/correcciones_entrega3.ipynb
 python docs/generar_pdf.py guion-defensa-entrega3.html   # el guion de la defensa de la E3
+.venv\Scripts\python app/build_app.py                     # regenera la app de la E4 (verifica contra el notebook)
 ```
 
 ## Antes de cada entrega
@@ -165,6 +170,14 @@ Lo que no se toca sin preguntar: la partición del test (20 %, estratificada por
 
 ### Y para las correcciones de la Entrega 3
 
-`notebooks/entrega-4/correcciones_entrega3.ipynb` usa las mismas clases, la misma partición y los mismos pedazos de la E3, con la banda de 3 minutos como objetivo. No copia CSV: lee `entrega-2/datos/` y `entrega-3/datos/`. Se ejecuta en unos veinte segundos. Al cerrar el kernel en Windows puede aparecer un `KeyError` de `joblib_memmapping_folder`: es la limpieza de joblib, no una celda en error.
+`notebooks/entrega-4/correcciones_entrega3.ipynb` usa las mismas clases, la misma partición y los mismos pedazos de la E3, con la banda de minutos como objetivo, en dos anchos (6 y 9 min): cada gráfico tiene una fila por ancho. No copia CSV: lee `entrega-2/datos/` y `entrega-3/datos/`. Se ejecuta en poco más de un minuto. Al cerrar el kernel en Windows puede aparecer un `KeyError` de `joblib_memmapping_folder`: es la limpieza de joblib, no una celda en error.
 
-Decisiones del grupo que no se reabren sin preguntar: el problema es de **clasificación** (la banda de 3 min en la que termina la partida); 12 bandas, de 3 min entre 15 y 45 más `<15` y `45+`; el modelo final es la **regresión logística sin pesos, `C=1`** (la más simple y la que da probabilidades por banda; `balanced` se probó y se descartó); decide el F1 macro, con accuracy, ±1 banda, error en minutos y matriz de confusión al lado; al jugador se le muestra la probabilidad de su ventana de 3 bandas. El MSE y el R² sólo se explican, sobre la regresión de la E3. El notebook es corto a propósito: hay poco tiempo para mostrarlo. Detalle en la Parte X del documento integral.
+Decisiones del grupo que no se reabren sin preguntar: el problema es de **clasificación** (la banda de minutos en la que termina la partida); **dos anchos** (10/11, reemplazan a las bandas de 3 min): 6 min → `<15, 15-21, 21-27, 27-33, 33-39, 39-45, 45+`, y 9 min → `<15, 15-24, 24-33, 33-42, 42+`; en cada ancho se comparan piso, logística sin pesos y `balanced`; **los dos modelos finales son la logística sin pesos** (`C=10` con 6, `C=1` con 9). Con 9 min la regla de la cátedra elegía la `balanced`, y el grupo la descartó porque queda debajo del piso en accuracy, minutos y calibración. Decide el F1 macro, con accuracy, ±1 banda (en los dos anchos), error en minutos y matriz de confusión al lado. Al jugador se le muestra, con 6 min, la ventana de 2 bandas (12 min) y, con 9 min, la banda más probable. El MSE y el R² se explican sobre la regresión de la E3 y se grafican, lo predicho contra lo real con la recta y = x, para el Ridge y los dos clasificadores (cada banda pasada a su minuto típico). **El notebook compara los dos finales sin elegir**; la app de la E4 usa el de 6 minutos (decisión del grupo, 10/11). Detalle en la Parte X del documento integral.
+
+### Y para la Entrega 4
+
+La app es `app/index.html`, **generada**: no se edita a mano. Los textos están en `app/plantilla.html` (cada número es una `$VARIABLE`); los números, los gráficos de Altair y la fórmula de la logística, en `app/build_app.py`. Después de tocar cualquiera de los dos, se corre `.venv\Scripts\python app/build_app.py` (menos de un minuto) y se commitea el `index.html` nuevo; el workflow `.github/workflows/pages.yml` publica la carpeta `app/` al hacer push a `main`.
+
+El script copia sin cambios las clases y la partición del notebook de las correcciones y, con los CSV congelados, **compara siete números con los guardados en el notebook y corta si no coinciden**: si se cambia el notebook, hay que actualizar `DEL_NOTEBOOK` en el script. Con `--desde-pipeline` lee lo último del DAG en `include/output/` y no compara.
+
+Decisiones del grupo (10/11) que no se reabren sin preguntar: la logística sin pesos de **6 minutos**; **HTML en GitHub Pages** (no Streamlit); «Probá» parte de una partida real del test y mueve servidor, elo y las 7 métricas del minuto 10; identidad visual propia (estética de LoL, el reloj de partida en la navegación, íconos de Data Dragon), no una copia del ejemplo de la cátedra. Los colores significan lo mismo en toda la app: las 7 bandas, dorado = lo que dice el modelo, turquesa = minuto 10, gris azulado = antes de jugar, gris = piso. Detalle en la Parte XI del documento integral.

@@ -239,6 +239,30 @@ CSV congelado y los CSV del minuto que viajan en `notebooks/entrega-3/datos/`.
 - **Cambia la pregunta**: predice a los diez minutos de juego, y no vale para las 137 partidas que
   terminan antes. Placas, wards y primera sangre del timeline quedaron fuera del modelo.
 
+## La aplicación (Entrega 4)
+
+Una página web que cuenta el proyecto y deja usar el modelo: **[`app/index.html`](app/index.html)**,
+publicada con GitHub Pages en **https://aguilarezequiel.github.io/FF-15/**. Usa el modelo final de las correcciones de la Entrega 3: la regresión
+logística sin pesos con bandas de 6 minutos (`C=10`), que al minuto 10 dice en qué ventana de 12
+minutos termina la partida.
+
+Se regenera entera con un solo comando, en el mismo venv de los notebooks:
+
+```bash
+.venv\Scripts\python app/build_app.py                   # con los CSV congelados de notebooks/ (los del notebook)
+.venv\Scripts\python app/build_app.py --desde-pipeline  # con lo último que dejó el DAG en include/output/
+```
+
+El script entrena el modelo con la misma partición, los mismos cinco pedazos y `SEMILLA = 42` que
+`notebooks/entrega-4/correcciones_entrega3.ipynb`. Con los CSV congelados, **compara sus números con los
+que quedaron guardados en el notebook y corta si no coinciden**. Después arma los gráficos con Altair,
+escribe adentro de la página los coeficientes de la logística (para «Probá el modelo», que calcula la
+probabilidad en el navegador) y llena `app/plantilla.html`. `app/index.html` no se edita a mano.
+
+Al hacer push de `app/index.html` a `main`, el workflow `.github/workflows/pages.yml` publica la
+carpeta `app/` en GitHub Pages. Para eso, el repositorio tiene que ser público y tener Pages activado
+con origen «GitHub Actions» (Settings → Pages).
+
 ## Probar
 
 ```bash
@@ -251,7 +275,7 @@ ruff check .        # estilo
 
 Para entender el proyecto entero —la teoría de la materia, el recorrido archivo por archivo,
 la guía de ejecución y la preparación de la defensa— está
-**[`docs/documentacion-proyecto.pdf`](docs/documentacion-proyecto.pdf)** (101 páginas).
+**[`docs/documentacion-proyecto.pdf`](docs/documentacion-proyecto.pdf)** (116 páginas).
 
 Se edita en `docs/documentacion-proyecto.html` y se regenera con `python docs/generar_pdf.py`.
 Es un documento vivo: cada avance del proyecto se refleja ahí, agregando lo nuevo y borrando
@@ -272,7 +296,13 @@ include/output/       · bronce, plata y entregables (gitignoreado)
 notebooks/            · el análisis de las Unidades 2+
   ├── requirements.txt      · el stack de análisis, en un venv aparte
   ├── entrega-2/            · el EDA, ya ejecutado, con el CSV congelado al lado
-  └── entrega-3/            · el modelado; en datos/ van los CSV de los minutos 5, 10 y 15
+  ├── entrega-3/            · el modelado; en datos/ van los CSV de los minutos 5, 10 y 15
+  └── entrega-4/            · las correcciones de la E3: la duración como clasificación
+app/                  · la aplicación de la Entrega 4
+  ├── build_app.py          · datos → modelo → gráficos de Altair → index.html
+  ├── plantilla.html        · el HTML y los textos, con los números como $VARIABLES
+  └── index.html            · lo que se publica (generado: no se edita a mano)
+.github/workflows/    · pages.yml publica app/ en GitHub Pages
 tests/                · astro dev pytest
 docs/                 · la documentación integral (HTML fuente + PDF)
 Documentacion/        · material de la cátedra

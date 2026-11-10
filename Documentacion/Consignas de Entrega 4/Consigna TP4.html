@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ciencia de Datos: Consigna TP4 | Campus</title><style>body{font-family:system-ui,Segoe UI,sans-serif;max-width:960px;margin:2rem auto;padding:0 1rem;line-height:1.5;color:#222}table{border-collapse:collapse;margin:1rem 0}td,th{border:1px solid #ccc;padding:.35rem .6rem;vertical-align:top}pre,code{background:#f4f4f4}pre{padding:.6rem;overflow:auto}img{max-width:100%}</style></head><body>
+<p><small>Descargado del campus (curso Ciencia de Datos, Unidad 4) el 2026-11-10.</small></p>
+<div class="box py-3 generalbox center clearfix"><div class="no-overflow"><p class="p-3 rounded" style="background-color:#D9F7F5"><strong>TP 4 · Una pregunta, un póster.</strong> <strong>Individual</strong>. Se presenta el miércoles 21 de octubre y se entrega por campus hasta el <strong>domingo 1 de noviembre a las 23:59</strong>. La votación de los pósters es en la clase del <strong>miércoles 4 de noviembre</strong>, en el primer bloque, antes del parcial.</p>
+
+<p>Hoy cualquier herramienta arma un gráfico prolijo en segundos. Lo que no hace sola es decidir: qué mostrar, a quién dejar afuera, en qué escala, contra qué comparar. Eso es lo que evalúa este TP. Cada una de las diez preguntas de abajo tiene una lectura obvia que los datos desmienten o matizan. El trabajo es encontrarla, medirla y contarla en un póster que cualquiera entienda sin leer tu notebook.</p>
+
+<h3>De dónde arrancás</h3>
+
+<table class="table table-sm table-bordered">
+<thead><tr><th>Notebook</th><th>Qué te deja</th></tr></thead>
+<tbody>
+<tr><td><code>Unidad 4 - Practica.ipynb</code></td><td>La gramática de Altair y un póster resuelto sobre una pregunta que no está en esta lista.</td></tr>
+</tbody>
+</table>
+
+<p>El dataset es el canónico de siempre. Si no lo tenés, esta celda lo baja la primera vez:</p>
+<pre><code>import os
+
+ARCHIVO  = "fifa_canonico_2026-07-23.csv"
+ID_DRIVE = "1cF30_fSvxNKpK5-AKJlzUqLHZTTUf0ls"
+
+if not os.path.exists(ARCHIVO):
+    !gdown $ID_DRIVE -O $ARCHIVO</code></pre>
+
+<h3>Las preguntas</h3>
+
+<p>Diez preguntas en cinco ejes. Elegís dos de <strong>ejes distintos</strong>.</p>
+
+<table class="table table-sm table-bordered">
+<thead><tr><th>Eje</th><th>Preguntas</th></tr></thead>
+<tbody>
+<tr><td><strong>1 · Posición, rol y atributos técnicos</strong></td><td><strong>P1.</strong> ¿Los jugadores se reparten equitativamente entre todas las posiciones?<br><strong>P2.</strong> ¿Qué atributos técnicos tienen mayor influencia en el valor de mercado?</td></tr>
+<tr><td><strong>2 · País, nacionalidad y geografía</strong></td><td><strong>P3.</strong> ¿Hay países que realmente dominen la escena futbolística?<br><strong>P4.</strong> ¿Qué países parecen producir mejores arqueros?</td></tr>
+<tr><td><strong>3 · Físico y condición atlética</strong></td><td><strong>P5.</strong> ¿Qué tan distinta es la estatura entre posiciones defensivas y ofensivas?<br><strong>P6.</strong> ¿Qué tan frecuente es encontrar jugadores con mucha técnica y mucha fuerza a la vez?</td></tr>
+<tr><td><strong>4 · Valor de mercado, salario y contratos</strong></td><td><strong>P7.</strong> ¿A qué edad empieza a notarse una brecha importante en los salarios?<br><strong>P8.</strong> ¿Los jugadores más valiosos tienen contratos más cortos?</td></tr>
+<tr><td><strong>5 · Edad, carrera y potencial</strong></td><td><strong>P9.</strong> ¿Qué tan concentrado está el talento joven en unos pocos clubes?<br><strong>P10.</strong> ¿Hay alguna posición donde los jugadores lleguen a su pico más tarde?</td></tr>
+</tbody>
+</table>
+
+<h3>Qué se pide</h3>
+
+<p>Por cada pregunta que elegís, <strong>un póster</strong>: una sola figura que responde la pregunta. El póster tiene que <strong>mostrar la lectura obvia y lo que la desarma</strong>, su título <strong>afirma la respuesta</strong> —no repite la pregunta— y declara qué hiciste con los datos: qué filtraste, qué agregaste y cuántos jugadores quedaron. <strong>La forma es tuya.</strong></p>
+
+<h3>Las reglas</h3>
+
+<ol>
+<li><p><strong>Todo en Altair, en una sola figura.</strong> El PNG que entregás es el que sale de <code>chart.save()</code>. Nada de Canva, Figma, PowerPoint ni imágenes pegadas: un póster editado fuera de Altair no es válido.</p></li>
+
+<li><p><strong>Sólo el dataset canónico.</strong> Los datos se preparan con pandas o con las transformaciones de Altair, a tu elección, siempre dentro del notebook.</p></li>
+
+<li><p><strong>El notebook corre de punta a punta</strong>: desde bajar el archivo hasta guardar el PNG.</p></li>
+
+<li><p><strong>Dos pósters obligatorios</strong>, de preguntas de ejes distintos. Podés entregar más, de otras pregunta, para tener más chances en la votación; se cuentan tus dos mejores resultados.</p></li>
+
+<li><p><strong>Es individual.</strong> Dos pósters con la misma construcción se tratan como copia.</p></li>
+
+<li><p><strong>Podés usar la herramienta que quieras para escribir código.</strong> Las decisiones —qué filtrar, qué comparar, en qué escala— tienen que estar medidas en tu notebook. Un póster sin esa medición no es válido, por más lindo que se vea.</p></li>
+</ol>
+
+<h3>Qué se entrega</h3>
+
+<p>Por cada póster, dos archivos: el notebook y el PNG, con el mismo nombre: comisión, apellido y número de pregunta. Por ejemplo, <code>TP4_5K09_Perez_P06.ipynb</code> y <code>TP4_5K09_Perez_P06.png</code>. Todos los archivos van juntos en la tarea <strong>«<a class="autolink" title="Entrega TP4" href="https://campusvirtual.frm.utn.edu.ar/mod/assign/view.php?id=57925">Entrega TP4</a>»</strong>.</p>
+
+<p>El notebook de cada póster sigue este orden:</p>
+
+<ol>
+<li>Una celda de texto con tu comisión, tu nombre y la pregunta.</li>
+<li><strong>La medición</strong>: las cuentas que muestran la trampa, con sus números.</li>
+<li><strong>La versión ingenua</strong>: el primer gráfico, tal como salió.</li>
+<li><strong>El póster</strong>: la celda que arma la figura completa y la guarda en PNG.</li>
+<li>Un párrafo final con la respuesta y <strong>la decisión que separa la versión ingenua del póster</strong>: qué componente cambiaste y qué dato te llevó a cambiarlo</li></ol><p><strong><span>Los notebooks se suben sin salidas</span></strong>. En Colab: «Editar → Borrar todas las salidas», y después «Archivo → Descargar → Descargar .ipynb». Cada gráfico de Altair guarda sus datos adentro de la salida, y con las salidas puestas un notebook puede pasar el límite de 20 MB por archivo de la tarea. No se pierde nada: para corregir, el notebook se vuelve a correr de punta a punta.<br></p>
+
+<h3>La votación — miércoles 4 de noviembre</h3>
+
+<p>Cada comisión vota por separado. La cátedra elige <strong>hasta tres finalistas por pregunta</strong> en cada comisión, y se presentan sin nombre, con una letra. La clase recorre las diez preguntas, y en cada una:</p>
+
+<ol>
+<li>Se proyectan los finalistas y se vota desde el celular, en la consulta de esa ronda. Está abierta un minuto.</li>
+<li>Se muestra el ganador y quién lo hizo.</li>
+<li>La cátedra explica por qué esos pósters llegaron a la final.</li>
+</ol>
+
+<p>Si hay empate, ganan los dos. Podés votar en la ronda de tu propia pregunta. Si no tenés celular, votás desde la compu de un compañero, con tu usuario.</p>
+
+<h3>Cómo se va a evaluar</h3>
+
+<table class="table table-sm table-bordered">
+<thead><tr><th>Parte</th><th>Puntos</th></tr></thead>
+<tbody>
+<tr><td>Dos pósters válidos, de ejes distintos</td><td>25 cada uno</td></tr>
+<tr><td>Votación: un punto por cada ronda en la que votaste</td><td>hasta 10</td></tr>
+<tr><td>Por cada póster finalista</td><td>+15</td></tr>
+<tr><td>Por cada pregunta ganada, en lugar del +15</td><td>+20</td></tr>
+</tbody>
+</table>
+
+<p class="p-3 rounded" style="background-color:#D9F7F5"><strong>La nota tiene un tope de 100 y se aprueba con 60. Con dos pósters válidos y la votación completa llegás a 60; un finalista lleva a 75, y dos preguntas ganadas, a 100.</strong></p>
+
+<p>Si en tu comisión hay menos de diez rondas, los 10 puntos de la votación se reparten entre las que haya.</p>
+
+<p>Un póster es válido si cumple todo esto:</p>
+
+<table class="table table-sm table-bordered">
+<thead><tr><th>Se verifica</th><th>Cómo</th></tr></thead>
+<tbody>
+<tr><td>Que corra</td><td>El notebook corre entero desde cero y produce el PNG entregado.</td></tr>
+<tr><td>Que sea Altair</td><td>El PNG sale de una sola figura de Altair, sin edición posterior.</td></tr>
+<tr><td>Que la trampa esté medida</td><td>Hay en el notebook al menos un número que muestra por qué la lectura ingenua no alcanza.</td></tr>
+<tr><td>Que la trampa esté en el póster</td><td>Se ve en el póster, no sólo en el texto del notebook.</td></tr>
+<tr><td>Que el título responda</td><td>El título afirma una respuesta; no repite la pregunta.</td></tr>
+<tr><td>Que los ejes sean distintos</td><td>Tus dos pósters obligatorios son de ejes distintos.</td></tr>
+</tbody>
+</table>
+
+<p>Un póster que no es válido se puede rehacer una vez, hasta el <strong>domingo 8 de noviembre a las 23:59</strong>. Cuenta para los 25 puntos, pero ya no compite.</p>
+
+<p>Para elegir finalistas se mira, en este orden: si la trampa está detectada y desarmada; si cada parte del póster agrega algo; si se entiende sin leer el notebook; y si colores y escalas significan lo mismo en todo el póster. Lo prolijo desempata, pero no clasifica.</p>
+
+<p>Lo que practicás acá —contar con datos una historia que no es la obvia— es lo que la Entrega 4 del Integrador te pide sobre tus propios datos, con interactividad.</p>
+
+<p>Si te trabás, preguntá en el foro de <a class="autolink" title="Consultas" href="https://campusvirtual.frm.utn.edu.ar/mod/forum/view.php?id=55340">Consultas</a>. Las preguntas sobre las reglas se contestan para todos; las de cuál es la trampa, no.</p></div></div><div class="modified">Última modificación: miércoles, 21 de octubre de 2026, 14:12</div><div id="format-tiles-js-config" data-modalallowedmodnames="[&quot;page&quot;,&quot;pdf&quot;,&quot;url&quot;,&quot;html&quot;]" data-modalallowedcmids="[53212,53219,53233,53237,53238,53241,53242,53243,53244,55622,55658,55919,55928,56646,57256,57266,57267,57455,57681,57683,57893,57894,57895,57896,57924,57930,57931]" data-defaultcourseicon="pie-chart"></div>
+</body></html>

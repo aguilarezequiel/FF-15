@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unidad 4: Visualización de Datos (sección del campus)</title><style>body{font-family:system-ui,Segoe UI,sans-serif;max-width:960px;margin:2rem auto;padding:0 1rem;line-height:1.5;color:#222}table{border-collapse:collapse;margin:1rem 0}td,th{border:1px solid #ccc;padding:.35rem .6rem;vertical-align:top}pre,code{background:#f4f4f4}pre{padding:.6rem;overflow:auto}img{max-width:100%}</style></head><body>
+<p><small>Descargado del campus (curso Ciencia de Datos, Unidad 4) el 2026-11-10.</small></p>
+
+    <div class="left side"></div>
+            <div class="pagesechead">
+                <div class="sectiontitlecontainer">
+                    <div class="sectiontitle" id="sectiontitle5">
+                        <h2>Unidad 4</h2>
+                        
+                    </div>
+                </div>
+            </div>
+    <div class="right side">
+            <div class="sectionbuttons" style="top: unset; right: unset;">
+                
+            </div>
+    </div>
+        
+        <div class="summary"><div class="no-overflow"><p dir="ltr" style="text-align: left;"></p><br><h3 style="text-align: center;">Unidad 4: Visualización de Datos</h3>
+<p>En esta unidad vamos a trabajar la visualización como una herramienta clave en todo proceso de ciencia de datos. Más allá de embellecer resultados, los gráficos permiten explorar, detectar patrones, comunicar hallazgos y tomar decisiones fundamentadas. Veremos cómo una visualización puede aclarar lo que los números no muestran, y cómo cada decisión visual es también una decisión narrativa: qué destacar, qué omitir, cómo estructurar el mensaje.</p>
+<p>Durante la clase teórica analizaremos ejemplos históricos, errores frecuentes y principios de diseño efectivos. También introduciremos la idea de que toda visualización puede pensarse como una <strong>oración visual</strong>, compuesta por elementos bien definidos: datos, mapeos estéticos, geometría, transformaciones, escalas y disposición. Esta estructura —conocida como <strong>gramática de gráficos</strong>— nos servirá como modelo mental para construir gráficos potentes, claros y reproducibles.</p><p>En la parte práctica utilizaremos <strong>Altair</strong>, una librería de visualización declarativa basada en la gramática de gráficos. A diferencia de otras herramientas más imperativas, Altair permite construir visualizaciones complejas a partir de combinaciones simples y estructuradas de componentes como datos, marcas, mapeos estéticos, escalas y transformaciones. Este enfoque no solo facilita la creación de gráficos claros y expresivos, sino que también promueve la reproducibilidad y la legibilidad del código. Exploraremos sus capacidades para crear visualizaciones estáticas e interactivas, y veremos cómo su diseño conciso se integra naturalmente al flujo de trabajo del análisis de datos en Python.</p><br><p></p></div></div>
+        <ul class="format-tiles-cm-list nosubtiles">
+            
+                
+                
+                
+                    <li class="activity activity-wrapper label modtype_label hasinfo
+                             mod_label  completion-enabled completion-manual  " id="module-57926" data-for="cmitem" data-id="57926" data-cmid="57926" data-contextid="92772" data-modinstance="10129" data-modtype="label" data-title="Teoría (copia) (copia) (copia)" data-completion-state="0" data-completion="1">
+                            <div class="activity-item " data-activityname="Teoría (copia) (copia) (copia)">
+                                        <div class="bulkselect d-none" data-for="cmBulkSelect">
+                                            <input id="cmCheckbox57926" type="checkbox" data-id="57926" data-action="toggleSelectionCm" data-bulkcheckbox="1">
+                                            <label class="sr-only" for="cmCheckbox57926">
+                                                Seleccionar actividad Teoría (copia) (copia) (copia)
+                                            </label>
+                                        </div>
+                            
+                                        
+                                        <div class="activity-grid noname-grid tiles-activity-container" data-cmid="57926" data-modinstance="10129" data-title="Teoría (copia) (copia) (copia)">
+                                    
+                                    
+                                    
+                                    
+                                                    <div class="activity-completion align-self-start ms-sm-2">
+                                                            <div data-region="activity-information" data-activityname="Teoría (copia) (copia) (copia)" class="activity-information">
+                                                                    
+                                                            </div>
+                                                    </div>
+                                    
+                                    
+                                                <div class="activity-altcontent d-flex text-break ">
+                                                    <div class="no-overflow"><div class="no-overflow"><h4 dir="ltr" style="text-align: left;"><u>Teoría</u></h4></div></div>
+                                                </div>
+                                    
+                                    
+                                        </div>
+                            </div>
+                    </li>
+                
+                
+                
+                    <li class="activity activity-wrapper resource modtype_resource hasinfo
+                             mod_resource modtype_markup completion-enabled completion-manual  " id="module-53231" data-for="cmitem" data-id="53231" data-cmid="53231" data-contextid="85524" data-modinstance="18345" data-modtype="resource_markup" data-title="Clase Teórica Visualización" data-completion-state="0" data-completion="1">
+                            <div class="activity-item " data-activityname="Clase Teórica Visualización">
+                                        <div class="bulkselect d-none" data-for="cmBulkSelect">
+                                            <input id="cmCheckbox53231" type="checkbox" data-id="53231" data-action="toggleSelectionCm" data-bulkcheckbox="1">
+                                            <label class="sr-only" for="cmCheckbox53231">
+                                                Seleccionar actividad Clase Teórica Visualización
+                                            </label>
+                                        </div>
+                            
+                                        
+                                        <div class="activity-grid  tiles-activity-container" data-cmid="53231" data-modinstance="18345" data-title="Clase Teórica Visualización">
+                                                                                <div class="activity-icon activityiconcontainer smaller content courseicon align-self-start me-2 ">
+                                                                                    <img src="https://campusvirtual.frm.utn.edu.ar/theme/image.php/boost/core/1793877951/f/markup?filtericon=1" class="activityicon " alt="Icono Recurso">
+                                                                                </div>
+                                                        
+                                                                <div class="activity-name-area activity-instance d-flex flex-column me-2 ">
+                                                                    <div class="activitytitle media  modtype_resource position-relative align-self-start">
+                                                                        <div class="media-body align-self-center">
+                                                                            <div class="activityname">
+                                                                                        <a id="cm-link-53231" href="https://campusvirtual.frm.utn.edu.ar/mod/resource/view.php?id=53231" class="aalink stretched-link" onclick="window.open('https://campusvirtual.frm.utn.edu.ar/mod/resource/view.php?id=53231&amp;redirect=1', '', 'width=620,height=450,toolbar=no,location=no,menubar=no,copyhistory=no,status=no,directories=no,scrollbars=yes,resizable=yes'); return false;"><span class="instancename">Clase Teórica Visualización</span></a>
+                                                                                        <span class="ms-1">
+                                                                                            <span class="activitybadge badge rounded-pill ">
+                                                                                                    
+                                                                                            </span>
+                                                                                        </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                    
+                                    
+                                    
+                                    
+                                                    <div class="activity-completion align-self-start ms-sm-2">
+                                                            <div data-region="activity-information" data-activityname="Clase Teórica Visualización" class="activity-information">
+                                                                    
+                                                            </div>
+                                                    </div>
+                                    
+                                    
+                                    
+                                    
+                                        </div>
+                            </div>
+                    </li>
+                
+                
+                
+                    <li class="activity activity-wrapper quiz modtype_quiz hasinfo
+                             mod_quiz  completion-enabled completion-view  " id="module-58352" data-for="cmitem" data-id="58352" data-cmid="58352" data-contextid="93383" data-modinstance="5916" data-modtype="quiz" data-title="Autoevaluación Visualización" data-completion-state="1" data-completion="2">
+                            <div class="activity-item " data-activityname="Autoevaluación Visualización">
+                                        <div class="bulkselect d-none" data-for="cmBulkSelect">
+                                            <input id="cmCheckbox58352" type="checkbox" data-id="58352" data-action="toggleSelectionCm" data-bulkcheckbox="1">
+                                            <label class="sr-only" for="cmCheckbox58352">
+                                                Seleccionar actividad Autoevaluación Visualización
+                                            </label>
+                                        </div>
+                            
+                                        
+                                        <div class="activity-grid  tiles-activity-container" data-cmid="58352" data-modinstance="5916" data-title="Autoevaluación Visualización">
+                                                                                <div class="activity-icon activityiconcontainer smaller assessment courseicon align-self-start me-2 ">
+                                                                                    <img src="https://campusvirtual.frm.utn.edu.ar/theme/image.php/boost/quiz/1793877951/monologo?filtericon=1" class="activityicon " alt="Icono Cuestionario">
+                                                                                </div>
+                                                        
+                                                                <div class="activity-name-area activity-instance d-flex flex-column me-2 ">
+                                                                    <div class="activitytitle media  modtype_quiz position-relative align-self-start">
+                                                                        <div class="media-body align-self-center">
+                                                                            <div class="activityname">
+                                                                                        <a id="cm-link-58352" href="https://campusvirtual.frm.utn.edu.ar/mod/quiz/view.php?id=58352" class="aalink stretched-link"><span class="instancename">Autoevaluación Visualización</span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                    
+                                    
+                                    
+                                    
+                                                    <div class="activity-completion align-self-start ms-sm-2">
+                                                            <div data-region="activity-information" data-activityname="Autoevaluación Visualización" class="activity-information">
+                                                                    
+                                                            </div>
+                                                    </div>
+                                    
+                                    
+                                    
+                                    
+                                        </div>
+                            </div>
+                    </li>
+                
+                
+                
+                    <li class="activity activity-wrapper label modtype_label hasinfo
+                             mod_label  completion-enabled completion-manual  " id="module-57927" data-for="cmitem" data-id="57927" data-cmid="57927" data-contextid="92773" data-modinstance="10130" data-modtype="label" data-title="Práctica (copia) (copia) (copia)" data-completion-state="0" data-completion="1">
+                            <div class="activity-item " data-activityname="Práctica (copia) (copia) (copia)">
+                                        <div class="bulkselect d-none" data-for="cmBulkSelect">
+                                            <input id="cmCheckbox57927" type="checkbox" data-id="57927" data-action="toggleSelectionCm" data-bulkcheckbox="1">
+                                            <label class="sr-only" for="cmCheckbox57927">
+                                                Seleccionar actividad Práctica (copia) (copia) (copia)
+                                            </label>
+                                        </div>
+                            
+                                        
+                                        <div class="activity-grid noname-grid tiles-activity-container" data-cmid="57927" data-modinstance="10130" data-title="Práctica (copia) (copia) (copia)">
+                                    
+                                    
+                                    
+                                    
+                                                    <div class="activity-completion align-self-start ms-sm-2">
+                                                            <div data-region="activity-information" data-activityname="Práctica (copia) (copia) (copia)" class="activity-information">
+                                                                    
+                                                            </div>
+                                                    </div>
+                                    
+                                    
+                                                <div class="activity-altcontent d-flex text-break ">
+                                                    <div class="no-overflow"><div class="no-overflow"><h4 dir="ltr" style="text-align: left;"><u>Práctica</u></h4></div></div>
+                                                </div>
+                                    
+                                    
+                                        </div>
+                            </div>
+                    </li>
+                
+                
+                
+                    <li class="activity activity-wrapper url modtype_url hasinfo
+                             mod_url  completion-enabled completion-manual  " id="module-53233" data-for="cmitem" data-id="53233" data-cmid="53233" data-contextid="85526" data-modinstance="7901" data-modtype="url" data-title="Intro a Altair" data-modal="url" data-completion-state="0" data-completion="1">
+                            <div class="activity-item " data-activityname="Intro a Altair">
+                                        <div class="bulkselect d-none" data-for="cmBulkSelect">
+                                            <input id="cmCheckbox53233" type="checkbox" data-id="53233" data-action="toggleSelectionCm" data-bulkcheckbox="1">
+                                            <label class="sr-only" for="cmCheckbox53233">
+                                                Seleccionar actividad Intro a Altair
+                                            </label>
+                                        </div>
+                            
+                                        
+                                        <div class="activity-grid  tiles-activity-container" data-cmid="53233" data-modinstance="7901" data-title="Intro a Altair">
+                                                                                <div class="activity-icon activityiconcontainer smaller content courseicon align-self-start me-2 ">
+                                                                                    <img src="https://campusvirtual.frm.utn.edu.ar/theme/image.php/boost/url/1793877951/monologo?filtericon=1" class="activityicon " alt="Icono URL">
+                                                                                </div>
+                                                        
+                                                                <div class="activity-name-area activity-instance d-flex flex-column me-2 ">
+                                                                    <div class="activitytitle media  modtype_url position-relative align-self-start">
+                                                                        <div class="media-body align-self-center">
+                                                                            <div class="activityname">
+                                                                                        <a id="cm-link-53233" href="https://campusvirtual.frm.utn.edu.ar/mod/url/view.php?id=53233" data-action="launch-tiles-cm-modal" class="aalink stretched-link"><span class="instancename">Intro a Altair</span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                    
+                                    
+                                    
+                                    
+                                                    <div class="activity-completion align-self-start ms-sm-2">
+                                                            <div data-region="activity-information" data-activityname="Intro a Altair" class="activity-information">
+                                                                    
+                                                            </div>
+                                                    </div>
+                                    
+                                    
+                                    
+                                    
+                                        </div>
+                            </div>
+                    </li>
+                
+                
+                
+                    <li class="activity activity-wrapper quiz modtype_quiz hasinfo
+                             mod_quiz  completion-enabled completion-view  " id="module-58351" data-for="cmitem" data-id="58351" data-cmid="58351" data-contextid="93382" data-modinstance="5915" data-modtype="quiz" data-title="Autoevaluación Altair" data-completion-state="0" data-completion="2">
+                            <div class="activity-item " data-activityname="Autoevaluación Altair">
+                                        <div class="bulkselect d-none" data-for="cmBulkSelect">
+                                            <input id="cmCheckbox58351" type="checkbox" data-id="58351" data-action="toggleSelectionCm" data-bulkcheckbox="1">
+                                            <label class="sr-only" for="cmCheckbox58351">
+                                                Seleccionar actividad Autoevaluación Altair
+                                            </label>
+                                        </div>
+                            
+                                        
+                                        <div class="activity-grid  tiles-activity-container" data-cmid="58351" data-modinstance="5915" data-title="Autoevaluación Altair">
+                                                                                <div class="activity-icon activityiconcontainer smaller assessment courseicon align-self-start me-2 ">
+                                                                                    <img src="https://campusvirtual.frm.utn.edu.ar/theme/image.php/boost/quiz/1793877951/monologo?filtericon=1" class="activityicon " alt="Icono Cuestionario">
+                                                                                </div>
+                                                        
+                                                                <div class="activity-name-area activity-instance d-flex flex-column me-2 ">
+                                                                    <div class="activitytitle media  modtype_quiz position-relative align-self-start">
+                                                                        <div class="media-body align-self-center">
+                                                                            <div class="activityname">
+                                                                                        <a id="cm-link-58351" href="https://campusvirtual.frm.utn.edu.ar/mod/quiz/view.php?id=58351" class="aalink stretched-link"><span class="instancename">Autoevaluación Altair</span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                    
+                                    
+                                    
+                                    
+                                                    <div class="activity-completion align-self-start ms-sm-2">
+                                                            <div data-region="activity-information" data-activityname="Autoevaluación Altair" class="activity-information">
+                                                                    
+                                                            </div>
+                                                    </div>
+                                    
+                                    
+                                    
+                                    
+                                        </div>
+                            </div>
+                    </li>
+                
+                
+                
+                    <li class="activity activity-wrapper page modtype_page hasinfo
+                             mod_page   " id="module-57924" data-for="cmitem" data-id="57924" data-cmid="57924" data-contextid="92770" data-modinstance="836" data-modtype="page" data-title="Consigna TP4" data-modal="page" data-completion="0">
+                            <div class="activity-item " data-activityname="Consigna TP4">
+                                        <div class="bulkselect d-none" data-for="cmBulkSelect">
+                                            <input id="cmCheckbox57924" type="checkbox" data-id="57924" data-action="toggleSelectionCm" data-bulkcheckbox="1">
+                                            <label class="sr-only" for="cmCheckbox57924">
+                                                Seleccionar actividad Consigna TP4
+                                            </label>
+                                        </div>
+                            
+                                        
+                                        <div class="activity-grid  tiles-activity-container" data-cmid="57924" data-modinstance="836" data-title="Consigna TP4">
+                                                                                <div class="activity-icon activityiconcontainer smaller content courseicon align-self-start me-2 ">
+                                                                                    <img src="https://campusvirtual.frm.utn.edu.ar/theme/image.php/boost/page/1793877951/monologo?filtericon=1" class="activityicon " alt="Icono Página">
+                                                                                </div>
+                                                        
+                                                                <div class="activity-name-area activity-instance d-flex flex-column me-2 ">
+                                                                    <div class="activitytitle media  modtype_page position-relative align-self-start">
+                                                                        <div class="media-body align-self-center">
+                                                                            <div class="activityname">
+                                                                                        <a id="cm-link-57924" href="https://campusvirtual.frm.utn.edu.ar/mod/page/view.php?id=57924" data-action="launch-tiles-cm-modal" class="aalink stretched-link"><span class="instancename">Consigna TP4</span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                        </div>
+                            </div>
+                    </li>
+                
+                
+                
+                    <li class="activity activity-wrapper assign modtype_assign hasinfo
+                             mod_assign   " id="module-57925" data-for="cmitem" data-id="57925" data-cmid="57925" data-contextid="92771" data-modinstance="5584" data-modtype="assign" data-title="Entrega TP4" data-completion="0">
+                            <div class="activity-item " data-activityname="Entrega TP4">
+                                        <div class="bulkselect d-none" data-for="cmBulkSelect">
+                                            <input id="cmCheckbox57925" type="checkbox" data-id="57925" data-action="toggleSelectionCm" data-bulkcheckbox="1">
+                                            <label class="sr-only" for="cmCheckbox57925">
+                                                Seleccionar actividad Entrega TP4
+                                            </label>
+                                        </div>
+                            
+                                        
+                                        <div class="activity-grid  tiles-activity-container" data-cmid="57925" data-modinstance="5584" data-title="Entrega TP4">
+                                                                                <div class="activity-icon activityiconcontainer smaller assessment courseicon align-self-start me-2 ">
+                                                                                    <img src="https://campusvirtual.frm.utn.edu.ar/theme/image.php/boost/assign/1793877951/monologo?filtericon=1" class="activityicon " alt="Icono Tarea">
+                                                                                </div>
+                                                        
+                                                                <div class="activity-name-area activity-instance d-flex flex-column me-2 ">
+                                                                    <div class="activitytitle media  modtype_assign position-relative align-self-start">
+                                                                        <div class="media-body align-self-center">
+                                                                            <div class="activityname">
+                                                                                        <a id="cm-link-57925" href="https://campusvirtual.frm.utn.edu.ar/mod/assign/view.php?id=57925" class="aalink stretched-link"><span class="instancename">Entrega TP4</span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                        </div>
+                            </div>
+                    </li>
+                
+                
+                
+                    <li class="activity activity-wrapper label modtype_label hasinfo
+                             mod_label  completion-enabled completion-manual  " id="module-57928" data-for="cmitem" data-id="57928" data-cmid="57928" data-contextid="92774" data-modinstance="10131" data-modtype="label" data-title="Integrador (copia) (copia)" data-completion-state="0" data-completion="1">
+                            <div class="activity-item " data-activityname="Integrador (copia) (copia)">
+                                        <div class="bulkselect d-none" data-for="cmBulkSelect">
+                                            <input id="cmCheckbox57928" type="checkbox" data-id="57928" data-action="toggleSelectionCm" data-bulkcheckbox="1">
+                                            <label class="sr-only" for="cmCheckbox57928">
+                                                Seleccionar actividad Integrador (copia) (copia)
+                                            </label>
+                                        </div>
+                            
+                                        
+                                        <div class="activity-grid noname-grid tiles-activity-container" data-cmid="57928" data-modinstance="10131" data-title="Integrador (copia) (copia)">
+                                    
+                                    
+                                    
+                                    
+                                                    <div class="activity-completion align-self-start ms-sm-2">
+                                                            <div data-region="activity-information" data-activityname="Integrador (copia) (copia)" class="activity-information">
+                                                                    
+                                                            </div>
+                                                    </div>
+                                    
+                                    
+                                                <div class="activity-altcontent d-flex text-break ">
+                                                    <div class="no-overflow"><div class="no-overflow"><h4 dir="ltr" style="text-align: left;"><u>Integrador</u></h4>
+
+<p class="p-3 rounded" style="background-color:#D9F7F5"><strong>Entrega 4 · Visualización y app.</strong> Miércoles 11 de noviembre, la clase completa. Cada grupo pasa <strong>25 minutos</strong> con el docente, en privado, <strong>en la franja que tiene asignada más abajo</strong>. No hay audiencia de otros grupos.</p>
+
+<h3>Tu horario</h3>
+
+<p>Cada grupo tiene <strong>una franja asignada</strong>. Llegá cinco minutos antes con la aplicación ya abierta en su URL pública y el repositorio a mano: la franja empieza y termina a la hora que dice, los turnos van uno detrás del otro, y lo que no llegues a mostrar en tus veinticinco minutos no se recupera.</p>
+
+<p><strong>Comisión 5K09 · miércoles 11 de noviembre</strong></p>
+
+<table class="table table-sm table-bordered">
+    <thead>
+        <tr>
+            <th>Grupo</th>
+            <th>Horario</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>5K09-01</strong></td>
+            <td><code>14:30 – 14:55</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K09-02</strong></td>
+            <td><code>14:55 – 15:20</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K09-03</strong></td>
+            <td><code>15:20 – 15:45</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K09-04</strong></td>
+            <td><code>15:45 – 16:10</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K09-05</strong></td>
+            <td><code>16:10 – 16:35</code></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center;background-color:#F5F5F5"><em>corte de 15 minutos</em></td>
+        </tr>
+        <tr>
+            <td><strong>5K09-06</strong></td>
+            <td><code>16:50 – 17:15</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K09-07</strong></td>
+            <td><code>17:15 – 17:40</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K09-08</strong></td>
+            <td><code>17:40 – 18:05</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K09-09</strong></td>
+            <td><code>18:05 – 18:30</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K09-10</strong></td>
+            <td><code>18:30 – 18:55</code></td>
+        </tr>
+    </tbody>
+</table>
+
+<p><strong>Comisión 5K10 · miércoles 11 de noviembre</strong></p>
+
+<table class="table table-sm table-bordered">
+    <thead>
+        <tr>
+            <th>Grupo</th>
+            <th>Horario</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><strong>5K10-01</strong></td>
+            <td><code>19:00 – 19:25</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K10-02</strong></td>
+            <td><code>19:25 – 19:50</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K10-03</strong></td>
+            <td><code>19:50 – 20:15</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K10-04</strong></td>
+            <td><code>20:15 – 20:40</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K10-05</strong></td>
+            <td><code>20:40 – 21:05</code></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:center;background-color:#F5F5F5"><em>corte de 15 minutos</em></td>
+        </tr>
+        <tr>
+            <td><strong>5K10-06</strong></td>
+            <td><code>21:20 – 21:45</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K10-07</strong></td>
+            <td><code>21:45 – 22:10</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K10-08</strong></td>
+            <td><code>22:10 – 22:35</code></td>
+        </tr>
+        <tr>
+            <td><strong>5K10-09</strong></td>
+            <td><code>22:35 – 23:00</code></td>
+        </tr>
+    </tbody>
+</table>
+
+<p class="p-3 rounded" style="background-color:#FFF4E0"><strong>Cinco grupos de la 5K10 exponen el viernes.</strong> Con catorce grupos no entran los veinticinco minutos para todos dentro de la banda de cursada, así que <strong>5K10-10, 5K10-11, 5K10-12, 5K10-13</strong> y <strong>5K10-14</strong> pasan al horario de consulta del <strong>viernes 13 de noviembre</strong>: 19:00, 19:25, 19:50, 20:15 y 20:40 respectivamente. Mismos veinticinco minutos y misma exigencia.</p></div></div>
+                                                </div>
+                                    
+                                    
+                                        </div>
+                            </div>
+                    </li>
+                
+                
+                
+                    <li class="activity activity-wrapper page modtype_page hasinfo
+                             mod_page   " id="module-57930" data-for="cmitem" data-id="57930" data-cmid="57930" data-contextid="92776" data-modinstance="837" data-modtype="page" data-title="Instructivo Entrega 4" data-modal="page" data-completion="0">
+                            <div class="activity-item " data-activityname="Instructivo Entrega 4">
+                                        <div class="bulkselect d-none" data-for="cmBulkSelect">
+                                            <input id="cmCheckbox57930" type="checkbox" data-id="57930" data-action="toggleSelectionCm" data-bulkcheckbox="1">
+                                            <label class="sr-only" for="cmCheckbox57930">
+                                                Seleccionar actividad Instructivo Entrega 4
+                                            </label>
+                                        </div>
+                            
+                                        
+                                        <div class="activity-grid  tiles-activity-container" data-cmid="57930" data-modinstance="837" data-title="Instructivo Entrega 4">
+                                                                                <div class="activity-icon activityiconcontainer smaller content courseicon align-self-start me-2 ">
+                                                                                    <img src="https://campusvirtual.frm.utn.edu.ar/theme/image.php/boost/page/1793877951/monologo?filtericon=1" class="activityicon " alt="Icono Página">
+                                                                                </div>
+                                                        
+                                                                <div class="activity-name-area activity-instance d-flex flex-column me-2 ">
+                                                                    <div class="activitytitle media  modtype_page position-relative align-self-start">
+                                                                        <div class="media-body align-self-center">
+                                                                            <div class="activityname">
+                                                                                        <a id="cm-link-57930" href="https://campusvirtual.frm.utn.edu.ar/mod/page/view.php?id=57930" data-action="launch-tiles-cm-modal" class="aalink stretched-link"><span class="instancename">Instructivo Entrega 4</span></a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                        </div>
+                            </div>
+                    </li>
+                
+                
+                
+                    <li class="activity activity-wrapper resource modtype_resource hasinfo
+                             mod_resource modtype_markup  " id="module-57931" data-for="cmitem" data-id="57931" data-cmid="57931" data-contextid="92777" data-modinstance="20049" data-modtype="resource_markup" data-title="aplicación de ejemplo" data-modal="html" data-completion="0">
+                            <div class="activity-item " data-activityname="aplicación de ejemplo">
+                                        <div class="bulkselect d-none" data-for="cmBulkSelect">
+                                            <input id="cmCheckbox57931" type="checkbox" data-id="57931" data-action="toggleSelectionCm" data-bulkcheckbox="1">
+                                            <label class="sr-only" for="cmCheckbox57931">
+                                                Seleccionar actividad aplicación de ejemplo
+                                            </label>
+                                        </div>
+                            
+                                        
+                                        <div class="activity-grid  tiles-activity-container" data-cmid="57931" data-modinstance="20049" data-title="aplicación de ejemplo">
+                                                                                <div class="activity-icon activityiconcontainer smaller content courseicon align-self-start me-2 ">
+                                                                                    <img src="https://campusvirtual.frm.utn.edu.ar/theme/image.php/boost/core/1793877951/f/markup?filtericon=1" class="activityicon " alt="Icono Recurso">
+                                                                                </div>
+                                                        
+                                                                <div class="activity-name-area activity-instance d-flex flex-column me-2 ">
+                                                                    <div class="activitytitle media  modtype_resource position-relative align-self-start">
+                                                                        <div class="media-body align-self-center">
+                                                                            <div class="activityname">
+                                                                                        <a id="cm-link-57931" href="https://campusvirtual.frm.utn.edu.ar/mod/resource/view.php?id=57931" data-action="launch-tiles-cm-modal" class="aalink stretched-link"><span class="instancename">aplicación de ejemplo</span></a>
+                                                                                        <span class="ms-1">
+                                                                                            <span class="activitybadge badge rounded-pill badge-none">
+                                                                                                    HTML
+                                                                                            </span>
+                                                                                        </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                                        </div>
+                            </div>
+                    </li>
+        </ul>
+
+
+
+</body></html>

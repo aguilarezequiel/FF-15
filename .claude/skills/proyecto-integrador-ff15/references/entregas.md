@@ -1,6 +1,6 @@
 # Entregas del Integrador
 
-Fuente: `Documentacion/Kit de arranque - Proyecto Integrador 2026.pdf` y la página del campus guardada en `Documentacion/Consignas de Entrega 1/`.
+Fuente: `Documentacion/Kit de arranque - Proyecto Integrador 2026.pdf` y las páginas del campus guardadas en `Documentacion/Consignas de Entrega N/`. La de la Entrega 4 (instructivo, app de ejemplo, teórica y práctica de Altair) está en `Documentacion/Consignas de Entrega 4/`, con el instructivo en texto en `consigna.md`.
 
 ## Contenido
 
@@ -9,6 +9,7 @@ Fuente: `Documentacion/Kit de arranque - Proyecto Integrador 2026.pdf` y la pág
 - [Instrucciones para la Entrega 1 (verbatim)](#instrucciones-para-la-entrega-1-verbatim)
 - [Instrucciones para la Entrega 2 (verbatim)](#instrucciones-para-la-entrega-2-verbatim)
 - [La Entrega 3 (resumen de la consigna)](#la-entrega-3-resumen-de-la-consigna)
+- [La Entrega 4 (resumen de la consigna)](#la-entrega-4-resumen-de-la-consigna)
 - [Errores de años anteriores](#errores-de-años-anteriores)
 
 ---
@@ -21,11 +22,13 @@ Fuente: `Documentacion/Kit de arranque - Proyecto Integrador 2026.pdf` y la pág
 | **1 · Ingeniería de datos** | **miércoles 9/9** | Pipeline automatizado que produce tu dataset |
 | **2 · Análisis exploratorio** | **miércoles 23/9** | Exploración, hipótesis y hallazgos |
 | **3 · Modelado** | **miércoles 28/10** | Objetivo predictivo, modelos comparados y métricas |
-| 4 · Visualización e integración | 04/11 | Visualizaciones y aplicación funcionando |
-| Exposición final | 18/11 | Proyecto completo y demo en vivo |
-| Recuperación | 25/11 | Para los grupos que la necesiten |
+| **4 · Visualización y app** | **miércoles 11/11** | Aplicación web publicada en una URL pública que cuenta el proyecto y deja usarlo |
+| Exposición final | 25/11 | Proyecto completo y demo en vivo, con la misma app de la E4 |
+| Recuperación | sin fecha confirmada | El Kit decía 25/11, que el instructivo de la E4 ahora le da a la exposición final |
 
-> **Discrepancia de fechas, a favor del campus.** El PDF del Kit de arranque dice que la Entrega 1 es el **02/09** y que la Entrega 2 es el **16/09**. Las consignas del campus, más recientes, dicen **miércoles 9 de septiembre** y **miércoles 23 de septiembre**. Valen las del campus.
+> **Discrepancia de fechas, a favor del campus.** El PDF del Kit de arranque dice que la Entrega 1 es el **02/09** y que la Entrega 2 es el **16/09**. Las consignas del campus, más recientes, dicen **miércoles 9 de septiembre** y **miércoles 23 de septiembre**. Valen las del campus. Lo mismo con la E4: el Kit decía **04/11** y la exposición final **18/11**; el instructivo de la E4 (`Documentacion/Consignas de Entrega 4/`) dice **miércoles 11 de noviembre** y **25 de noviembre**.
+
+**Franja del grupo 5K09-02 en la Entrega 4: miércoles 11 de noviembre, 14:55 – 15:20** (25 minutos). Llegar cinco minutos antes con la aplicación ya abierta en su URL pública y el repositorio a mano.
 
 **La Entrega 2 ocupa la clase completa**, no una franja asignada: cada grupo pasa 20 minutos con el docente, en privado, sin audiencia de otros grupos.
 
@@ -246,14 +249,27 @@ Cómo lo resolvimos: Parte IX de `docs/documentacion-proyecto.html` y `docs/guio
 
 No hay consigna escrita en `Documentacion/`: las cuatro correcciones las transmitió el usuario. El criterio de fondo del docente: **un modelo útil para el jugador**.
 
-1. **Clasificación**: en qué banda de 3 minutos termina la partida, sabiendo lo del minuto 10.
+1. **Clasificación**: en qué banda de minutos termina la partida, sabiendo lo del minuto 10.
 2. **Distribución del error con gráficos**, no sólo números.
 3. **Probar el MSE**, o buscar una métrica mejor.
 4. **Expresar bien el R²**.
 
-Decisiones del grupo (no reabrir sin preguntar): **el problema pasa a ser de clasificación** y el modelo final es una **regresión logística** (la más simple, y da una probabilidad por banda: «62 % de que termine entre 24 y 33 minutos»); 12 bandas, de 3 min entre 15 y 45 más `<15` y `45+`; se comparan la versión sin pesos y la `balanced` contra el piso, y decide el **F1 macro**, con accuracy, ±1 banda, error en minutos y matriz de confusión al lado; el MSE y el R² se explican en una sección corta sobre la regresión de la E3; el notebook es **corto y con muchos gráficos** (estilo de las prácticas: curva de C, barras de error, matrices de confusión, métricas por banda, calibración, coeficientes, permutación). **Resultado**: queda la **sin pesos, `C=1`** (F1 macro 0,099 en el test, piso 0,025). En minutos casi no le gana al piso (38,0 % contra 37,0 % de partidas a menos de 3 minutos); lo que aporta son probabilidades calibradas que cambian de partida en partida (dice 56 %, pasa 56 %). `balanced` no le gana en F1, cae por debajo del piso en accuracy y rompe la calibración.
+Decisiones del grupo (no reabrir sin preguntar): **el problema pasa a ser de clasificación** y el modelo es una **regresión logística** (la más simple, y da una probabilidad por banda: «79 % de que termine entre 21 y 33 minutos»). La primera versión (9/11) usaba 12 bandas de 3 min; **el 10/11 se reemplazaron por dos anchos**: 6 min (`<15, 15-21, 21-27, 27-33, 33-39, 39-45, 45+`) y 9 min (`<15, 15-24, 24-33, 33-42, 42+`), y **quedan dos modelos finales**. En cada ancho se comparan la versión sin pesos y la `balanced` contra el piso, y decide el **F1 macro**, con accuracy, ±1 banda (en los dos anchos: ±6 y ±9 min), error en minutos y matriz de confusión al lado. Al jugador: con 6 min, la ventana de 2 bandas (12 min); con 9 min, la banda más probable. El MSE y el R² se explican sobre la regresión de la E3 y se grafican (predicho contra real, con la recta y = x) para el Ridge y los dos clasificadores, pasando cada banda a su minuto típico. Cada gráfico del notebook tiene una fila por ancho. **Resultado**: los dos finales son la **sin pesos**: `C=10` con 6 min (F1 macro 0,159 en el test, piso 0,076) y `C=1` con 9 min (0,221, piso 0,137). Con 9 min la regla de la cátedra elegía la `balanced` (le ganaba por 0,0098 en F1 cv, con desvío 0,0072), y **el grupo la descartó**: en el test empata en F1, su accuracy (27,3 %) queda muy debajo del piso (52,2 %), erra 9,5 min en promedio y rompe la calibración. En minutos ninguno le gana casi al piso (37,5 y 38,0 % de partidas a menos de 3 min contra 36,5 y 37,0 %; R² pasado a minutos 0,042 y 0,046, contra 0,129 del Ridge); lo que aportan son probabilidades calibradas que cambian de partida en partida (6 min: dice 66,6 %, pasa 66,3 %; 9 min: dice 53,9 %, pasa 54,4 %). El notebook los compara sin elegir; **el 10/11 el grupo eligió el de 6 minutos para la app** de la Entrega 4.
 
-Notebook: `notebooks/entrega-4/correcciones_entrega3.ipynb` (no es la Entrega 4: la app no se empezó). Detalle: Parte X de `docs/documentacion-proyecto.html`.
+Notebook: `notebooks/entrega-4/correcciones_entrega3.ipynb` (no es la Entrega 4: la app está en `app/`). Detalle: Parte X de `docs/documentacion-proyecto.html`.
+
+## La Entrega 4 (resumen de la consigna)
+
+Consigna completa en `Documentacion/Consignas de Entrega 4/` (instructivo en `consigna.md`; también la app de ejemplo de la cátedra, la teórica y la práctica de Altair). **Miércoles 11/11, 25 min en privado, franja del 5K09-02: 14:55 – 15:20.** Se entrega la versión final del proyecto: **una aplicación web publicada en una URL**, la misma de la exposición final del 25/11.
+
+- **Forma de copa de martini.** Portada: la pregunta, la idea central en una oración con sujeto y verbo, y tres números. Tallo (lo guía el autor): «Los datos», «Lo que encontramos» y «El modelo», cada una con un **título que afirma**, un gráfico que lo prueba y un desplegable **«Cómo lo sabemos»** cerrado por defecto. Copa (la maneja el usuario): «Explorá» (panorama, al menos dos controles que cambian el gráfico, detalle a pedido con lo que dijo el modelo) y «Probá el modelo» (un caso nuevo, con probabilidad si es clasificación; no se pueden cargar valores que el modelo nunca vio, o la app avisa).
+- **Gráficos con Altair**, legibles componente por componente; colores, categorías y escalas con el mismo significado en toda la app.
+- **Dónde corre**: HTML en GitHub Pages (la fórmula del modelo escrita en la página) o Streamlit Community Cloud.
+- **El proyecto integrado**: repo en GitHub con README; un script que toma los datos del pipeline, entrena con la misma semilla y genera la app; lo que muestra la app coincide con el notebook.
+- **Los 25 minutos**: 0–2 qué cambió · 2–10 el tallo · 10–15 la copa (el docente toma el mouse) · 15–22 preguntas dirigidas · 22–25 devolución.
+- **Se pregunta**: por qué cada título afirma lo que afirma; un gráfico componente por componente; una decisión de diseño que cambió; qué toca cada control; cómo llega el modelo a la app y qué pasa con un caso raro; cómo se regenera la app.
+
+**Lo que hizo el grupo (10/11)**: `app/build_app.py` → `app/index.html`, HTML en GitHub Pages con la logística de 6 minutos. El script repite el modelado del notebook de las correcciones y **verifica siete números contra él** (corta si no coinciden). «Probá» parte de una partida real del test y mueve servidor, elo y las 7 métricas del minuto 10. Identidad visual propia (estética de LoL), no una copia del ejemplo. Publicada en https://aguilarezequiel.github.io/FF-15/ (el repo es público desde el 10/11; sólo queda el workflow `pages.yml`). Detalle: Parte XI de `docs/documentacion-proyecto.html`.
 
 ## Errores de años anteriores
 

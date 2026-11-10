@@ -15,7 +15,7 @@ description: Workflow completo del Proyecto Integrador de Ciencia de Datos (UTN 
 | Fuente | **Riot Games API** (`developer.riotgames.com`) + Data Dragon CDN |
 | Unidad de análisis | **Una partida clasificatoria** (cola 420) de LoL, Season 16 |
 | Clave primaria | `match_id` (ej. `LA2_1617259431`) |
-| Columna objetivo | `game_duration_s` — segundos. Hasta la E3, **regresión**; desde sus correcciones, el modelo final predice la **banda de 3 minutos** → **clasificación** |
+| Columna objetivo | `game_duration_s` — segundos. Hasta la E3, **regresión**; desde sus correcciones, se predice la **banda de minutos** → **clasificación**, con dos anchos: 6 y 9 minutos |
 | Stack | Apache Airflow **3.3** sobre **Astro Runtime 3.3-4**, orquestado con Astro CLI |
 | Repo | `github.com/aguilarezequiel/FF-15` |
 
@@ -72,7 +72,7 @@ python -m venv .venv
 .venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-4/correcciones_entrega3.ipynb
 ```
 
-El modelo final es una **regresión logística sin pesos** (`C=1`) con las 137 columnas y el estado al minuto 10: predice la banda de 3 minutos en la que termina la partida y da una probabilidad por banda. Las correcciones de la E3 que llevaron a eso están en `references/entregas.md`.
+Quedan **dos modelos finales**, los dos una **regresión logística sin pesos** con las 137 columnas y el estado al minuto 10: uno con bandas de 6 minutos (`C=10`) y otro con bandas de 9 (`C=1`). Predicen la banda en la que termina la partida y dan una probabilidad por banda. **La app de la Entrega 4 usa el de 6 minutos** (decisión del grupo, 10/11): `app/build_app.py` la regenera en `app/index.html` (`.venv\Scripts\python app/build_app.py`), y `app/index.html` no se edita a mano. Las correcciones de la E3 que llevaron a eso están en `references/entregas.md`.
 
 Editar un `.py` de `dags/` o de `include/` **no** necesita restart: el dag-processor lo recoge solo en unos segundos.
 

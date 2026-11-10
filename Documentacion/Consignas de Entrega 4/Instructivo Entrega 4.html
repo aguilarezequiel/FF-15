@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ciencia de Datos: Instructivo Entrega 4 | Campus</title><style>body{font-family:system-ui,Segoe UI,sans-serif;max-width:960px;margin:2rem auto;padding:0 1rem;line-height:1.5;color:#222}table{border-collapse:collapse;margin:1rem 0}td,th{border:1px solid #ccc;padding:.35rem .6rem;vertical-align:top}pre,code{background:#f4f4f4}pre{padding:.6rem;overflow:auto}img{max-width:100%}</style></head><body>
+<p><small>Descargado del campus (curso Ciencia de Datos, Unidad 4) el 2026-11-10.</small></p>
+<div class="box py-3 generalbox center clearfix"><div class="no-overflow"><p class="p-3 rounded" style="background-color:#D9F7F5"><strong>Entrega 4 · Visualización y app.</strong> Miércoles 11 de noviembre, la clase completa, y cinco grupos de la 5K10 el viernes 13. Cada grupo pasa <strong>25 minutos</strong> con el docente, en privado. No hay audiencia de otros grupos.</p>
+
+<p>En las tres entregas anteriores construiste las piezas: un pipeline que produce el dataset, un análisis que dice qué tiene adentro y un modelo que dice algo que los datos solos no decían. Ahora la pregunta es otra: <strong>¿alguien que no estuvo en tu proyecto puede entender lo que encontraste, creerte, y después hacerle sus propias preguntas a tus datos?</strong></p>
+
+<p>Lo que se entrega es la <strong>versión final del proyecto</strong>: una aplicación web, publicada en una URL, que cuenta el proyecto entero y deja usarlo. Es la misma aplicación que vas a mostrar en la exposición final del 25 de noviembre, así que lo que se corrija acá es lo que llega a esa instancia.</p>
+
+<h3>El ejemplo</h3>
+
+<p>En el aula está la <strong><a class="autolink" title="aplicación de ejemplo" href="https://campusvirtual.frm.utn.edu.ar/mod/resource/view.php?id=57931">aplicación de ejemplo</a></strong>, hecha sobre el dataset canónico: «¿Se puede adivinar la posición?». Abrila antes de leer el resto: cada cosa que pide esta consigna está ahí, y es más fácil de entender viéndola. No es un molde: tu proyecto tiene otra pregunta, otros datos y otros hallazgos, y la aplicación tiene que ser la tuya.</p>
+
+<h3>La forma: una copa de martini</h3>
+
+<p>La aplicación entera es una copa de martini. Primero <strong>el tallo</strong>, que guía el autor: el usuario recorre el proyecto en el orden que elegiste, y cada sección le cuenta un hallazgo. Después <strong>la copa</strong>, que maneja el usuario: explora tus datos y prueba tu modelo, ya sabiendo qué mirar.</p>
+
+<table class="table table-sm table-bordered">
+<thead><tr><th>Parte</th><th>Sección</th><th>Qué tiene</th><th>Cierra</th></tr></thead>
+<tbody>
+<tr><td>Portada</td><td><strong>El proyecto</strong></td><td>La pregunta, la idea central en una oración con sujeto y verbo, y tres números que la sostienen.</td><td>La definición</td></tr>
+<tr><td>Tallo</td><td><strong>Los datos</strong></td><td>Un título que afirma algo de los datos, y un gráfico que lo muestra.</td><td>La Entrega 1</td></tr>
+<tr><td>Tallo</td><td><strong>Lo que encontramos</strong></td><td>Un título que afirma el hallazgo principal del análisis, y un gráfico que lo muestra.</td><td>La Entrega 2</td></tr>
+<tr><td>Tallo</td><td><strong>El modelo</strong></td><td>Un título que afirma qué logró el modelo, y un gráfico que lo muestra.</td><td>La Entrega 3</td></tr>
+<tr><td>Copa</td><td><strong>Explorá</strong></td><td>Tus datos, con el resultado del modelo, para que el usuario los recorra.</td><td>Todas</td></tr>
+<tr><td>Copa</td><td><strong>Probá el modelo</strong></td><td>El usuario carga un caso nuevo y ve qué dice el modelo.</td><td>La Entrega 3</td></tr>
+</tbody>
+</table>
+
+<p>El nombre y el diseño de cada sección son decisión del grupo. Lo que tiene que estar es esto.</p>
+
+<h3>El tallo: cada sección, un hallazgo</h3>
+
+<p>Cada sección del tallo cuenta una cosa, y tiene tres partes:</p>
+
+<ul>
+<li><strong>Un título que afirma.</strong> No «Distribución de los roles», sino «Hay seis roles de campo, y uno de ellos es mucho más chico que el resto». Si la sección no tiene algo que afirmar, todavía no es una sección del tallo.</li>
+<li><strong>Un gráfico que prueba el título</strong>, y unas pocas líneas que dicen qué mirar en él.</li>
+<li><strong>«Cómo lo sabemos»</strong>: un desplegable, cerrado por defecto, con la evidencia técnica de esa etapa. Es lo que convierte el hallazgo en algo que se puede creer.</li>
+</ul>
+
+<p>Lo que va en cada «Cómo lo sabemos»:</p>
+
+<table class="table table-sm table-bordered">
+<thead><tr><th>Sección</th><th>Qué tiene que estar adentro</th></tr></thead>
+<tbody>
+<tr><td><strong>Los datos</strong></td><td>De dónde salen y cómo se obtienen: el pipeline y la fecha de los datos. Qué es una fila. Qué se filtró, paso por paso, con cuántas filas quedaron en cada uno y por qué. Qué columnas se descartaron por fuga.</td></tr>
+<tr><td><strong>Lo que encontramos</strong></td><td>Una hipótesis que se sostuvo y una que no, cada una con su número. Cómo se construyó el gráfico, si hubo alguna transformación que no sea obvia.</td></tr>
+<tr><td><strong>El modelo</strong></td><td>La métrica y por qué. El piso. Cómo se armó la validación. La tabla de comparación con media y desvío, el ajuste del elegido, el resultado en el test y dónde se equivoca. En qué se apoya. Sin objetivo: las columnas de la distancia, la elección de <em>k</em> y la descripción de cada grupo.</td></tr>
+</tbody>
+</table>
+
+<p>Arriba de todo, la portada: la idea central en una oración, la misma que defendiste en la Entrega 3 o la que salió de corregirla, y tres números que la sostienen. En el ejemplo: <em>«Con sus atributos se adivina el rol del 89 % de los jugadores de campo, y cuando el modelo se equivoca, el 68 % de las veces lo confunde con un vecino de cancha»</em>.</p>
+
+<h3>La copa: lo que pregunta el usuario</h3>
+
+<p><strong>Explorá.</strong> La exploración va de lo general a lo particular:</p>
+
+<ul>
+<li><strong>Un panorama:</strong> todos los datos, o todo el universo que tenga sentido, en una vista.</li>
+<li><strong>Zoom y filtro:</strong> al menos dos controles que achiquen el universo —un menú, un deslizador, una selección— y que cambien lo que muestra el gráfico.</li>
+<li><strong>Detalle a pedido:</strong> la información de cada caso cuando el usuario la pide, al pasar el mouse o al elegirlo, incluido lo que dijo el modelo sobre ese caso.</li>
+</ul>
+
+<p><strong>Probá el modelo.</strong> Con objetivo: el usuario carga los valores de un caso nuevo y ve lo que predice el modelo, con su probabilidad si es clasificación. Sin objetivo: a qué grupo pertenece un caso que el usuario elige o carga, y qué lo acerca a ese grupo. En los dos casos, el usuario no puede cargar valores que el modelo nunca vio, o la aplicación le avisa cuando lo hace.</p>
+
+<h3>Los gráficos</h3>
+
+<ul>
+<li><strong>Hechos con Altair.</strong> Cada uno tiene que poder leerse componente por componente: datos, mapeo, marca, transformaciones, escalas.</li>
+<li><strong>Los colores, las categorías y las escalas significan lo mismo en toda la aplicación.</strong> Si el azul es una clase en el tallo, es la misma clase en la copa.</li>
+<li><strong>La copa es interactiva;</strong> el tallo puede serlo, pero cada gráfico del tallo tiene que decir lo suyo sin que nadie lo toque.</li>
+</ul>
+
+<h3>Dónde corre: HTML o Streamlit</h3>
+
+<p>La aplicación se publica en una URL que se abre desde cualquier navegador, sin instalar nada. Hay dos formas, y elige el grupo:</p>
+
+<table class="table table-sm table-bordered">
+<thead><tr><th>Forma</th><th>Cómo se publica</th><th>Lo que hay que resolver</th></tr></thead>
+<tbody>
+<tr><td><strong>Una página HTML</strong>, como el ejemplo</td><td>GitHub Pages, desde el repositorio del grupo.</td><td>En el navegador no corre Python. Las predicciones para explorar se calculan antes y viajan con los datos. Para probar el modelo, la fórmula tiene que poder escribirse adentro de la página: una regresión, lineal o logística, o un árbol.</td></tr>
+<tr><td><strong>Una aplicación de Streamlit</strong></td><td>Streamlit Community Cloud, desde el repositorio del grupo.</td><td>Corre Python, así que carga cualquier modelo guardado. A cambio, hay que mantenerla publicada y andando.</td></tr>
+</tbody>
+</table>
+
+<p class="p-3 rounded" style="background-color:#D9F7F5"><strong>Si tu mejor modelo de la Entrega 3 no se puede llevar al navegador</strong>, hay dos salidas: Streamlit, o un modelo que sí se puede llevar y que queda a menos de un desvío del mejor. La segunda es una decisión de modelado, y va con sus números en el «Cómo lo sabemos» del modelo, como en el ejemplo.</p>
+
+<h3>El proyecto integrado</h3>
+
+<p>La aplicación no es una pieza aparte: es el último paso de la misma cadena.</p>
+
+<table class="table table-sm table-bordered">
+<thead><tr><th>Qué</th><th>Detalle</th></tr></thead>
+<tbody>
+<tr><td><strong>El repositorio</strong></td><td>En GitHub, con el código del pipeline, del análisis y del modelo, y un README que explique cómo se corre todo.</td></tr>
+<tr><td><strong>La construcción</strong></td><td>Un script que toma los datos que produce tu pipeline, carga o entrena el modelo con la misma semilla y genera la aplicación. Si los datos se actualizan, correrlo de nuevo actualiza la aplicación. En el ejemplo es <code>build_app.py</code>.</td></tr>
+<tr><td><strong>El modelo</strong></td><td>El elegido en la Entrega 3, con lo que te marcamos corregido. Lo que muestra la aplicación tiene que coincidir con lo que da el notebook.</td></tr>
+</tbody>
+</table>
+
+<h3>Qué tenés que traer</h3>
+
+<p>Llegá con esto ya funcionando. Los 25 minutos son para mostrar y explicar, no para publicar ni para esperar que cargue un modelo.</p>
+
+<table class="table table-sm table-bordered">
+<thead><tr><th>Qué</th><th>Detalle</th></tr></thead>
+<tbody>
+<tr><td><strong>La aplicación abierta</strong></td><td>La URL pública, ya abierta en el navegador antes de entrar. Que funcione en la notebook de alguien del grupo no alcanza.</td></tr>
+<tr><td><strong>El repositorio</strong></td><td>Abierto en GitHub, con el README.</td></tr>
+<tr><td><strong>Lo que te marcamos en la Entrega 3</strong></td><td>Resuelto, o con una explicación de por qué no se pudo.</td></tr>
+</tbody>
+</table>
+
+<h3>Cómo se organizan los 25 minutos</h3>
+
+<table class="table table-sm table-bordered">
+<thead><tr><th>Min.</th><th>Momento</th><th>Qué pasa</th></tr></thead>
+<tbody>
+<tr><td>0–2</td><td>Qué cambió</td><td>Qué se corrigió del modelo desde la Entrega 3. Dos oraciones.</td></tr>
+<tr><td>2–10</td><td>El tallo</td><td>Recorrés la aplicación como si el docente no conociera tu proyecto: de la portada al modelo, en orden. El docente abre los «Cómo lo sabemos» que quiera.</td></tr>
+<tr><td>10–15</td><td>La copa</td><td>El docente toma el mouse: explora los datos y prueba el modelo con un caso propio. El grupo responde lo que aparezca.</td></tr>
+<tr><td>15–22</td><td>Preguntas dirigidas</td><td>El docente pregunta, a integrantes puntuales, sobre cualquier parte de la aplicación o del repositorio.</td></tr>
+<tr><td>22–25</td><td>Devolución</td><td>Qué está bien, qué hay que corregir antes de la exposición final.</td></tr>
+</tbody>
+</table>
+
+<p class="p-3 rounded" style="background-color:#D9F7F5">La evaluación es <strong>individual</strong>. Repartirse el trabajo está bien; desentenderse de la parte del otro, no. La pregunta sobre un gráfico puede caerle a quien armó la publicación.</p>
+
+<h3>Lo que hay que saber explicar</h3>
+
+<p>Esto no lo mide ningún script: se pregunta.</p>
+
+<ul>
+<li>Por qué cada título del tallo afirma lo que afirma, y qué número lo sostiene.</li>
+<li>Un gráfico de la aplicación, componente por componente: qué variable va a cada canal, qué marca, qué transformación y qué escala, y por qué.</li>
+<li>Una decisión de diseño que cambiaste: qué tenía la primera versión de ese gráfico y por qué no funcionaba.</li>
+<li>Qué componente del gráfico toca cada control de la copa.</li>
+<li>Cómo llega el modelo a la aplicación, y qué pasa si el usuario carga un caso raro.</li>
+<li>Cómo se regenera la aplicación desde el repositorio si cambian los datos.</li>
+</ul>
+
+<h3>Cómo se aprueba</h3>
+
+<ul>
+<li>La aplicación abre en su URL pública y funciona sin errores durante la entrega.</li>
+<li>Está la portada con la oración, y las tres secciones del tallo, cada una con un título que afirma, un gráfico que lo prueba y su «Cómo lo sabemos» completo.</li>
+<li>Está la copa: un panorama, al menos dos controles que cambian el gráfico, detalle a pedido con el resultado del modelo, y una forma de probar el modelo con un caso nuevo.</li>
+<li>Los gráficos están hechos con Altair y el grupo puede leer cualquiera de ellos componente por componente.</li>
+<li>Lo que muestra la aplicación coincide con el notebook, y el repositorio tiene un README con el que otra persona puede regenerarla.</li>
+<li>Las respuestas no vienen de una sola persona.</li>
+</ul>
+
+<h3>Tres formas de perder los 25 minutos</h3>
+
+<ul>
+<li><strong>El tablero sin historia.</strong> Diez filtros, seis gráficos y ninguna conclusión: todo el control al usuario y ningún mensaje. El usuario no sabe qué mirar, y el docente tampoco.</li>
+<li><strong>El notebook con otra ropa.</strong> La aplicación copia las celdas del análisis una debajo de la otra: todos los gráficos que se hicieron, sin decir cuáles importan ni por qué. Lo técnico va en los «Cómo lo sabemos», no en el tallo.</li>
+<li><strong>La aplicación que sólo corre en una notebook.</strong> Si la URL no abre el día de la entrega, no hay entrega que mostrar. Publicá con tiempo y probala desde otra computadora.</li>
+</ul>
+
+<p>Que hable uno solo sigue siendo el error más caro, porque las preguntas van dirigidas y la nota es individual.</p>
+
+<p>Si algo no te dio —el modelo no le gana al piso, un hallazgo no se sostuvo—, la aplicación lo puede contar igual. Una historia honesta sobre un resultado modesto vale más que una aplicación brillante que no se sabe de dónde salió.</p></div></div><div class="modified">Última modificación: miércoles, 21 de octubre de 2026, 14:22</div><div id="format-tiles-js-config" data-modalallowedmodnames="[&quot;page&quot;,&quot;pdf&quot;,&quot;url&quot;,&quot;html&quot;]" data-modalallowedcmids="[53212,53219,53233,53237,53238,53241,53242,53243,53244,55622,55658,55919,55928,56646,57256,57266,57267,57455,57681,57683,57893,57894,57895,57896,57924,57930,57931]" data-defaultcourseicon="pie-chart"></div>
+</body></html>

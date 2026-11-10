@@ -103,7 +103,8 @@ y cómo defenderlo frente al docente.</p>
 la IV recorre el repositorio archivo por archivo; la V describe el dataset que se produce;
 la VI es la guía práctica para ejecutarlo; la VII prepara la defensa de la Entrega 1; la VIII,
 la de la Entrega 2, con el análisis exploratorio y las ocho hipótesis; la IX, la de la Entrega 3,
-con el modelado; y la X, las correcciones que el docente pidió sobre la Entrega 3.</p>
+con el modelado; la X, las correcciones que el docente pidió sobre la Entrega 3; y la XI, la
+aplicación de la Entrega 4.</p>
 
 <div class="aviso">
   <span class="etiqueta">Regla de mantenimiento de este documento</span>
@@ -128,7 +129,8 @@ con el modelado; y la X, las correcciones que el docente pidió sobre la Entrega
 <tr><td>Calidad de código</td><td>19 tests: 11 del DAG y los esquemas, y 8 del corte del timeline. Los 8 del timeline pasan después del cambio del 27/10 (corridos con <code>pytest</code> en el venv, porque <code>timeline.py</code> no importa Airflow); <strong>la corrida completa con <code>astro dev pytest</code> no se repitió</strong> después de ese cambio · <code>astro dev parse</code> limpio · <code>ruff</code> sin hallazgos en el código nuevo; queda un aviso <code>B023</code> en <code>land_bronze</code>, anterior al 25/10, que es un falso positivo (la <code>lambda</code> se consume dentro de la misma vuelta del bucle).</td></tr>
 <tr><td>Rama del timeline (25/10)</td><td>Es la corrección 2 del docente a la Entrega 2: como las condiciones iniciales solas predicen poco la duración, el DAG baja también la <strong>línea de tiempo</strong> de cada partida (endpoint H) y arma un segundo dataset, <code>lol_minN_AAAA-MM-DD.csv</code>, con el estado de la partida en el <strong>minuto N</strong>: 35 columnas, unido al principal por <code>match_id</code>. Las 137 columnas no cambian. Corrió el 26/10: <strong>19.145 filas al minuto 5, 19.008 al 10 y 18.878 al 15</strong>, ninguna partida sin timeline. Los tres CSV y sus reportes están versionados en <code>notebooks/entrega-3/datos/</code>. El chequeo de eventos encontró <strong>tres problemas</strong>, todos explicados en V.8: los wards cuentan objetos que dejan habilidades de campeones, las placas no se pudieron verificar, y el chequeo de asesinatos comparaba contra un total que incluye las ejecuciones (corregido el 27/10, falta volver a correr la plata para ver el número nuevo). Ver III.4, IV.4.6, IV.5, V.8 y VI.8.</td></tr>
 <tr><td>Modelado (Entrega 3, 28/10)</td><td><strong>Completo.</strong> <code>notebooks/entrega-3/modelado_entrega3.ipynb</code>, 126 celdas, ejecutado sin errores, con las salidas guardadas y la semilla 42. Sin el minuto, el mejor modelo —<code>Ridge(alpha=1000)</code>— erra 315,5 s en el test contra 325,5 del piso: las condiciones iniciales predicen muy poco. <strong>El modelo final suma el estado de la partida al minuto 10</strong> (decisión del grupo, 27/10): <code>Ridge(alpha=100)</code>, 297,3 ± 3,0 s en validación cruzada y <strong>294,7 s en el test</strong>, contra 317,6 del piso y 307,0 del mejor sin el minuto, sobre las mismas 3.798 partidas. El minuto 5 se midió y no mejora por más que el desvío. Placas, wards y primera sangre quedan fuera. Ver la Parte IX.</td></tr>
-<tr><td>Correcciones de la Entrega 3 (9/11)</td><td><strong>Hechas, y cambian el modelo final.</strong> <code>notebooks/entrega-4/correcciones_entrega3.ipynb</code>, 44 celdas, ejecutado sin errores. Por decisión del grupo, <strong>el problema pasa a ser de clasificación</strong>: en qué banda de 3 minutos termina la partida, sabiendo lo del minuto 10, con una <strong>regresión logística sin pesos (<code>C=1</code>)</strong>, que da una probabilidad por banda. En el test: F1 macro 0,099 (piso 0,025), y en minutos casi igual que el piso (38,0 % de partidas a menos de 3 minutos contra 37,0 %). Lo que agrega son probabilidades calibradas: para su ventana de tres bandas dice 56 % y pasa el 56 %. El MSE y el R² se explican sobre la regresión de la E3. La Entrega 4 todavía no se empezó. Ver la Parte X.</td></tr>
+<tr><td>Correcciones de la Entrega 3 (9/11, rehechas el 10/11)</td><td><strong>Hechas, y cambian el modelo final.</strong> <code>notebooks/entrega-4/correcciones_entrega3.ipynb</code>, 47 celdas, ejecutado sin errores. Por decisión del grupo, <strong>el problema pasa a ser de clasificación</strong>: en qué banda de minutos termina la partida, sabiendo lo del minuto 10. El 10/11 las bandas de 3 minutos se reemplazaron por <strong>dos anchos, 6 y 9 minutos, y quedan dos modelos finales</strong>, los dos una <strong>regresión logística sin pesos</strong> (<code>C=10</code> con 6 minutos, <code>C=1</code> con 9), que da una probabilidad por banda. Con 9 minutos la regla de la cátedra elegía la <code>balanced</code>, y el grupo la descartó. En el test: F1 macro 0,159 y 0,221 (pisos 0,076 y 0,137); en minutos, casi igual que el piso (37,5 y 38,0 % de partidas a menos de 3 minutos contra 36,5 y 37,0 %). Lo que agregan son probabilidades calibradas: con 6 minutos, para la ventana de 12 minutos que vería el jugador dice 66,6 % y pasa el 66,3 %; con 9, para la banda más probable, dice 53,9 % y pasa el 54,4 %. El MSE y el R² se explican sobre la regresión de la E3 y se grafican, con la recta y = x, para el Ridge (R² 0,129) y los dos clasificadores (0,042 y 0,046). El 10/11 el grupo eligió <strong>el de 6 minutos para la app</strong> de la Entrega 4. Ver la Parte X.</td></tr>
+<tr><td>Aplicación (Entrega 4, 11/11)</td><td><strong>Hecha y publicada en <code>https://aguilarezequiel.github.io/FF-15/</code>.</strong> <code>app/build_app.py</code> genera <code>app/index.html</code>: una página HTML con Altair que cuenta el proyecto (portada, los datos, lo que encontramos, el modelo) y deja explorar las 19.008 partidas y probar el modelo, con la logística de 6 minutos escrita adentro de la página. El script repite el modelado del notebook y verifica siete números contra él: coinciden. El workflow <code>.github/workflows/pages.yml</code> la publica en GitHub Pages: el 10/11 el dueño del repo lo hizo público y activó Pages. Ver la Parte XI.</td></tr>
 <tr><td>Bug corregido (2026-09-05)</td><td><code>land_bronze</code> fallaba con <code>HTTP 400</code> en las seis plataformas: el pool de keys rotaba de key en cada request individual, y un <code>puuid</code> sólo lo puede leer la key que lo emitió. Fix: afinidad key↔puuid en <code>RiotClient</code> — ver 4.1.</td></tr>
 <tr><td>Incidente superado (2026-09-06)</td><td>La máquina entró en hibernación a las 03:19 con cuatro tareas <code>land_bronze</code> a mitad de camino. Los procesos murieron; <strong>el bronce no perdió un solo archivo</strong>. Airflow relanzó las tareas solo a las 07:16 y el dataset se generó igual. Es la mejor evidencia práctica de por qué el bronce va a disco y es append-only — ver 7.7.</td></tr>
 <tr><td>Limitación conocida</td><td><strong>Sesgo de muestreo por tier.</strong> Cada plataforma quedó con partidas de un rango casi puro y distinto (elo medio de 1.627 en NA1 a 3.231 en LA1). Está medido y declarado en 7.5; no invalida el dataset, pero condiciona qué conclusiones se pueden sacar de él.</td></tr>
@@ -138,7 +140,7 @@ con el modelado; y la X, las correcciones que el docente pidió sobre la Entrega
 <tr><td>Perfil del objetivo</td><td>Asimetría <strong>−0,039</strong> y curtosis 0,579: simétrico, <strong>no necesita transformarse</strong>. Sin desbalance —la banda más poblada, 25 a 30 minutos, es el 29,9 %—. Truncado a izquierda en 300 s por el filtro de remakes, y con un escalón de <strong>714 partidas</strong> en los 900 s: el minuto 15, cuando el juego habilita la rendición. Ver 8.2.</td></tr>
 <tr><td>Decisiones de columna tomadas</td><td>De las 137 columnas, <strong>82 no entran como feature y 54 sí</strong>, más el objetivo. Treinta salen por las fichas: los diez <code>player_winrate</code> (H6), los diez <code>is_main</code> y los dos <code>mains_count</code> (H2), los cuatro <code>avg_defense</code> y <code>avg_magic</code> (H7), los dos <code>total_base_armor</code> (H5) y los dos <code>count_flash</code> (H8). Salen además los diez <code>champ_name</code> por redundar con <code>champ_id</code>, los cuarenta códigos <code>sum1</code>, <code>sum2</code>, <code>rune_primary</code> y <code>rune_sub</code>, y <code>match_id</code> y <code>roles_inferidos</code>. De las 34 columnas de agregados de equipo quedan 24, y H3 las colapsa en <strong>12 sumas</strong>. Ver 8.5.</td></tr>
 <tr><td>Decisión que se cerró</td><td>La columna <code>es_unranked</code> que quedaba pendiente en 5.5 <strong>no hace falta</strong> para este objetivo: las partidas con jugadores imputados duran 38 segundos más, separación 0,067, zona roja. Se midió sin ficha propia en una versión anterior del notebook; esa celda se quitó al simplificarlo y el número queda como respuesta oral. Ver 8.5.</td></tr>
-<tr><td>Lo que falta</td><td>Que los cinco lean la Parte X antes de la próxima entrega. La Entrega 4 (la aplicación) no se empezó. Fuera de las entregas: volver a correr la plata del timeline para ver el número nuevo del chequeo de asesinatos, y pedir el tiempo de esa corrida y el peso de <code>bronze/timelines/</code> (Cierre).</td></tr>
+<tr><td>Lo que falta</td><td>Para la Entrega 4 (<strong>miércoles 11/11, de 14:55 a 15:20</strong>): abrir <code>https://aguilarezequiel.github.io/FF-15/</code> desde otra computadora, y que los cinco lean las Partes X y XI y recorran la app. Fuera de las entregas: volver a correr la plata del timeline para ver el número nuevo del chequeo de asesinatos, y pedir el tiempo de esa corrida y el peso de <code>bronze/timelines/</code> (Cierre).</td></tr>
 <tr><td>Entorno del análisis</td><td>El venv de <code>notebooks/requirements.txt</code> necesita <strong>Python 3.12 o más nuevo</strong>: <code>numpy==2.5.2</code> no se instala con 3.11. Se verificó el 9/11 con Python 3.14 (<code>py -3.14 -m venv .venv</code>).</td></tr>
 </table>
 
@@ -252,11 +254,22 @@ con el modelado; y la X, las correcciones que el docente pidió sobre la Entrega
     <ol>
       <li>Qué pidió el docente y qué decidió el grupo</li>
       <li>El objetivo nuevo y las métricas</li>
-      <li>Elegir el modelo: sin pesos contra balanced</li>
+      <li>Elegir el modelo: sin pesos contra balanced, en cada ancho</li>
       <li>El test, y dónde se equivoca</li>
       <li>Lo que le sirve al jugador: las probabilidades</li>
       <li>Qué aprendió</li>
-      <li>El MSE y el R², en corto</li>
+      <li>El MSE y el R², con el gráfico</li>
+      <li>Los dos modelos finales</li>
+      <li>Banco de preguntas probables</li>
+    </ol>
+  </li>
+  <li>Parte XI · La Entrega 4: la aplicación
+    <ol>
+      <li>Qué pide la Entrega 4 y qué se entrega</li>
+      <li>Las decisiones del grupo (10/11)</li>
+      <li>Cómo se construye: app/build_app.py</li>
+      <li>La app, sección por sección</li>
+      <li>Cómo se organizan los 25 minutos</li>
       <li>Banco de preguntas probables</li>
     </ol>
   </li>
@@ -270,7 +283,7 @@ con el modelado; y la X, las correcciones que el docente pidió sobre la Entrega
 
 <p>El Proyecto Integrador es un proyecto de ciencia de datos <em>de punta a punta</em>, sobre un
 problema que elige el grupo y datos que consigue el grupo. Empieza el 12 de agosto y termina
-el 18 de noviembre. En ese recorrido hay que conseguir los datos y automatizar su descarga,
+el 25 de noviembre, con la exposición final. En ese recorrido hay que conseguir los datos y automatizar su descarga,
 explorarlos, modelarlos, visualizarlos y comunicar los hallazgos en una aplicación funcionando.</p>
 
 <p>No es un anexo de la materia: es el eje. Tres números que lo dimensionan, tomados del
@@ -302,9 +315,9 @@ explorarlos, modelarlos, visualizarlos y comunicar los hallazgos en una aplicaci
 <tr><td><strong>1 · Ingeniería de datos</strong></td><td><strong>miércoles 9/9</strong></td><td>Pipeline automatizado que produce tu dataset</td></tr>
 <tr><td><strong>2 · Análisis exploratorio</strong></td><td><strong>23/09</strong></td><td>Exploración, hipótesis y hallazgos</td></tr>
 <tr><td><strong>3 · Modelado</strong></td><td><strong>miércoles 28/10</strong></td><td>Objetivo predictivo, modelos comparados y métricas. 25 minutos con el docente. El Kit de arranque decía 14/10; vale la del campus (IX.1)</td></tr>
-<tr><td>4 · Visualización e integración</td><td>04/11</td><td>Visualizaciones y aplicación funcionando</td></tr>
-<tr><td>Exposición final</td><td>18/11</td><td>Proyecto completo y demo en vivo</td></tr>
-<tr><td>Recuperación</td><td>25/11</td><td>Para los grupos que la necesiten</td></tr>
+<tr><td><strong>4 · Visualización y app</strong></td><td><strong>miércoles 11/11</strong></td><td>Aplicación web publicada en una URL pública, que cuenta el proyecto y deja usarlo. 25 minutos con el docente; al 5K09-02 le toca de <strong>14:55 a 15:20</strong>. El Kit de arranque decía 04/11; vale la del campus</td></tr>
+<tr><td>Exposición final</td><td>25/11</td><td>Proyecto completo y demo en vivo, con la misma aplicación de la Entrega 4. El Kit decía 18/11; vale el instructivo de la Entrega 4</td></tr>
+<tr><td>Recuperación</td><td>sin fecha confirmada</td><td>El Kit decía 25/11, que el instructivo de la Entrega 4 ahora le da a la exposición final</td></tr>
 </table>
 
 <div class="aviso">
@@ -317,7 +330,7 @@ explorarlos, modelarlos, visualizarlos y comunicar los hallazgos en una aplicaci
 </div>
 
 <p>Cada entrega parcial es una reunión privada con el docente, sin audiencia de otros grupos.
-La exposición final del 18/11 sí es pública, frente al curso.</p>
+La exposición final del 25/11 sí es pública, frente al curso.</p>
 
 <h4>El error de gestión más común</h4>
 <p>Trabajar el integrador la semana previa a cada entrega. Las entregas están separadas por tres
@@ -1222,10 +1235,18 @@ vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más 
 │   ├── entrega-2/
 │   │   ├── eda_entrega2.ipynb  167 celdas · el EDA, ejecutado
 │   │   └── datos/lol_2026-09-06.csv      · el CSV congelado, versionado
-│   └── entrega-3/
-│       ├── modelado_entrega3.ipynb 126 celdas · el modelado, ejecutado
-│       └── datos/                        · lol_min5, lol_min10 y lol_min15 (2026-10-26),
-│                                           con sus calidad_minutoN.md, versionados
+│   ├── entrega-3/
+│   │   ├── modelado_entrega3.ipynb 126 celdas · el modelado, ejecutado
+│   │   └── datos/                        · lol_min5, lol_min10 y lol_min15 (2026-10-26),
+│   │                                       con sus calidad_minutoN.md, versionados
+│   └── entrega-4/
+│       └── correcciones_entrega3.ipynb 47 celdas · la duración como clasificación
+│
+├── app/                                  · LA APLICACIÓN DE LA ENTREGA 4 (Parte XI)
+│   ├── build_app.py           765 líneas · datos → modelo → gráficos de Altair → index.html
+│   ├── plantilla.html         502 líneas · el HTML y los textos, con los números como $VARIABLES
+│   └── index.html                        · lo que se publica: generado, no se edita (~7 MB)
+├── .github/workflows/pages.yml  40 líneas · publica app/ en GitHub Pages
 │
 ├── tests/
 │   ├── dags/test_dag_integrity.py 100 líneas · 11 tests
@@ -1233,7 +1254,7 @@ vez, porque el cliente cachea los perfiles. Cuanto más grande el dataset, más 
 │
 ├── docs/                                 · LA DOCUMENTACIÓN INTEGRAL
 │   ├── documentacion-proyecto.html       · este documento (fuente editable)
-│   ├── documentacion-proyecto.pdf        · este documento (101 páginas)
+│   ├── documentacion-proyecto.pdf        · este documento (116 páginas)
 │   ├── informe-sesgo-muestreo.{html,pdf} · el anexo sobre el sesgo por tier
 │   ├── guion-defensa-entrega2.{html,pdf} · el guión de la defensa de la Entrega 2
 │   ├── guion-defensa-entrega3.{html,pdf} · el guión de la defensa de la Entrega 3
@@ -3988,31 +4009,34 @@ puede caerle a quien armó las columnas».</p>
 <p>Al revisar la Entrega 3, el docente pidió cuatro correcciones. El criterio de fondo que marcó es
 que el modelo <strong>le sirva al jugador de League of Legends</strong>:</p>
 <ol>
-  <li><strong>Cambiar a clasificación</strong>: en qué banda de 3 minutos termina la partida,
-  sabiendo lo que pasó hasta el minuto 10.</li>
+  <li><strong>Cambiar a clasificación</strong>: en qué banda de minutos termina la partida, sabiendo
+  lo que pasó hasta el minuto 10.</li>
   <li><strong>Analizar la distribución del error con gráficos</strong>, no sólo con números.</li>
   <li><strong>Probar el MSE</strong> (error cuadrático), o buscar una métrica mejor.</li>
   <li><strong>Expresar bien el R²</strong>.</li>
 </ol>
 
 <div class="clave">
-  <span class="etiqueta">Decisión del grupo (9/11): el problema pasa a ser de clasificación</span>
-  <p>El objetivo deja de ser <code>game_duration_s</code> en segundos y pasa a ser <strong>la banda
-  de 3 minutos</strong> en la que termina la partida. El modelo es una <strong>regresión
-  logística</strong>, elegida por dos razones: es el modelo más simple de su familia, y <strong>da una
-  probabilidad para cada banda</strong>. Al jugador no se le dice «tu partida dura 29 minutos», sino
-  «62 % de que termine entre los 24 y los 33». La regresión <code>Ridge</code> de la Entrega 3 deja
-  de ser el modelo final.</p>
+  <span class="etiqueta">Decisión del grupo: clasificación, con dos anchos de banda</span>
+  <p>El objetivo deja de ser <code>game_duration_s</code> en segundos y pasa a ser <strong>la banda de
+  minutos</strong> en la que termina la partida. El modelo es una <strong>regresión logística</strong>,
+  elegida por dos razones: es el modelo más simple de su familia, y <strong>da una probabilidad para cada
+  banda</strong>. Al jugador no se le dice «tu partida dura 29 minutos», sino «79 % de que termine entre
+  los 21 y los 33». La regresión <code>Ridge</code> de la Entrega 3 deja de ser el modelo final.</p>
+  <p>La primera versión (9/11) usaba bandas de 3 minutos. <strong>El 10/11 el grupo la reemplazó por dos
+  anchos, 6 y 9 minutos, y quedan dos modelos finales</strong>, uno por ancho, los dos la logística sin
+  pesos. El notebook los compara sin elegir; <strong>el 10/11 el grupo eligió el de 6 minutos para la
+  app</strong> de la Entrega 4 (Parte XI).</p>
 </div>
 
 <p>El entregable es <strong><code>notebooks/entrega-4/correcciones_entrega3.ipynb</code></strong>:
-44 celdas, ejecutado de arriba a abajo sin errores, con las salidas guardadas y
-<code>SEMILLA = 42</code>. Es corto a propósito, porque el tiempo para mostrarlo es poco, y tiene
-muchos gráficos. Corre en unos veinte segundos. <strong>No es la Entrega 4</strong>: la aplicación
-todavía no se empezó. Lee los CSV de <code>entrega-2/datos/</code> y <code>entrega-3/datos/</code>;
-en Colab, los dos van juntos en <code>datos/</code>.</p>
+47 celdas, ejecutado de arriba a abajo sin errores, con las salidas guardadas y
+<code>SEMILLA = 42</code>. Cada gráfico tiene una fila por ancho, para comparar de un vistazo. Corre en
+poco más de un minuto. <strong>No es la Entrega 4</strong>: la aplicación está en <code>app/</code> (Parte XI). Lee los
+CSV de <code>entrega-2/datos/</code> y <code>entrega-3/datos/</code>; en Colab, los dos van juntos en
+<code>datos/</code>.</p>
 
-<pre>.venv\Scripts\jupyter nbconvert --to notebook --execute --inplace notebooks/entrega-4/correcciones_entrega3.ipynb</pre>
+<pre>.venv\Scripts\jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.timeout=-1 notebooks/entrega-4/correcciones_entrega3.ipynb</pre>
 
 <p>Lo que no cambia: las 137 columnas y el estado al minuto 10 (con el mismo pipeline), la partición
 del test de la E3 (20 %, estratificada por grupo de elo), los cinco pedazos de la validación
@@ -4021,133 +4045,169 @@ cruzada y la regla de la cátedra para elegir.</p>
 <table>
 <tr><th>Sección del notebook</th><th>Qué hay</th></tr>
 <tr><td>0 · La base</td><td>Las clases de la E3 y la partición</td></tr>
-<tr><td>1 · El objetivo nuevo</td><td>Las 12 bandas y su distribución</td></tr>
-<tr><td>2 · Elegir el modelo</td><td>Piso, logística sin pesos y <code>balanced</code>: curva de <code>C</code> y barras de error</td></tr>
+<tr><td>1 · El objetivo nuevo</td><td>Las bandas de 6 y de 9 minutos y su distribución</td></tr>
+<tr><td>2 · Elegir el modelo</td><td>Piso, logística sin pesos y <code>balanced</code> en cada ancho: curva de <code>C</code>, barras de error y la regla</td></tr>
 <tr><td>3 · El test</td><td>Métricas de clasificación y error en minutos</td></tr>
 <tr><td>4 · Dónde se equivoca</td><td>Matrices de confusión, métricas por banda, error en bandas, por grupo de elo</td></tr>
 <tr><td>5 · Lo que le sirve al jugador</td><td>Error acumulado, probabilidades de partidas de ejemplo, calibración y resolución</td></tr>
 <tr><td>6 · Qué aprendió</td><td>Coeficientes por banda e importancia por permutación</td></tr>
-<tr><td>7 · El MSE y el R², en corto</td><td>Qué son, medidos sobre la regresión de la E3</td></tr>
-<tr><td>8 · Cierre</td><td>La tabla que resume y la decisión</td></tr>
+<tr><td>7 · El MSE y el R², con el gráfico</td><td>Qué son, sobre la regresión de la E3, y el gráfico de lo predicho contra lo real (recta y = x) para el Ridge y los dos clasificadores</td></tr>
+<tr><td>8 · Cierre</td><td>La tabla que resume y la comparación de los dos finales</td></tr>
 </table>
 
 <h3>2. El objetivo nuevo y las métricas</h3>
 
-<p><strong>Doce bandas</strong> (decisión del grupo): de 3 minutos entre los 15 y los 45
-(<code>15-18</code> … <code>42-45</code>), más <code>&lt;15</code> y <code>45+</code>, porque de 54
-minutos en adelante quedan entre 1 y 7 partidas por banda. Cada banda incluye su borde inferior. Están
-desbalanceadas: <code>24-27</code>, <code>27-30</code> y <code>30-33</code> juntan el
-<strong>52 %</strong> de las partidas, y <code>&lt;15</code> tiene el 0,7 %.</p>
+<p><strong>Los dos anchos</strong> (decisión del grupo). Los dos arrancan con <code>&lt;15</code> y
+terminan en una banda abierta. Cada banda incluye su borde inferior (<code>15-21</code> es de 15:00 a
+20:59).</p>
+
+<table>
+<tr><th>Ancho</th><th>Bandas</th><th>% de las partidas</th></tr>
+<tr><td><strong>6 minutos</strong> (7 bandas)</td><td><code>&lt;15</code>, <code>15-21</code>, <code>21-27</code>, <code>27-33</code>, <code>33-39</code>, <code>39-45</code>, <code>45+</code></td><td>0,7 · 10,4 · 25,2 · <strong>35,9</strong> · 20,1 · 6,3 · 1,5</td></tr>
+<tr><td><strong>9 minutos</strong> (5 bandas)</td><td><code>&lt;15</code>, <code>15-24</code>, <code>24-33</code>, <code>33-42</code>, <code>42+</code></td><td>0,7 · 19,3 · <strong>52,1</strong> · 24,5 · 3,3</td></tr>
+</table>
+
+<p>Están desbalanceadas: con 6 minutos, las tres del medio juntan el 81,2 %; con 9, <code>24-33</code>
+sola tiene más de la mitad. <code>&lt;15</code> tiene sólo 104 partidas de entrenamiento.
+<strong>Ensanchar la banda sube el acierto de cualquier modelo, también el del piso</strong>, así que
+cada modelo se compara contra el piso de su ancho, nunca la accuracy de uno contra la del otro.</p>
 
 <p><strong>Las métricas</strong> (decisión del grupo): decide el <strong>F1 macro</strong> (Práctica
 2); al lado van la <strong>accuracy</strong>, el <strong>acierto a ±1 banda</strong> (métrica propia
-del grupo) y el <strong>error en minutos</strong>, que representa cada banda con la mediana de sus
-partidas de entrenamiento. El piso es <code>DummyClassifier(strategy="prior")</code>: contesta siempre
-la banda más frecuente (<code>27-30</code>) y da como probabilidades la frecuencia de cada banda.</p>
+del grupo, que equivale a unos ±6 minutos con un ancho y a ±9 con el otro) y el <strong>error en
+minutos</strong>, que representa cada banda con la mediana de sus partidas de entrenamiento. El piso es
+<code>DummyClassifier(strategy="prior")</code>: contesta siempre la banda más frecuente
+(<code>27-33</code> o <code>24-33</code>) y da como probabilidades la frecuencia de cada banda.</p>
 
-<h3>3. Elegir el modelo: sin pesos contra balanced</h3>
+<h3>3. Elegir el modelo: sin pesos contra balanced, en cada ancho</h3>
 
 <table>
 <tr><th>Validación cruzada</th><th>C</th><th>F1 macro</th><th>accuracy</th><th>±1 banda</th></tr>
-<tr><td>Piso</td><td>—</td><td>0,026</td><td>18,6 %</td><td>52,1 %</td></tr>
-<tr><td><strong>Logística sin pesos</strong></td><td>1</td><td><strong>0,106 ± 0,005</strong></td><td>19,8 %</td><td>53,2 %</td></tr>
-<tr><td>Logística <code>balanced</code></td><td>0,1</td><td>0,101 ± 0,008</td><td>10,5 %</td><td>28,6 %</td></tr>
+<tr><td>6 min · piso</td><td>—</td><td>0,075</td><td>35,8 %</td><td>80,9 %</td></tr>
+<tr><td><strong>6 min · logística sin pesos</strong></td><td>10</td><td><strong>0,171 ± 0,004</strong></td><td>38,4 %</td><td>82,9 %</td></tr>
+<tr><td>6 min · logística <code>balanced</code></td><td>0,001</td><td>0,171 ± 0,004</td><td>20,2 %</td><td>50,8 %</td></tr>
+<tr><td>9 min · piso</td><td>—</td><td>0,137</td><td>52,1 %</td><td>95,9 %</td></tr>
+<tr><td><strong>9 min · logística sin pesos</strong></td><td>1</td><td><strong>0,214 ± 0,007</strong></td><td>53,4 %</td><td>95,5 %</td></tr>
+<tr><td>9 min · logística <code>balanced</code></td><td>0,01</td><td>0,224 ± 0,007</td><td>27,8 %</td><td>67,9 %</td></tr>
 </table>
 
 <ul>
-  <li><strong>La regla de la cátedra elige la sin pesos</strong>: <code>balanced</code> no le gana en F1
-  macro (da 0,005 menos) y queda muy por debajo del piso en accuracy y en ±1 banda. Es lo de la
-  Parte 6 de la Práctica 2: los pesos hacen que el modelo conteste las bandas chicas, pero las
-  contesta mal y pierde las grandes.</li>
-  <li><strong>La curva de C</strong> es plana entre 0,01 y 10; sólo con 0,001 el F1 cae a 0,084. La
-  distancia entre train y validación es de 0,013: no sobreajusta.</li>
+  <li><strong>Con 6 minutos, la regla de la cátedra elige la sin pesos</strong>: <code>balanced</code> le
+  gana por 0,0006 en F1 macro, mucho menos que su desvío (0,0042), y en accuracy y ±1 banda queda muy
+  debajo del piso.</li>
+  <li><strong>Con 9 minutos, la regla elige la <code>balanced</code>, y el grupo la descarta</strong>
+  (decisión del 10/11). Le gana a la sin pesos por 0,0098 en F1 macro, más que su desvío (0,0072). Pero
+  gana sólo en F1 macro, contestando las bandas de las puntas cientos de veces, y en todo lo demás queda
+  muy por debajo del piso. En el test el F1 empata (0,218 contra 0,221), la accuracy cae a 27,3 % (piso
+  52,2 %), el error medio sube a 9,5 minutos y las probabilidades dejan de estar calibradas (X.5). El
+  notebook muestra lo que elegía la regla y, al lado, la decisión del grupo.</li>
+  <li><strong>La curva de C</strong> de la sin pesos es plana entre 0,1 y 10 en los dos anchos; sólo cae
+  con 0,01 y 0,001. Que con 6 minutos gane <code>C=10</code>, el borde de la grilla, no cambia nada: entre
+  0,1 y 10 el F1 se mueve en milésimas. Train y validación casi se tocan: no sobreajusta.</li>
 </ul>
 
 <h3>4. El test, y dónde se equivoca</h3>
 
 <table>
 <tr><th>Test (3.798 partidas)</th><th>F1 macro</th><th>accuracy</th><th>±1 banda</th><th>error ≤ 3 min</th><th>error medio</th></tr>
-<tr><td>Piso</td><td>0,025</td><td>17,9 %</td><td>52,2 %</td><td>37,0 %</td><td>5,3 min</td></tr>
-<tr><td><strong>Logística sin pesos</strong></td><td><strong>0,099</strong></td><td>19,7 %</td><td>52,5 %</td><td>38,0 %</td><td>5,3 min</td></tr>
-<tr><td>Logística <code>balanced</code></td><td>0,096</td><td>10,1 %</td><td>27,7 %</td><td>18,0 %</td><td>10,1 min</td></tr>
+<tr><td>6 min · piso</td><td>0,076</td><td>36,2 %</td><td>82,0 %</td><td>36,5 %</td><td>5,31 min</td></tr>
+<tr><td><strong>6 min · sin pesos (final)</strong></td><td><strong>0,159</strong></td><td>36,9 %</td><td>84,3 %</td><td>37,5 %</td><td>5,15 min</td></tr>
+<tr><td>6 min · <code>balanced</code></td><td>0,160</td><td>18,9 %</td><td>50,2 %</td><td>21,0 %</td><td>9,84 min</td></tr>
+<tr><td>9 min · piso</td><td>0,137</td><td>52,2 %</td><td>96,4 %</td><td>37,0 %</td><td>5,32 min</td></tr>
+<tr><td><strong>9 min · sin pesos (final)</strong></td><td><strong>0,221</strong></td><td>54,4 %</td><td>96,2 %</td><td>38,0 %</td><td>5,15 min</td></tr>
+<tr><td>9 min · <code>balanced</code></td><td>0,218</td><td>27,3 %</td><td>67,5 %</td><td>20,6 %</td><td>9,50 min</td></tr>
 </table>
 
 <div class="aviso">
   <span class="etiqueta">Hay que decirlo con todas las letras</span>
-  <p>Como clasificador puro, la logística <strong>casi no le gana al piso</strong>: en minutos deja a
-  menos de 3 minutos el 38,0 % de las partidas, contra el 37,0 % de contestar siempre el centro. Lo
-  que agrega está en las <strong>probabilidades</strong> (X.5), no en la banda que contesta.</p>
+  <p>Como clasificadores puros, los dos finales <strong>casi no le ganan al piso</strong>: en minutos
+  dejan a menos de 3 minutos el 37,5 % y el 38,0 % de las partidas, contra el 36,5 % y el 37,0 % de
+  contestar siempre el centro. <strong>Ensanchar la banda no cambia el error en minutos</strong> (5,15 en
+  los dos): lo que sube con 9 minutos es la accuracy, porque la banda es más ancha. Lo que agregan está
+  en las <strong>probabilidades</strong> (X.5), no en la banda que contestan.</p>
 </div>
 
 <ul>
-  <li><strong>Matriz de confusión.</strong> La sin pesos contesta casi siempre el centro: en cada banda
-  real, entre el 68 y el 89 % de las partidas se predice en <code>24-27</code>, <code>27-30</code> o
-  <code>30-33</code>. Nunca contesta <code>&lt;15</code>, <code>39-42</code> ni <code>42-45</code>. La
-  <code>balanced</code> se reparte por toda la matriz: 96 partidas de <code>27-30</code> terminan
-  predichas como <code>&lt;15</code>.</li>
-  <li><strong>Por banda.</strong> El F1 de la sin pesos es 0,27 en <code>27-30</code>, 0,26 en
-  <code>15-18</code> y 0,24 en <code>30-33</code>, y cero en las cuatro bandas de las puntas. La
-  <code>balanced</code> sube el recall de las puntas (<code>45+</code>, de 0 a 0,22) con una precisión de
-  0,02.</li>
-  <li><strong><code>15-18</code> es la banda que se ve venir</strong>: es la rendición. Con una ventaja
-  grande al minuto 10, el que va perdiendo se rinde apenas se habilita la votación.</li>
-  <li><strong>Error en bandas.</strong> La sin pesos acierta la banda exacta en el 19,7 % y queda a una
-  banda en el 32,8 %: más de la mitad a un paso o menos. Contra la banda real, el error es una recta
-  que baja (las cortas se predicen largas y las largas, cortas): la tendencia al centro.</li>
-  <li><strong>Por grupo de elo</strong>, ayuda donde el piso más falla: en Hierro–Oro el ±1 banda pasa
-  de 45,7 % a 48,5 %; en los otros dos grupos empata con el piso.</li>
+  <li><strong>Matriz de confusión.</strong> La sin pesos contesta casi siempre el centro: con 6 minutos,
+  <code>27-33</code> en 2.857 de las 3.798 partidas (75,2 %), y nunca <code>&lt;15</code> ni
+  <code>39-45</code> (<code>45+</code> una vez, mal); con 9 minutos, <code>24-33</code> en 3.393 (89,3 %),
+  y nunca <code>&lt;15</code> ni <code>42+</code>. La <code>balanced</code> se reparte por toda la matriz:
+  con 9 minutos contesta <code>42+</code> 918 veces para acertar 51.</li>
+  <li><strong>Por banda.</strong> El F1 de la sin pesos es 0,51 en <code>27-33</code> y 0,27 en
+  <code>15-21</code> (6 minutos); 0,69 en <code>24-33</code> y 0,32 en <code>15-24</code> (9 minutos). En
+  las bandas de las puntas, cero. La <code>balanced</code> sube el recall de las puntas (<code>&lt;15</code>
+  a 0,44) con una precisión de 0,02 a 0,06.</li>
+  <li><strong>La banda corta es la que se ve venir</strong>: es la rendición. <code>15-21</code> acierta el
+  20 % de sus partidas y <code>15-24</code>, el 22 %. Con una ventaja grande al minuto 10, el que va
+  perdiendo se rinde apenas se habilita la votación.</li>
+  <li><strong>Error en bandas.</strong> La sin pesos queda a una banda o menos en el 84,2 % de las
+  partidas con 6 minutos y en el 96,2 % con 9. Contra la banda real, el error es una recta que baja (las
+  cortas se predicen largas y las largas, cortas): la tendencia al centro.</li>
+  <li><strong>Por grupo de elo</strong>, le gana al piso en F1 en los tres grupos; en lo demás la diferencia
+  es chica. Con 6 minutos, el ±1 banda de Hierro–Oro pasa de 78,1 % a 81,1 %, y el de Master–Challenger,
+  de 82,9 a 85,7 %.</li>
 </ul>
 
 <h3>5. Lo que le sirve al jugador: las probabilidades</h3>
 
 <p>La razón para elegir la logística es que da una probabilidad por banda. Eso sirve si las
 probabilidades son <strong>creíbles</strong> (calibradas) y si <strong>cambian de partida en
-partida</strong> (resolución). El notebook mide las dos cosas sobre la <strong>ventana de 3 bandas más
-probable</strong>, que son 9 minutos.</p>
+partida</strong> (resolución). <strong>Qué se le muestra al jugador</strong> (decisión del grupo): con 6
+minutos, la <strong>ventana de 2 bandas</strong> consecutivas más probable (12 minutos); con 9 minutos,
+<strong>la banda más probable</strong> (9 minutos).</p>
 
 <table>
-<tr><th>Ventana de 3 bandas</th><th>Dice en promedio</th><th>Pasa</th></tr>
-<tr><td>Piso</td><td>52,1 % (siempre lo mismo)</td><td>52,2 %</td></tr>
-<tr><td><strong>Logística sin pesos</strong></td><td><strong>56,1 %</strong></td><td><strong>55,6 %</strong></td></tr>
-<tr><td>Logística <code>balanced</code></td><td>42,6 %</td><td>35,0 %: mal calibrada</td></tr>
+<tr><th>Lo que ve el jugador</th><th>Dice en promedio</th><th>Pasa</th></tr>
+<tr><td>6 min · piso (ventana <code>21-33</code>, siempre)</td><td>61,0 %</td><td>61,2 %</td></tr>
+<tr><td><strong>6 min · sin pesos, ventana de 12 min</strong></td><td><strong>66,6 %</strong></td><td><strong>66,3 %</strong></td></tr>
+<tr><td>9 min · piso (banda <code>24-33</code>, siempre)</td><td>52,1 %</td><td>52,2 %</td></tr>
+<tr><td><strong>9 min · sin pesos, banda de 9 min</strong></td><td><strong>53,9 %</strong></td><td><strong>54,4 %</strong></td></tr>
+<tr><td>9 min · <code>balanced</code></td><td>36,2 %</td><td>27,3 %: mal calibrada</td></tr>
 </table>
 
 <table>
-<tr><th>Resolución de la sin pesos</th><th>% de las partidas</th><th>Dice</th><th>Pasa</th></tr>
-<tr><td>Dice menos de 50 %</td><td>16 %</td><td>46,5 %</td><td>49,8 %</td></tr>
-<tr><td>Dice 50–60 %</td><td>58 %</td><td>55,4 %</td><td>54,5 %</td></tr>
-<tr><td>Dice 60 % o más</td><td>26 %</td><td>63,3 %</td><td>61,7 %</td></tr>
+<tr><th>Resolución de la sin pesos (tercios de las partidas)</th><th>Dice</th><th>Pasa</th></tr>
+<tr><td>6 min · el tercio que dice menos (44–64 %)</td><td>59,8 %</td><td>60,0 %</td></tr>
+<tr><td>6 min · el tercio que dice más (69 % o más)</td><td>73,0 %</td><td>70,9 %</td></tr>
+<tr><td>9 min · el tercio que dice menos (31–50 %)</td><td>45,8 %</td><td>48,3 %</td></tr>
+<tr><td>9 min · el tercio que dice más (58 % o más)</td><td>62,0 %</td><td>60,6 %</td></tr>
 </table>
 
-<p><strong>La lectura:</strong> las probabilidades de la sin pesos están calibradas (dice 56 %, pasa
-56 %) y distinguen partidas: en una de cada cuatro dice 60 % o más, y ahí acierta el 62 %. El piso dice
-52 % siempre. La diferencia es modesta, del 50 al 62 %, pero es real, y es lo único que la logística le
-da al jugador que el piso no le da. Los pesos (<code>balanced</code>) rompen la calibración, otra razón
-para no usarlos.</p>
+<p><strong>La lectura:</strong> las probabilidades de la sin pesos están calibradas con los dos anchos y
+distinguen partidas: el acierto va del 60 al 71 % con 6 minutos y del 48 al 61 % con 9, según cuánto se
+anima a decir. El piso dice siempre lo mismo. La diferencia es modesta, pero es real, y es lo único que la
+logística le da al jugador que el piso no le da. Los pesos (<code>balanced</code>) rompen la calibración y
+no tienen resolución: con 9 minutos, en el tercio en que más se anima, acierta menos (23,2 %) que en el que
+menos (29,4 %).</p>
 
-<p>El notebook muestra tres partidas de ejemplo. En la de 29,5 minutos, el modelo dice <strong>62 %
-entre 24 y 33</strong> y acierta. En la de 20 minutos dice 50 % entre 24 y 33 y falla, pero avisa que
-no está seguro. En la de 40,5 minutos dice 54 % entre 27 y 36 y también falla.</p>
+<p>El notebook muestra las mismas tres partidas con los dos anchos. En la de 33,0 minutos acierta con los
+dos: <strong>79 % entre 21 y 33</strong> (6 minutos) y <strong>67 % en <code>24-33</code></strong> (9
+minutos). En la de 16,8 minutos falla con los dos, y avisa que no está seguro (64 % y 50 %). En la de 40,4
+minutos falla también; con 9 minutos, por poco: le da 45 % a <code>24-33</code> y 44 % a la real,
+<code>33-42</code>.</p>
 
 <h3>6. Qué aprendió</h3>
 
 <ul>
-  <li><strong><code>elo_partida</code></strong>: su coeficiente baja de +0,57 en <code>15-18</code> a
-  −0,76 en <code>45+</code>. A más elo, partidas más cortas.</li>
-  <li><strong><code>dif_gold_m10</code></strong>: +0,43 en <code>15-18</code> y −0,29 en las bandas
-  largas. Un equipo que ya se separó en oro cierra rápido: es lo que afirmaba H9, y explica la banda de
-  la rendición.</li>
-  <li><strong>Importancia por permutación</strong>: desordenar <code>dif_gold_m10</code> baja el F1
-  macro en 0,012 (un 12 %); la plataforma, 0,003; el elo, 0,002; el resto, menos de 0,001.</li>
-  <li>Los coeficientes de las bandas chicas (<code>&lt;15</code>, <code>42-45</code>, <code>45+</code>)
-  zigzaguean porque se estiman con pocas partidas: se lee la tendencia.</li>
+  <li><strong><code>elo_partida</code></strong>: su coeficiente baja de +0,51 en <code>15-21</code> a
+  −0,76 en <code>45+</code> (6 minutos), y de +0,42 en <code>15-24</code> a −0,58 en <code>42+</code> (9
+  minutos). A más elo, partidas más cortas.</li>
+  <li><strong><code>dif_gold_m10</code></strong>: +0,38 en <code>15-21</code> y −0,27 en
+  <code>33-39</code>; +0,30 en <code>15-24</code> y −0,26 en <code>33-42</code>. Un equipo que ya se
+  separó en oro cierra rápido: es lo que afirmaba H9, y explica la banda de la rendición.</li>
+  <li><strong>Importancia por permutación</strong>: desordenar <code>dif_gold_m10</code> baja el F1 macro
+  en 0,018 con 6 minutos (un 11 %) y en 0,043 con 9 (un 19 %). Después vienen la plataforma,
+  <code>dif_kills_m10</code> y el elo con 6 minutos, y <code>dif_xp_m10</code>, el elo y la plataforma
+  con 9.</li>
+  <li>Los coeficientes de <code>&lt;15</code> zigzaguean porque se estiman con 104 partidas: se lee la
+  tendencia.</li>
 </ul>
 
-<h3>7. El MSE y el R², en corto</h3>
+<h3>7. El MSE y el R², con el gráfico</h3>
 
-<p>Son métricas de regresión: se calculan sobre una predicción en segundos, así que el notebook las
-mide sobre la regresión de la E3 (<code>Ridge(alpha=100)</code>, mismas columnas, mismo test) para
-responder la corrección:</p>
+<p>Son métricas de regresión: se calculan sobre una predicción en números. El notebook las mide primero
+sobre la regresión de la E3 (<code>Ridge(alpha=100)</code>, mismas columnas, mismo test), y después
+sobre los dos clasificadores finales, pasando cada banda predicha a su minuto típico:</p>
 <ul>
   <li><strong>R² = 1 − MSE / varianza.</strong> La varianza de lo real (165.426 s²) es el error
   cuadrático de contestar siempre el promedio; el MSE de la regresión es 144.082 s², el 87,1 % de eso.
@@ -4155,20 +4215,202 @@ responder la corrección:</p>
   acertadas.</li>
   <li><strong>El MSE</strong> eleva los errores al cuadrado (castiga más los grandes) y está en s²; su
   raíz, el <strong>RMSE</strong>, vuelve a segundos: 379,6, contra un MAE de 294,7.</li>
-  <li><strong>Con la clasificación no aplican</strong>: el modelo contesta una banda. Su lugar lo ocupan
-  el error en minutos (X.4) y la calibración (X.5).</li>
 </ul>
 
-<h3>8. Banco de preguntas probables</h3>
+<p><strong>El gráfico</strong> pone, para cada partida del test, la duración real en el eje x y la
+predicha en el y. Si las predicciones fueran perfectas, caerían sobre la <strong>recta y = x</strong>.
+Una línea roja marca el promedio de lo predicho para cada minuto real: cuanto más se parece a la
+diagonal, más se parecen las predicciones a lo real; cuanto más se acuesta, más se pegan al promedio.</p>
+
+<table>
+<tr><th>Predicho contra real (min)</th><th>R²</th><th>MSE (min²)</th><th>Valores que predice</th></tr>
+<tr><td>Ridge de la E3 · regresión</td><td><strong>0,129</strong></td><td>40,0</td><td>continuos, de unos 18 a 36 min</td></tr>
+<tr><td>Final 6 min · sin pesos</td><td><strong>0,042</strong></td><td>44,0</td><td>5 (17,5 · 24,8 · 29,9 · 35,3 · 47,2)</td></tr>
+<tr><td>Final 9 min · sin pesos</td><td><strong>0,046</strong></td><td>43,9</td><td>3 (20,6 · 28,6 · 35,9)</td></tr>
+</table>
+
+<p>La varianza de lo real es 45,95 min². <strong>Las tres líneas rojas son mucho más planas que la
+diagonal</strong>: la del Ridge sube de unos 26 a unos 31 minutos mientras lo real va de 15 a 43. Los
+clasificadores forman rayas horizontales, porque sólo contestan el minuto típico de las bandas que
+predicen, y su R² queda más bajo que el del Ridge: al pasar de una banda a su minuto típico se pierde
+lo que el modelo sabe adentro de la banda. <strong>Con la clasificación, el R² y el MSE no son la
+métrica con la que se elige</strong>: para calcularlos hay que inventarle un número a cada banda. Se
+muestran porque los pidió el docente; su función la cumplen el F1 macro, el error en minutos (X.4) y la
+calibración (X.5).</p>
+
+<h3>8. Los dos modelos finales</h3>
+
+<table>
+<tr><th></th><th>6 minutos</th><th>9 minutos</th></tr>
+<tr><td>Modelo</td><td>logística sin pesos, <code>C=10</code></td><td>logística sin pesos, <code>C=1</code></td></tr>
+<tr><td>F1 macro en el test (piso)</td><td>0,159 (0,076)</td><td>0,221 (0,137)</td></tr>
+<tr><td>Accuracy (piso)</td><td>36,9 % (36,2 %)</td><td>54,4 % (52,2 %)</td></tr>
+<tr><td>Error ≤ 3 min (piso)</td><td>37,5 % (36,5 %)</td><td>38,0 % (37,0 %)</td></tr>
+<tr><td>R², pasado a minutos</td><td>0,042</td><td>0,046</td></tr>
+<tr><td>Lo que ve el jugador</td><td>ventana de 2 bandas (12 min)</td><td>la banda más probable (9 min)</td></tr>
+<tr><td>Calibración de lo que ve</td><td>dice 66,6 %, pasa 66,3 %</td><td>dice 53,9 %, pasa 54,4 %</td></tr>
+<tr><td>Resolución (tercio bajo → alto)</td><td>del 60,0 al 70,9 %</td><td>del 48,3 al 60,6 %</td></tr>
+<tr><td>Bandas que llega a contestar</td><td>5 de 7</td><td>3 de 5</td></tr>
+</table>
+
+<p>Con 6 minutos la frase cubre 12 minutos con más probabilidad; con 9 minutos cubre 9 minutos con
+menos. En los dos, lo que respalda la frase son las probabilidades calibradas. El notebook compara los
+dos sin elegir; <strong>el 10/11 el grupo eligió el de 6 minutos para la app</strong> de la Entrega 4
+(XI.2).</p>
+
+<h3>9. Banco de preguntas probables</h3>
 
 <table>
 <tr><th>Pregunta</th><th>Respuesta</th></tr>
-<tr><td>«¿Por qué una logística?»</td><td>Es la más simple, se lee por sus coeficientes, y da una probabilidad por banda. Al jugador le decimos «62 % de que termine entre 24 y 33 minutos», y esa probabilidad está calibrada: cuando dice 56 %, pasa el 56 % de las veces.</td></tr>
-<tr><td>«¿Le gana al piso?»</td><td>En F1 macro, sí: 0,099 contra 0,025. En minutos, casi nada: 38,0 % de partidas a menos de 3 minutos contra 37,0 %. Lo que agrega son probabilidades que cambian de partida en partida: en una de cada cuatro dice 60 % o más y acierta el 62 %; el piso dice 52 % siempre.</td></tr>
-<tr><td>«¿Por qué sin pesos y no balanced?»</td><td>Por la regla de la cátedra: balanced no le gana en F1 macro (0,101 contra 0,106) y su accuracy (10,5 %) y su ±1 banda (28,6 %) quedan muy debajo del piso. Además rompe la calibración: dice 43 % y pasa el 35 %.</td></tr>
-<tr><td>«¿Dónde se equivoca?»</td><td>En las puntas: nunca contesta <code>&lt;15</code>, <code>39-42</code> ni <code>42-45</code>. Contesta el centro, porque es donde está más de la mitad de las partidas. La excepción es <code>15-18</code>, la rendición.</td></tr>
-<tr><td>«¿Qué columna pesa más?»</td><td>La diferencia de oro al minuto 10: desordenarla baja el F1 macro un 12 %. Se conoce en el minuto 10, antes del final: no hay fuga, siempre que se prediga en ese minuto.</td></tr>
-<tr><td>«¿Qué es el R²?»</td><td>1 − MSE / varianza: cuánto baja el error cuadrático respecto de contestar siempre el promedio. La regresión de la E3 da 0,129. Con la clasificación no aplica, porque el modelo no contesta segundos.</td></tr>
+<tr><td>«¿Por qué una logística?»</td><td>Es la más simple, se lee por sus coeficientes, y da una probabilidad por banda. Al jugador le decimos, por ejemplo, «79 % de que termine entre 21 y 33 minutos», y esa probabilidad está calibrada: con 6 minutos dice 66,6 % en promedio y pasa el 66,3 %.</td></tr>
+<tr><td>«¿Por qué 6 y 9 minutos, y no una sola?»</td><td>Porque es la decisión del grupo: se probaron los dos anchos y quedan los dos como finales. El más angosto da una respuesta más precisa con menos probabilidad; el más ancho, al revés. La accuracy no sirve para compararlos: la banda más ancha la sube sola, también al piso.</td></tr>
+<tr><td>«¿Le gana al piso?»</td><td>En F1 macro, sí: 0,159 contra 0,076, y 0,221 contra 0,137. En minutos, casi nada: 37,5 y 38,0 % de partidas a menos de 3 minutos contra 36,5 y 37,0 %. Lo que agrega son probabilidades que cambian de partida en partida; el piso dice siempre lo mismo.</td></tr>
+<tr><td>«¿Por qué sin pesos y no balanced?»</td><td>Con 6 minutos, por la regla: empatan en F1 macro. Con 9 minutos la regla elegía la balanced (le ganaba por 0,0098, más que su desvío de 0,0072), y <strong>el grupo la descartó</strong>: en el test empata en F1 (0,218 contra 0,221), su accuracy (27,3 %) queda muy por debajo del piso (52,2 %), erra 9,5 minutos en promedio contra 5,2, y rompe la calibración (dice 36 %, pasa el 27 %).</td></tr>
+<tr><td>«¿Dónde se equivoca?»</td><td>En las puntas: nunca contesta <code>&lt;15</code> ni las bandas largas. Contesta el centro, porque ahí está la mayoría de las partidas. La excepción es la banda corta, la de la rendición.</td></tr>
+<tr><td>«¿Qué columna pesa más?»</td><td>La diferencia de oro al minuto 10: desordenarla baja el F1 macro un 11 % (6 minutos) y un 19 % (9 minutos). Se conoce en el minuto 10, antes del final: no hay fuga, siempre que se prediga en ese minuto.</td></tr>
+<tr><td>«¿Qué es el R²?»</td><td>1 − MSE / varianza: cuánto baja el error cuadrático respecto de contestar siempre el promedio. La regresión de la E3 da 0,129. Los clasificadores, pasando cada banda a su minuto típico, dan 0,042 y 0,046. En el gráfico se ve como cuánto se acercan los puntos a la recta y = x, y las tres nubes quedan mucho más planas que la recta.</td></tr>
+</table>
+
+<h2 class="parte"><span class="n">Parte XI</span>La Entrega 4: la aplicación</h2>
+
+<h3>1. Qué pide la Entrega 4 y qué se entrega</h3>
+
+<p>La consigna está en <code>Documentacion/Consignas de Entrega 4/</code> (el instructivo, también en
+texto en <code>consigna.md</code>, y la app de ejemplo de la cátedra). Pide la versión final del
+proyecto: <strong>una aplicación web publicada en una URL</strong> que cuente el proyecto entero y deje
+usarlo. Es la misma que se muestra en la exposición final del 25/11. La entrega es el
+<strong>miércoles 11/11</strong>, 25 minutos con el docente en privado; al 5K09-02 le toca de
+<strong>14:55 a 15:20</strong>, y hay que llegar cinco minutos antes con la app abierta en su URL pública
+y el repositorio a mano.</p>
+
+<table>
+<tr><th>Lo que pide</th><th>Dónde está</th></tr>
+<tr><td>Una portada con la pregunta, la idea central en una oración y tres números</td><td>«El proyecto»</td></tr>
+<tr><td>El tallo: tres secciones (los datos, lo que encontramos, el modelo), cada una con un título que afirma, un gráfico que lo prueba y un «Cómo lo sabemos» cerrado por defecto</td><td>«Los datos», «Lo que encontramos», «El modelo»</td></tr>
+<tr><td>La copa: un panorama, al menos dos controles que cambian el gráfico y detalle a pedido con lo que dijo el modelo</td><td>«Explorá las partidas»</td></tr>
+<tr><td>Probar el modelo con un caso nuevo, sin poder cargar valores que el modelo nunca vio</td><td>«Probá el modelo»</td></tr>
+<tr><td>Gráficos con Altair, y los mismos colores con el mismo significado en toda la app</td><td>Todos (XI.4)</td></tr>
+<tr><td>Un script que toma los datos del pipeline, entrena con la misma semilla y genera la app</td><td><code>app/build_app.py</code> (XI.3)</td></tr>
+<tr><td>Que lo que muestra la app coincida con el notebook</td><td>El script lo verifica y corta si no (XI.3)</td></tr>
+<tr><td>El repositorio en GitHub con un README que explique cómo se corre todo</td><td><code>README.md</code>, sección «La aplicación (Entrega 4)»</td></tr>
+</table>
+
+<h3>2. Las decisiones del grupo (10/11)</h3>
+
+<table>
+<tr><th>Decisión</th><th>Qué se eligió</th><th>Por qué</th></tr>
+<tr><td>El modelo de la app</td><td>La <strong>logística sin pesos con bandas de 6 minutos</strong> (<code>C=10</code>) de las correcciones de la E3</td><td>La ventana de 12 minutos da la frase más útil para el jugador, con la probabilidad mejor calibrada: dice 66,6 % y pasa el 66,3 % (X.5). Cierra la elección que la Parte X dejaba abierta.</td></tr>
+<tr><td>Dónde corre</td><td><strong>Una página HTML en GitHub Pages</strong>, como el ejemplo</td><td>Una logística se puede escribir adentro de la página: no hace falta un servidor que mantener andando. La otra opción de la consigna era Streamlit.</td></tr>
+<tr><td>Qué carga el usuario en «Probá»</td><td>Una <strong>partida real del test</strong> como punto de partida, y deslizadores para el servidor, el elo medio y las 7 métricas del minuto 10 (diferencia y total)</td><td>El modelo usa 49 columnas derivadas; la composición de campeones queda la de la partida elegida, y lo que se mueve es lo que más pesa.</td></tr>
+<tr><td>Dónde va en el repo</td><td>Una carpeta nueva, <code>app/</code>, y el workflow <code>.github/workflows/pages.yml</code></td><td>La app es el último paso de la misma cadena, pero no es un notebook.</td></tr>
+<tr><td>El estilo</td><td>Identidad propia, no una copia del ejemplo: estética de League of Legends (fondo oscuro, dorado y turquesa), la navegación como un reloj de partida (00:00 a 25:00), y los íconos de los campeones desde Data Dragon</td><td>Pedido del grupo: que tenga personalidad propia, con elementos del proyecto.</td></tr>
+</table>
+
+<h3>3. Cómo se construye: <code>app/build_app.py</code></h3>
+
+<pre>.venv\Scripts\python app/build_app.py                   # con los CSV congelados (los del notebook)
+.venv\Scripts\python app/build_app.py --desde-pipeline  # con lo último que dejó el DAG en include/output/</pre>
+
+<p>Corre en el mismo venv de los notebooks, al que se sumó <code>altair==6.3.0</code> en
+<code>notebooks/requirements.txt</code> (la 5.x no importa con Python 3.14). Tarda menos de un minuto y
+hace, en orden:</p>
+
+<ol>
+<li><strong>Lee los datos</strong>: por defecto, los mismos CSV congelados que el notebook
+(<code>lol_2026-09-06.csv</code> y <code>lol_min10_2026-10-26.csv</code>); con
+<code>--desde-pipeline</code>, el último CSV que escribió el DAG en <code>include/output/</code>. Si los
+datos se actualizan, correrlo de nuevo actualiza la app.</li>
+<li><strong>Repite el modelado del notebook</strong> para el ancho de 6 minutos: las mismas clases
+(copiadas sin cambios), la misma partición, los mismos cinco pedazos y <code>SEMILLA = 42</code>. Compara
+piso, logística sin pesos y <code>balanced</code> con la grilla de <code>C</code>, y mide el test una vez.</li>
+<li><strong>Se verifica contra el notebook.</strong> Con los CSV congelados, compara siete números con los
+que quedaron guardados en <code>correcciones_entrega3.ipynb</code> (C = 10; F1 macro 0,159 y del piso
+0,076; accuracy 0,369; ±1 banda 0,843; la ventana dice 0,666 y pasa 0,663). Si uno no coincide,
+<strong>corta sin escribir la página</strong>. Hoy coinciden los siete.</li>
+<li><strong>Predice cada partida con un modelo que no la vio</strong>, para «Explorá»: las 15.210 del
+entrenamiento con la validación cruzada (<code>cross_val_predict</code>, los mismos cinco pedazos) y las
+3.798 del test con el modelo final.</li>
+<li><strong>Lleva la logística al navegador.</strong> Para cada partida de ejemplo, separa la parte fija
+de la fórmula (la ordenada y lo que aportan las columnas que no se mueven) de la parte que depende de los
+deslizadores, que va escrita como expresión de Vega con las medias y los desvíos del escalado. Antes de
+escribirla, <strong>comprueba que con los valores reales de la partida da exactamente lo mismo que
+<code>predict_proba</code></strong>. En el navegador se volvió a comprobar: en las 13 partidas de ejemplo,
+la diferencia máxima es de 0,00005, por el redondeo de los valores a dos decimales.</li>
+<li><strong>Arma los cinco gráficos con Altair</strong> y llena <code>app/plantilla.html</code>, donde
+están el HTML y los textos con cada número como <code>$VARIABLE</code>. Escribe
+<code>app/index.html</code>, de unos 7 MB porque lleva adentro las 19.008 partidas de «Explorá».</li>
+</ol>
+
+<div class="aviso">
+  <span class="etiqueta">app/index.html no se edita a mano</span>
+  <p>Se regenera con el script. Un texto se cambia en <code>app/plantilla.html</code>; un número o un
+  gráfico, en <code>app/build_app.py</code>. Después se vuelve a correr el script.</p>
+</div>
+
+<p><strong>La publicación.</strong> El workflow <code>.github/workflows/pages.yml</code> publica la carpeta
+<code>app/</code> en GitHub Pages cada vez que se hace push de <code>app/index.html</code> a
+<code>main</code>. No reconstruye: publica el archivo commiteado, que es el que se verificó. Requisito,
+una sola vez: <strong>el repositorio tiene que ser público y tener Pages activado con origen «GitHub
+Actions»</strong>. El repo es de <code>aguilarezequiel</code>, y el 10/11 hizo las dos cosas (antes se
+revisó el historial de git: no hay ninguna API key de Riot commiteada). Él había agregado un workflow
+genérico, <code>static.yml</code>, que publicaba el repo entero y se pisaba con éste: se borró, y queda sólo
+<code>pages.yml</code>. <strong>La URL es <code>https://aguilarezequiel.github.io/FF-15/</code>.</strong></p>
+
+<h3>4. La app, sección por sección</h3>
+
+<p><strong>El sistema de colores</strong>, que la consigna pide que signifique lo mismo en toda la app:</p>
+<table>
+<tr><th>Color</th><th>Significa</th></tr>
+<tr><td>Siete colores, de celeste a amarillo</td><td>Las siete bandas de 6 minutos, de la más corta a la más larga</td></tr>
+<tr><td>Dorado</td><td>Lo que dice el modelo (la línea de la calibración, el borde de la ventana)</td></tr>
+<tr><td>Turquesa</td><td>Lo que se sabe al minuto 10</td></tr>
+<tr><td>Gris azulado</td><td>Lo que se sabe antes de jugar</td></tr>
+<tr><td>Gris</td><td>El piso</td></tr>
+</table>
+
+<table>
+<tr><th>Sección</th><th>Título que afirma</th><th>Gráfico, leído por componentes</th></tr>
+<tr><td>El proyecto</td><td>«A los 10 minutos de juego, el modelo dice en qué ventana de 12 minutos va a terminar la partida, y su probabilidad se cumple: en promedio dice 67 % y acierta el 66 %. Antes de jugar, en cambio, casi nada anticipa cuánto va a durar.» Los tres números: 2,6 % (lo que explica el elo, Pearson −0,161), F1 0,159 contra 0,076 del piso, y 67 % → 66 %.</td><td>—</td></tr>
+<tr><td>Los datos</td><td>«La mayoría de las partidas termina entre los minutos 21 y 33, y en el 15 hay un salto: la rendición.» El 61 % de las 19.145 termina entre 21 y 33; del minuto 14 al 15 terminan 27 y del 15 al 16, 714.</td><td>Datos: las 19.145 partidas. Marca: barra. Transformación: <code>bin</code> de 1 minuto y <code>count</code>. Mapeo: minuto en x, cantidad en y, banda en color. Una regla en el minuto 15 con su anotación.</td></tr>
+<tr><td>Lo que encontramos</td><td>«Antes de jugar, casi nada anticipa la duración; a los 10 minutos, la diferencia entre los equipos sí.» Elo −0,161 (E2) contra diferencia de oro al minuto 10 −0,285.</td><td>Datos: la correlación de Pearson de cada columna derivada con la duración, sobre las 19.008 partidas que llegan al minuto 10; las 8 más fuertes de cada familia. Marca: barra horizontal. Mapeo: |r| en x, columna en y, familia en color. Una franja con la zona roja del semáforo (|r| &lt; 0,2). Sobre esas partidas el elo da −0,171, y el «Cómo lo sabemos» explica la diferencia con el −0,161.</td></tr>
+<tr><td>El modelo</td><td>«A los 10 minutos, el modelo dice en qué ventana de 12 minutos termina la partida, y sus probabilidades se cumplen.» Con un recuadro aparte, «Lo que no logra, sin adornos»: en la banda exacta y en minutos casi no le gana al piso.</td><td>La calibración del test. Datos: las 3.798 partidas agrupadas en tramos de 10 puntos de la probabilidad de su ventana (sólo los tramos con 20 o más). Marcas: línea y punto. Mapeo: lo que dice en x, lo que pasa en y, cantidad de partidas en tamaño, modelo o piso en color. La diagonal es la calibración perfecta.</td></tr>
+<tr><td>Explorá</td><td>«Las 19.008 partidas, y lo que dijo el modelo de cada una.»</td><td>Panorama: una nube con la diferencia de oro al minuto 10 en x, la duración real en y y la banda real en color. Controles: servidor (menú), grupo de elo (botones) y probabilidad mínima de la ventana (deslizador), que filtran la nube, las barras de «Dónde terminaron» y el porcentaje de acierto. La leyenda también filtra. Detalle a pedido: el tooltip (lo que dijo el modelo, con qué probabilidad y si acertó) y, con un clic, las probabilidades de las siete bandas de esa partida con la ventana en dorado.</td></tr>
+<tr><td>Probá</td><td>«Elegí una partida real, cambiá cómo iba al minuto 10 y mirá qué dice el modelo.»</td><td>Datos: para cada una de las 13 partidas de ejemplo del test (dos por banda, una en <code>&lt;15</code>), una fila por banda con su parte fija y sus coeficientes. Transformaciones: el logit, el softmax (<code>joinaggregate</code>) y la ventana con <code>window</code> (<code>lead</code> y <code>lag</code>). Marca: barras por banda, un borde dorado en la ventana y la frase arriba. Los deslizadores son <code>params</code> de Vega-Lite.</td></tr>
+</table>
+
+<p><strong>Lo que la app hace con un caso raro.</strong> Los deslizadores van del mínimo al máximo que vio
+el entrenamiento, así que no se puede cargar un valor fuera de rango. Y si el usuario arma algo imposible
+(una diferencia mayor que el total, por ejemplo 20 asesinatos de diferencia con 4 en total), la app lo
+avisa: la combinación no existe en una partida real y la probabilidad no es confiable. Las diferencias son
+<code>|t1 − t2|</code>: el modelo no sabe qué equipo va adelante, sólo por cuánto.</p>
+
+<p><strong>Íconos y aviso legal.</strong> Los íconos salen de Data Dragon, con la versión que el script lee
+al construir la página; si no hay red, aparecen los nombres. El pie de página lleva el aviso de que el
+proyecto no está respaldado por Riot Games.</p>
+
+<h3>5. Cómo se organizan los 25 minutos</h3>
+
+<table>
+<tr><th>Min.</th><th>Momento</th><th>Qué pasa</th></tr>
+<tr><td>0–2</td><td>Qué cambió</td><td>Qué se corrigió del modelo desde la E3: de regresión a clasificación en bandas, con la logística sin pesos de 6 minutos. Dos oraciones.</td></tr>
+<tr><td>2–10</td><td>El tallo</td><td>Recorrer la app como si el docente no conociera el proyecto, de la portada al modelo. El docente abre los «Cómo lo sabemos» que quiera.</td></tr>
+<tr><td>10–15</td><td>La copa</td><td>El docente toma el mouse: explora y prueba el modelo con un caso propio.</td></tr>
+<tr><td>15–22</td><td>Preguntas dirigidas</td><td>A integrantes puntuales, sobre la app o el repositorio.</td></tr>
+<tr><td>22–25</td><td>Devolución</td><td>Qué corregir antes de la exposición final.</td></tr>
+</table>
+
+<h3>6. Banco de preguntas probables</h3>
+
+<table>
+<tr><th>Pregunta</th><th>Respuesta</th></tr>
+<tr><td>«Leé este gráfico componente por componente.»</td><td>Ver la tabla de XI.4: datos, marca, mapeo de cada canal, transformaciones y escalas. Por ejemplo, el de los datos: las 19.145 partidas, barras, <code>bin</code> de un minuto y <code>count</code>, el minuto en x, la cantidad en y y la banda en color, con la escala de bandas que se usa en toda la app.</td></tr>
+<tr><td>«¿Qué toca cada control de la copa?»</td><td>Servidor, elo y probabilidad mínima son <code>params</code> que entran en un <code>filter</code>: cambian qué filas llegan a la nube, a las barras de «Dónde terminaron» y al porcentaje de acierto. La leyenda es una selección que baja la opacidad de las otras bandas. El clic es una selección que filtra el gráfico del detalle.</td></tr>
+<tr><td>«¿Cómo llega el modelo a la app?»</td><td>Como fórmula: para cada partida de ejemplo, el script guarda la parte fija del logit y los coeficientes divididos por el desvío del escalado. El gráfico suma, aplica el softmax y elige la ventana. Nada se reentrena. El script comprueba que, con los valores reales, da lo mismo que <code>predict_proba</code>.</td></tr>
+<tr><td>«¿Y si cargo un caso raro?»</td><td>No se puede salir del rango del entrenamiento, y si la combinación es imposible (diferencia mayor que el total) la app avisa que la probabilidad no es confiable.</td></tr>
+<tr><td>«¿Coincide con el notebook?»</td><td>Sí, y no por confianza: el script compara siete números con los guardados en el notebook y no escribe la página si alguno difiere.</td></tr>
+<tr><td>«¿Cómo se regenera si cambian los datos?»</td><td><code>python app/build_app.py --desde-pipeline</code> lee el último CSV del DAG; se commitea <code>app/index.html</code> y el workflow lo publica.</td></tr>
+<tr><td>«¿Las predicciones de Explorá las hizo un modelo que ya las había visto?»</td><td>No: las del entrenamiento salen de la validación cruzada, cada una de un modelo entrenado sin su pedazo, y las del test, del modelo final, que no las vio.</td></tr>
+<tr><td>«¿Por qué 6 minutos y no 9?»</td><td>Por la frase para el jugador: 12 minutos con 66,6 % de probabilidad calibrada, contra 9 minutos con 53,9 %. La accuracy no sirve para comparar anchos: la banda más ancha la sube sola.</td></tr>
 </table>
 
 <h2 class="parte"><span class="n">Anexo</span>Glosario</h2>
@@ -4250,17 +4492,17 @@ responder la corrección:</p>
 <table>
 <tr><th>Término</th><th>Qué es</th></tr>
 <tr><td><strong>MAE</strong></td><td>Error absoluto medio: cuántos segundos se erra, en promedio, sin importar el signo. Fue la métrica declarada de la regresión de la Entrega 3.</td></tr>
-<tr><td><strong>R²</strong></td><td>1 − MSE del modelo / varianza de lo real: la parte del error cuadrático de contestar siempre el promedio que el modelo se saca de encima. 1 es acertar todo, 0 es errar como el promedio, y puede ser negativo. La regresión de la E3 da 0,129 en el test (X.7). No aplica a un clasificador.</td></tr>
+<tr><td><strong>R²</strong></td><td>1 − MSE del modelo / varianza de lo real: la parte del error cuadrático de contestar siempre el promedio que el modelo se saca de encima. 1 es acertar todo, 0 es errar como el promedio, y puede ser negativo. La regresión de la E3 da 0,129 en el test (X.7). Un clasificador no contesta números: para calcularlo hay que pasar cada banda a su minuto típico, y así los dos finales dan 0,042 y 0,046.</td></tr>
 <tr><td><strong>MSE</strong></td><td>Error cuadrático medio: el promedio de los errores al cuadrado, en segundos². Castiga más los errores grandes. Su ganancia relativa sobre el promedio es el R².</td></tr>
 <tr><td><strong>RMSE</strong></td><td>La raíz del MSE: lo mismo, en segundos. De la regresión de la E3, 379,6 s en el test.</td></tr>
-<tr><td><strong>Regresión logística</strong></td><td>Un clasificador lineal que da una probabilidad para cada clase. <code>C</code> es la inversa de la regularización: más chico, más regularizado. El modelo final de las correcciones de la E3.</td></tr>
+<tr><td><strong>Regresión logística</strong></td><td>Un clasificador lineal que da una probabilidad para cada clase. <code>C</code> es la inversa de la regularización: más chico, más regularizado. Los dos modelos finales de las correcciones de la E3 (6 y 9 minutos) son logísticas sin pesos.</td></tr>
 <tr><td><strong>Calibración</strong></td><td>Que las probabilidades signifiquen lo que dicen: cuando el modelo dice 60 %, que pase el 60 % de las veces.</td></tr>
 <tr><td><strong>Resolución</strong></td><td>Que las probabilidades cambien de caso en caso. El piso está calibrado pero dice siempre lo mismo: no tiene resolución.</td></tr>
 <tr><td><strong>F1 macro</strong></td><td>El F1 de cada clase, promediado sin pesar: una clase chica cuenta lo mismo que una grande. No tiene en cuenta que las bandas están ordenadas.</td></tr>
 <tr><td><strong>Accuracy</strong></td><td>La proporción de predicciones que caen en la clase exacta.</td></tr>
-<tr><td><strong>Acierto a ±1 banda</strong></td><td>Métrica propia del grupo: la proporción de partidas que caen en la banda correcta o en una vecina.</td></tr>
+<tr><td><strong>Acierto a ±1 banda</strong></td><td>Métrica propia del grupo: la proporción de partidas que caen en la banda correcta o en una vecina. Equivale a unos ±6 minutos con bandas de 6 y a ±9 con bandas de 9.</td></tr>
 <tr><td><strong>Matriz de confusión</strong></td><td>La tabla de banda real contra banda predicha: dice qué se confunde con qué.</td></tr>
-<tr><td><strong><code>class_weight="balanced"</code></strong></td><td>Pesar cada partida por la inversa de la frecuencia de su clase al entrenar, para que las clases chicas cuenten. En nuestro caso no subió el F1 macro, bajó la accuracy y rompió la calibración.</td></tr>
+<tr><td><strong><code>class_weight="balanced"</code></strong></td><td>Pesar cada partida por la inversa de la frecuencia de su clase al entrenar, para que las clases chicas cuenten. En nuestro caso, con 6 minutos no subió el F1 macro; con 9 lo subió por poco más que el desvío, pero bajó la accuracy por debajo del piso y rompió la calibración, y el grupo la descartó.</td></tr>
 <tr><td><strong>Piso</strong></td><td>Un modelo que no mira ninguna columna (<code>DummyRegressor</code>). Con el MAE contesta siempre la mediana. Sin él, el número del modelo no significa nada.</td></tr>
 <tr><td><strong>Validación cruzada</strong></td><td>Partir el entrenamiento en pedazos (acá cinco, con <code>KFold</code>), entrenar con cuatro y medir con el quinto, rotando. Da una media y un desvío; todo se elige con ella.</td></tr>
 <tr><td><strong>Desvío</strong> (de la validación)</td><td>Cuánto varía el MAE entre pedazos: el ruido de la medición. La regla de la cátedra: un modelo más complejo tiene que ganarle al simple por más que el desvío.</td></tr>
@@ -4281,8 +4523,18 @@ responder la corrección:</p>
 <code>notebooks/entrega-4/correcciones_entrega3.ipynb</code> (Parte X).</p>
 <table>
 <tr><th></th><th>Tarea</th><th>Quién</th></tr>
-<tr><td><s>1</s></td><td><s>Clasificación en bandas de 3 min, distribución del error con gráficos, MSE y R².</s> <strong>Hecho el 9/11:</strong> 44 celdas, ejecutado sin errores. El modelo final pasa a ser la regresión logística sin pesos (X.1).</td></tr>
-<tr><td>2</td><td>Que <strong>los cinco</strong> lean la Parte X entera: es lo que el docente va a preguntar primero en la próxima entrega.</td><td>Todos</td></tr>
+<tr><td><s>1</s></td><td><s>Clasificación en bandas de minutos, distribución del error con gráficos, MSE y R².</s> <strong>Hecho el 9/11 con bandas de 3 minutos, y rehecho el 10/11 con bandas de 6 y de 9:</strong> 47 celdas, ejecutado sin errores. Quedan dos modelos finales, los dos la regresión logística sin pesos (X.1, X.8).</td></tr>
+<tr><td><s>2</s></td><td><s>Elegir entre el modelo de 6 y el de 9 minutos (X.8).</s> <strong>Hecho el 10/11: el de 6 minutos, para la app.</strong></td><td>El grupo</td></tr>
+<tr><td>3</td><td>Que <strong>los cinco</strong> lean la Parte X entera: es lo que el docente va a preguntar primero en la próxima entrega.</td><td>Todos</td></tr>
+</table>
+
+<h3>Lo que queda de la Entrega 4</h3>
+<p>La app está hecha, verificada contra el notebook y publicada en <code>https://aguilarezequiel.github.io/FF-15/</code> (Parte XI). Falta:</p>
+<table>
+<tr><th></th><th>Tarea</th><th>Quién</th></tr>
+<tr><td><s>1</s></td><td><s>Hacer público el repositorio y activar GitHub Pages.</s> <strong>Hecho el 10/11.</strong></td><td>aguilarezequiel</td></tr>
+<tr><td>2</td><td>Abrir la URL pública desde otra computadora antes de la entrega.</td><td>El grupo</td></tr>
+<tr><td>3</td><td>Que los cinco recorran la app y lean la Parte XI: la pregunta sobre un gráfico le puede caer a cualquiera.</td><td>Todos</td></tr>
 </table>
 
 <h3>Lo que quedó de la Entrega 2</h3>
@@ -4342,9 +4594,9 @@ tienen su lugar natural en las entregas siguientes:</p>
   <td>Resuelta en la <strong>Parte IX</strong>. Las preguntas que estaban anotadas acá tienen respuesta. Las combinaciones de columnas de condiciones iniciales tampoco predicen: ningún modelo le gana a la lineal y la lineal le gana al piso por 10 s. El escalón de los 900 s es el tramo donde más se erra, con el minuto y sin él. El rival de predecir siempre el centro quedó superado por 22,9 s recién con el estado de la partida al minuto 10.</td>
 </tr>
 <tr>
-  <td><strong>4 · Visualización</strong><br>04/11</td>
-  <td>Visualizaciones y una aplicación funcionando.</td>
-  <td>La consigna de la Entrega 3 lo fija: <strong>la app usa el modelo elegido</strong>. Después de las correcciones, es la <strong>regresión logística sin pesos</strong> sobre las 137 columnas y el estado de la partida al minuto 10, y la app puede mostrarle al jugador la probabilidad de cada banda de 3 minutos (X.5). Para predecir necesita ese estado, que sale del timeline (V.8). <strong>No se empezó.</strong></td>
+  <td><strong>4 · Visualización</strong><br>11/11 · 14:55 – 15:20</td>
+  <td>Una aplicación web publicada en una URL pública, con gráficos de Altair, que cuenta el proyecto y deja probar el modelo.</td>
+  <td>La consigna de la Entrega 3 lo fija: <strong>la app usa el modelo elegido</strong>. Después de las correcciones, es la <strong>regresión logística sin pesos</strong> sobre las 137 columnas y el estado de la partida al minuto 10, con bandas de 6 minutos: la app le muestra al jugador la probabilidad de la ventana de 12 minutos (X.5, XI.2). Para predecir necesita ese estado, que sale del timeline (V.8). <strong>Hecha en <code>app/</code>, falta publicarla</strong> (Parte XI).</td>
 </tr>
 </table>
 

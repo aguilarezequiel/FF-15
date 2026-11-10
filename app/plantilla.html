@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<!-- Plantilla de la app de la Entrega 4. NO se edita index.html a mano: se regenera con
+     .venv\Scripts\python app/build_app.py, que llena cada $$VARIABLE con lo que mide. -->
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$TITULO</title>
+<meta name="description" content="¿Se puede predecir cuánto dura una partida de League of Legends? Proyecto Integrador de Ciencia de Datos, UTN FRM, grupo 5K09-02.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/vega@6.4.0/build/vega.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-lite@6.4.1/build/vega-lite.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega-embed@7.3.0/build/vega-embed.min.js"></script>
+<style>
+:root{
+  --fondo:#070D18; --panel:#0E1A2E; --panel2:#122239; --linea:#24344F;
+  --crema:#F0E6D2; --gris:#A09B8C; --oro:#C8AA6E; --oro-osc:#785A28; --hex:#0AC8B9; --pizarra:#6E7F99; --rojo:#E08A7A;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:12px}
+body{margin:0;background:var(--fondo);color:var(--crema);font:17px/1.6 Inter,"Segoe UI",Helvetica,Arial,sans-serif;
+  background-image:radial-gradient(1200px 600px at 85% -10%,rgba(10,200,185,.08),transparent 60%),
+  radial-gradient(900px 500px at -10% 30%,rgba(200,170,110,.06),transparent 60%)}
+a{color:var(--hex)}
+code{font-size:.88em;background:#16263f;padding:1px 6px;border-radius:4px;color:#d9e6f5}
+
+/* ── el reloj de la partida (la navegación) ── */
+nav{position:fixed;top:0;left:0;bottom:0;width:236px;padding:26px 18px;border-right:1px solid var(--linea);
+  background:linear-gradient(180deg,#0A1428,#070D18);overflow-y:auto;z-index:5}
+.marca{font-family:Cinzel,serif;font-size:30px;letter-spacing:.06em;color:var(--oro);margin:0;line-height:1}
+.marca small{display:block;font-family:Inter,sans-serif;font-size:11.5px;letter-spacing:.04em;color:var(--gris);margin-top:8px;line-height:1.4}
+nav h3{font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin:26px 0 8px;color:var(--gris)}
+nav ol{list-style:none;margin:0;padding:0;border-left:2px solid var(--linea)}
+nav li a{display:grid;grid-template-columns:48px 1fr;gap:4px;padding:6px 0 6px 12px;color:var(--crema);text-decoration:none;
+  font-size:14.5px;line-height:1.3;margin-left:-2px;border-left:2px solid transparent}
+nav li a span{font-variant-numeric:tabular-nums;color:var(--gris);font-size:12.5px;padding-top:1px}
+nav li a:hover,nav li a.activo{border-left-color:var(--oro);color:var(--oro)}
+nav li a.activo span{color:var(--oro)}
+nav .copa li a:hover,nav .copa li a.activo{border-left-color:var(--hex);color:var(--hex)}
+nav .copa li a.activo span{color:var(--hex)}
+nav .nota-nav{font-size:12px;color:var(--gris);margin:10px 0 0;line-height:1.45}
+
+main{margin-left:236px;padding:0 44px 60px}
+section{max-width:1000px;margin:0 auto;padding:64px 0 30px;border-bottom:1px solid var(--linea)}
+.etapa{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin:0 0 10px;color:var(--oro)}
+.etapa.copa{color:var(--hex)}
+.etapa b{font-variant-numeric:tabular-nums;background:rgba(200,170,110,.14);padding:2px 8px;border-radius:4px;margin-right:8px}
+.etapa.copa b{background:rgba(10,200,185,.14)}
+h1{font-family:Cinzel,serif;font-size:44px;line-height:1.15;margin:0 0 18px;max-width:24ch;color:var(--crema)}
+h2{font-family:Cinzel,serif;font-size:29px;line-height:1.25;margin:0 0 16px;max-width:42ch;color:var(--crema)}
+p,li{max-width:74ch}
+.lead{font-size:19px;color:#d8cfbd;max-width:70ch}
+.pregunta{font-size:18px;color:var(--gris);border-left:3px solid var(--linea);padding-left:14px;max-width:70ch}
+.oracion{font-size:23px;line-height:1.45;margin:30px 0 32px;padding:22px 26px;max-width:60ch;
+  background:linear-gradient(90deg,rgba(200,170,110,.13),rgba(200,170,110,.02));border-left:4px solid var(--oro);border-radius:0 10px 10px 0}
+.nums{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:8px 0 20px}
+.num{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden}
+.num::after{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--oro),transparent)}
+.num span{display:block;font-family:Cinzel,serif;font-size:38px;font-weight:700;line-height:1.1;color:var(--oro)}
+.num p{margin:8px 0 0;font-size:14.5px;color:var(--gris);line-height:1.45}
+.nota{font-size:15px;color:var(--gris)}
+.ff{display:flex;gap:14px;align-items:flex-start;background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:14px 18px;font-size:15px;color:var(--gris);max-width:780px}
+.ff b{font-family:Cinzel,serif;color:var(--oro);font-size:20px;white-space:nowrap}
+
+.grafico{margin:24px 0 8px;background:var(--panel);border:1px solid var(--linea);border-radius:12px;padding:10px;overflow-x:auto}
+.mirar{font-size:15.5px;color:#cfc6b3;margin:10px 0 0;padding-left:14px;border-left:2px solid var(--oro-osc)}
+.mirar b{color:var(--oro)}
+.honesto{margin:22px 0 4px;padding:14px 18px;border:1px dashed #5b6b85;border-radius:10px;font-size:15.5px;color:#cfc6b3;max-width:820px}
+.honesto b{color:var(--crema)}
+
+details{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:0 22px;margin:20px 0 6px}
+details[open]{padding-bottom:16px}
+summary{cursor:pointer;font-weight:600;padding:15px 0;color:var(--oro);list-style:none;display:flex;align-items:center;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"";width:9px;height:9px;border-right:2px solid var(--oro);border-bottom:2px solid var(--oro);transform:rotate(-45deg);transition:transform .15s}
+details[open] summary::before{transform:rotate(45deg)}
+details h4{margin:20px 0 6px;font-size:16px;color:var(--crema)}
+details p,details li{font-size:15.5px;color:#d0c8b8}
+.tabla{overflow-x:auto;margin:8px 0 12px}
+table{border-collapse:collapse;font-size:14.5px}
+th,td{border:1px solid var(--linea);padding:6px 11px;text-align:left;vertical-align:top}
+th{background:#15253d;color:var(--crema);font-weight:600}
+td{color:#d0c8b8}
+.tabla.chica table{font-size:13.5px} .tabla.chica td{text-align:right} .tabla.chica td:first-child{text-align:left}
+.diag{color:var(--oro);font-weight:700}
+
+/* ── la copa ── */
+.controles{display:flex;flex-wrap:wrap;gap:12px 26px;margin:20px 0 0;padding:14px 18px;background:var(--panel);border:1px solid var(--linea);border-radius:10px;font-size:14.5px}
+.vega-bind{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.vega-bind-name{font-weight:600;color:var(--crema)}
+.vega-bind select{font-size:14.5px;padding:4px 8px;background:#0A1428;color:var(--crema);border:1px solid var(--linea);border-radius:6px}
+.vega-bind-radio label{margin-right:10px;color:#d0c8b8}
+.vega-bind input[type=range]{accent-color:var(--hex)}
+.vega-bind input[type=radio]{accent-color:var(--hex)}
+.probar{display:grid;grid-template-columns:minmax(0,1fr) 480px;gap:26px;align-items:start;margin-top:22px}
+.fijo{position:sticky;top:14px}
+.elegir{background:var(--panel);border:1px solid var(--linea);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.elegir label{font-weight:600;font-size:14.5px;margin-right:8px}
+.elegir select,.btn{font-size:14.5px;padding:6px 10px;background:#0A1428;color:var(--crema);border:1px solid var(--linea);border-radius:6px}
+.btn{cursor:pointer;border-color:var(--oro-osc);color:var(--oro)}
+.btn:hover{background:#15253d}
+.botones{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.equipos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.equipo{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris)}
+.equipo.azul b{color:#5aa9ff} .equipo.rojo b{color:#ff6b6b}
+.caras{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.caras img{width:40px;height:40px;border-radius:6px;border:1px solid var(--linea)}
+.equipo.azul img{border-color:#2d5d99} .equipo.rojo img{border-color:#8f3434}
+.caras .sin{font-size:12px;color:var(--crema);text-transform:none;letter-spacing:0}
+.revelado{margin-top:12px;font-size:15px;color:var(--crema);background:#0A1428;border-radius:8px;padding:10px 12px;display:none}
+.revelado.si{display:block}
+.revelado b{color:var(--oro)}
+fieldset{border:1px solid var(--linea);border-radius:10px;padding:8px 14px 10px;margin:0 0 12px;background:var(--panel)}
+legend{font-weight:600;font-size:13.5px;color:var(--hex);padding:0 6px;letter-spacing:.04em}
+.deslizadores{display:grid;grid-template-columns:1fr;gap:0}
+.slot .vega-bind{margin:3px 0}
+.slot .vega-bind label{display:grid;grid-template-columns:190px minmax(80px,1fr) 64px;align-items:center;gap:10px;font-size:13.5px;line-height:1.2;width:100%}
+.slot .vega-bind-name{font-weight:500;color:#d0c8b8}
+.slot input[type=range]{width:100%;margin:0}
+.slot .vega-bind span:last-child{font-variant-numeric:tabular-nums;text-align:right;color:var(--crema)}
+.aviso{display:none;margin:0 0 12px;padding:10px 14px;border-radius:8px;background:rgba(224,138,122,.12);border:1px solid #8f4a3e;color:#f2c1b6;font-size:14.5px}
+.aviso.si{display:block}
+
+footer{max-width:1000px;margin:0 auto;padding:30px 0;color:var(--gris);font-size:13px;line-height:1.55}
+footer p{max-width:none}
+#vg-tooltip-element.vg-tooltip.dark-theme{background:#0A1428;border:1px solid var(--oro-osc);color:var(--crema);font-family:Inter,sans-serif;font-size:13px}
+#vg-tooltip-element.vg-tooltip.dark-theme td.key{color:var(--gris)}
+@media (max-width:1180px){.probar{grid-template-columns:1fr}.fijo{position:static}}
+@media (max-width:900px){nav{display:none}main{margin-left:0;padding:0 16px 50px}.nums{grid-template-columns:1fr}
+  .deslizadores{grid-template-columns:1fr}h1{font-size:32px}h2{font-size:24px}.oracion{font-size:19px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <p class="marca">FF-15<small>Grupo 5K09-02 · Ciencia de Datos<br>UTN FRM · 2026</small></p>
+  <div class="tallo">
+    <h3>La historia</h3>
+    <ol>
+      <li><a href="#proyecto"><span>00:00</span>El proyecto</a></li>
+      <li><a href="#datos"><span>05:00</span>Los datos</a></li>
+      <li><a href="#hallazgo"><span>10:00</span>Lo que encontramos</a></li>
+      <li><a href="#modelo"><span>15:00</span>El modelo</a></li>
+    </ol>
+  </div>
+  <div class="copa">
+    <h3>Tu turno</h3>
+    <ol>
+      <li><a href="#explora"><span>20:00</span>Explorá las partidas</a></li>
+      <li><a href="#probar"><span>25:00</span>Probá el modelo</a></li>
+    </ol>
+    <p class="nota-nav">La historia se lee en orden. Acá las preguntas las hacés vos.</p>
+  </div>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════ PORTADA ═══════════════════════════ -->
+<section id="proyecto">
+  <p class="etapa"><b>00:00</b>El proyecto</p>
+  <h1>¿Cuánto va a durar tu partida?</h1>
+  <p class="pregunta">¿Es posible predecir la duración de una partida de League of Legends a partir de las
+  características de los jugadores, de los campeones de los equipos y de las condiciones iniciales de la partida?</p>
+  <div class="oracion">A los 10 minutos de juego, el modelo dice en qué ventana de 12 minutos va a terminar la partida,
+  y su probabilidad se cumple: en promedio dice $DICE0 y acierta el $PASA0. Antes de jugar, en cambio, casi nada
+  anticipa cuánto va a durar.</div>
+  <div class="nums">
+    <div class="num"><span>$R2_ELO</span><p>de la duración explica la columna de antes de jugar más asociada, el elo medio de la partida (Pearson $R_ELO)</p></div>
+    <div class="num"><span>$F1</span><p>F1 macro del modelo en el test, contra $F1_PISO del piso que contesta siempre la banda más común</p></div>
+    <div class="num"><span>$DICE0 → $PASA0</span><p>lo que dice el modelo para su ventana de 12 minutos, y las veces que la partida termina ahí, en las $N_TEST partidas del test</p></div>
+  </div>
+  <p class="nota">Medido sobre $N_PARTIDAS partidas clasificatorias Solo/Duo de la Season 16, de $N_SERVIDORES servidores
+  ($TXT_SRV). El modelo mira las $N_MIN10 que llegan al minuto 10.</p>
+  <div class="ff"><b>ff 15</b><span>En League of Legends, «ff» es votar la rendición, y el juego la habilita en el
+  minuto 15. Es la marca más visible que deja la duración en los datos: la vas a ver en el primer gráfico.</span></div>
+</section>
+
+<!-- ═══════════════════════════ TALLO 1 · LOS DATOS ═══════════════════════════ -->
+<section id="datos">
+  <p class="etapa"><b>05:00</b>Los datos</p>
+  <h2>La mayoría de las partidas termina entre los minutos 21 y 33, y en el 15 hay un salto: la rendición</h2>
+  <p class="lead">El $PARTE_21_33 de las $N_PARTIDAS partidas termina entre los minutos 21 y 33. Del minuto 14 al 15
+  terminan $EN_14; del 15 al 16, $EN_15: a los quince minutos se habilita la votación de rendición, y las partidas que
+  ya estaban decididas se cierran ahí.</p>
+  <div class="grafico" id="g-datos"></div>
+  <p class="mirar">El color es la <b>banda de 6 minutos</b> que el modelo tiene que adivinar, y es el mismo en toda la
+  página. Las bandas del centro juntan casi todo y las de las puntas son chicas: por eso, más abajo, la métrica es el
+  F1 macro y no la accuracy.</p>
+  <details>
+    <summary>Cómo lo sabemos</summary>
+    <h4>De dónde salen</h4>
+    <p>De la API oficial de Riot Games (Match-V5, League-V4 y Champion-Mastery-V4) y de Data Dragon, el catálogo
+    público de campeones. Los baja un DAG de Apache Airflow, <code>lol_ingest</code>. Riot no publica una lista de
+    partidas, así que el pipeline entra por la escalera de jugadores de seis servidores, recorre los tiers en orden
+    aleatorio para que un corte a mitad de camino no sesgue la muestra, y baja las últimas partidas clasificatorias de
+    cada jugador. Lo crudo queda en la capa bronce, que sólo crece: lo que ya se bajó no se vuelve a pedir. La capa plata
+    arma los CSV.</p>
+    <p>El estado al minuto 10 sale de la línea de tiempo de cada partida (el timeline de Match-V5): se guarda entero en
+    el bronce y se corta en la plata, así que cambiar de minuto no le pide nada a Riot. Esta app usa
+    <code>$CSV_DF</code> (las condiciones iniciales, 137 columnas) y <code>$CSV_MIN</code> (el estado al minuto 10,
+    35 columnas), unidos por <code>match_id</code>.</p>
+    <h4>Qué es una fila</h4>
+    <p>Una partida clasificatoria Solo/Duo (cola 420) de la Season 16. La clave es <code>match_id</code>: no se repite,
+    y lleva adelante el prefijo del servidor (<code>KR_</code>, <code>LA2_</code>…). El objetivo es
+    <code>game_duration_s</code>, en segundos, pasado a la banda de 6 minutos en la que termina.</p>
+    <h4>Qué se filtró, paso por paso</h4>
+    $T_FILTROS
+    <p class="nota">Las 1.651 descartadas son las que contó el bronce de la corrida grande del 5 y 6 de septiembre.</p>
+    <h4>Qué columnas quedaron afuera por fuga</h4>
+    <p>Por diseño, ninguna de las 137 columnas se completa después de la partida: no hay asesinatos, ni oro, ni torres,
+    ni el resultado. Se declaran dos reparos. El elo, el winrate y la maestría se leen días después de jugar, así que
+    ya cuentan esa misma partida; el winrate, el más comprometido, igual sale por redundante con el elo (H6). Y el
+    carril de cada jugador sale de un campo que Riot completa al cerrar la partida.</p>
+    <p>Del timeline entra sólo lo que pasó hasta el minuto 10, que se conoce en el minuto 10. Las placas, los wards y la
+    primera sangre quedan afuera, pero no por fuga: las placas no se pudieron verificar, los wards cuentan objetos que
+    dejan habilidades de campeones, y la primera sangre no se mueve con la duración.</p>
+  </details>
+</section>
+
+<!-- ═══════════════════════════ TALLO 2 · LO QUE ENCONTRAMOS ═══════════════════════════ -->
+<section id="hallazgo">
+  <p class="etapa"><b>10:00</b>Lo que encontramos</p>
+  <h2>Antes de jugar, casi nada anticipa la duración; a los 10 minutos, la diferencia entre los equipos sí</h2>
+  <p class="lead">De lo que se sabe antes de jugar, lo más asociado a la duración es el $NOMBRE_ANTES (Pearson
+  $R_ELO en la Entrega 2): todo queda en la zona roja del semáforo de la cátedra. En cambio, la $NOMBRE_MIN llega a $R_MIN.
+  Cuando un equipo ya se separó, la partida se cierra antes.</p>
+  <div class="grafico" id="g-hallazgo"></div>
+  <p class="mirar">Las barras <b style="color:#8f9fb8">gris azulado</b> son lo que se sabe antes de jugar; las
+  <b style="color:#0AC8B9">turquesa</b>, lo que se sabe al minuto 10. Esos dos colores significan lo mismo en toda la
+  página. La franja roja es la zona en la que una correlación no alcanza para afirmar nada.</p>
+  <details>
+    <summary>Cómo lo sabemos</summary>
+    <h4>Una hipótesis que se sostuvo: el elo y el winrate son la misma columna (H6)</h4>
+    <p>Correlacionan 0,711, zona verde: el winrate mediano sube de 0,478 a 0,537 entre el primer y el último decil de elo.
+    Se queda el elo, que conserva más señal contra la duración (−0,161 contra −0,120), y salen los diez winrate.</p>
+    <h4>Una que no: más tanques no alargan la partida (H1)</h4>
+    <p>Pearson −0,008, zona roja, y con el signo al revés del esperado. Era lo que el grupo daba por sabido. Tampoco se
+    sostuvo «a más elo, partidas más cortas» (H4): −0,161, rojo. Aun así, el elo es la columna más asociada de las 137 y
+    entra al modelo.</p>
+    <h4>El hallazgo que atraviesa las ocho fichas</h4>
+    <p>Las cuatro fichas que medían una columna contra la duración cayeron en rojo; las cuatro que dieron verde medían
+    columnas entre sí y encontraron redundancia. Con las condiciones iniciales, columna por columna, la respuesta a la
+    pregunta del proyecto fue no. Por eso, a pedido del docente, el pipeline sumó la línea de tiempo: a los 5 minutos la
+    diferencia de oro casi no se mueve con la duración (−0,130); a los 10, sí (−0,285, amarillo).</p>
+    <h4>Cómo se construyó el gráfico</h4>
+    <p>Para cada columna derivada que usa el modelo (las sumas y las diferencias entre los equipos, el elo y la maestría
+    medios, y el estado al minuto 10), la correlación de Pearson con la duración, sobre las $N_MIN10 partidas que
+    llegan al minuto 10, así las dos familias se miden sobre lo mismo. Se grafica el valor absoluto para comparar la
+    fuerza, y el signo va en el tooltip. Las diferencias entre equipos son <code>|t1 − t2|</code> y los totales,
+    <code>t1 + t2</code>: H3 mostró que separar azul de rojo duplica la información. El elo da $R_ANTES
+    en el gráfico y $R_ELO en la Entrega 2 y en la portada: ese número se midió sobre las $N_PARTIDAS partidas, incluidas
+    las que terminan antes del minuto 10.</p>
+  </details>
+</section>
+
+<!-- ═══════════════════════════ TALLO 3 · EL MODELO ═══════════════════════════ -->
+<section id="modelo">
+  <p class="etapa"><b>15:00</b>El modelo</p>
+  <h2>A los 10 minutos, el modelo dice en qué ventana de 12 minutos termina la partida, y sus probabilidades se cumplen</h2>
+  <p class="lead">Es una regresión logística: le da una probabilidad a cada banda de 6 minutos, y al jugador se le
+  muestran las dos bandas seguidas más probables. En el test, a esa ventana le da en promedio $DICE, y la partida termina
+  ahí el $PASA de las veces. Además, no dice siempre lo mismo: en el tercio de partidas en que más se anima, acierta el
+  $RES_ALTO; en el que menos, el $RES_BAJO.</p>
+  <div class="grafico" id="g-modelo"></div>
+  <p class="mirar">Cuanto más pegados a la diagonal, más creíble es la probabilidad. La línea <b>dorada</b> es el
+  modelo, y el dorado es siempre lo que dice el modelo. El punto gris es el piso: también está calibrado, pero le dice
+  $DICE_PISO a todas las partidas por igual.</p>
+  <div class="honesto"><b>Lo que no logra, sin adornos.</b> Como respuesta de una sola banda, casi no le gana al piso:
+  acierta la banda exacta en el $ACC de las partidas, contra $ACC_PISO del piso, y queda a menos de 3 minutos de lo
+  real en el $LE3, contra $LE3_PISO. Con lo que se sabe al minuto 10 no se separa bien una partida de 20 minutos de
+  una de 40. Lo que el modelo aporta está en las probabilidades.</div>
+  <details>
+    <summary>Cómo lo sabemos</summary>
+    <h4>Qué cambió desde la Entrega 3</h4>
+    <p>En la Entrega 3 el modelo predecía los segundos: un <code>Ridge(alpha=100)</code> que erraba $MAE_RIDGE s en el
+    test, con un R² de $R2_RIDGE. Por la corrección del docente, el problema pasó a ser de clasificación: en qué banda de
+    minutos termina la partida. Se probaron bandas de 6 y de 9 minutos, y el grupo eligió las de 6 para la app, porque la
+    ventana de 12 minutos da la frase más útil con la probabilidad mejor calibrada.</p>
+    <h4>La métrica, y por qué</h4>
+    <p><b>F1 macro</b>, declarado antes de comparar: es el F1 de cada banda promediado sin pesos, así que una banda chica
+    cuenta lo mismo que una grande. Con bandas tan desparejas, la accuracy premia contestar siempre el centro. Al lado van
+    la accuracy, el acierto a ±1 banda y el error en minutos.</p>
+    <h4>El piso y la validación</h4>
+    <p>El piso es <code>DummyClassifier(strategy="prior")</code>: contesta siempre la banda más frecuente. El test es el
+    20 % de la Entrega 3, estratificado por grupo de elo y separado una sola vez; sobre el 80 % restante, validación
+    cruzada de 5 pedazos al azar con semilla 42. Imputar, escalar y codificar van adentro del pipeline, así nada se
+    calcula mirando el test. Limitación declarada: un mismo jugador puede quedar de los dos lados de un corte, porque el
+    CSV no trae su identificador para usar <code>GroupKFold</code>; si eso hubiera inflado la validación, el test habría
+    salido peor, y no pasó.</p>
+    <h4>La comparación</h4>
+    $T_COMP
+    <p>Regla de la cátedra: el modelo más complejo gana sólo si supera al simple por más que su desvío. Con 6 minutos, la
+    logística con pesos <code>balanced</code> empata en F1 con la sin pesos y pierde por mucho en accuracy y en ±1 banda:
+    se queda la sin pesos.</p>
+    <h4>El ajuste de C</h4>
+    $T_GRILLA
+    <p>Entre C = 0,1 y C = 10 el F1 se mueve en milésimas: la regularización casi no importa. La grilla elige C = $C_FINAL.</p>
+    <h4>El resultado en el test</h4>
+    $T_TEST
+    <h4>Dónde se equivoca</h4>
+    $T_BANDAS
+    <p>Contesta $CONTESTA de las 7 bandas, casi siempre la del centro. Fuera del centro, la única que ve venir es la
+    corta, la de la rendición. La matriz, normalizada por fila (de cada banda real, a dónde va):</p>
+    $T_CM
+    <h4>Si la probabilidad cambia de partida en partida</h4>
+    $T_RES
+    <h4>En qué se apoya</h4>
+    <p>Los coeficientes, sobre columnas estandarizadas: a más elo y a más diferencia de oro, más empuje hacia las bandas
+    cortas. Y la importancia por permutación: cuánto baja el F1 macro si se desordena cada columna.</p>
+    $T_COEF
+    $T_IMP
+    <h4>El chequeo de fuga</h4>
+    <p>Las columnas del minuto 10 se conocen en el minuto 10, antes de que la partida termine: no hay fuga, siempre que
+    se prediga en ese minuto. Y no dan demasiado bien, que es lo esperable si no hay fuga.</p>
+  </details>
+</section>
+
+<!-- ═══════════════════════════ COPA · EXPLORÁ ═══════════════════════════ -->
+<section id="explora">
+  <p class="etapa copa"><b>20:00</b>Tu turno · Explorá</p>
+  <h2>Las $N_MIN10 partidas, y lo que dijo el modelo de cada una</h2>
+  <p class="lead">Cada punto es una partida: a la izquierda, las que estaban parejas al minuto 10; a la derecha, las que
+  ya tenían un equipo adelante. Filtrá por servidor, por elo o por cuánta confianza tenía el modelo, y hacé clic en una
+  partida para ver sus probabilidades.</p>
+  <div class="controles"><div id="c-srv"></div><div id="c-elo"></div><div id="c-conf"></div></div>
+  <div class="grafico" id="g-explora"></div>
+  <p class="mirar">Probá subir la <b>confianza mínima</b>: quedan menos partidas, y el acierto de la ventana sube. Cada
+  partida la predice un modelo que no la vio: las $N_TRAIN del entrenamiento, con la validación cruzada; las $N_TEST
+  del test, con el modelo final. La leyenda también es un filtro.</p>
+</section>
+
+<!-- ═══════════════════════════ COPA · PROBÁ ═══════════════════════════ -->
+<section id="probar">
+  <p class="etapa copa"><b>25:00</b>Tu turno · Probá el modelo</p>
+  <h2>Elegí una partida real, cambiá cómo iba al minuto 10 y mirá qué dice el modelo</h2>
+  <p class="lead">Las probabilidades se calculan adentro del gráfico con los coeficientes de la logística entrenada:
+  nada se reentrena. Cada deslizador va del mínimo al máximo que vio el entrenamiento, así que no se puede cargar un
+  valor que el modelo nunca vio. La composición de los equipos queda la de la partida elegida.</p>
+  <div class="probar">
+    <div>
+      <div class="elegir">
+        <label for="partida">Partir de una partida del test</label>
+        <select id="partida"></select>
+        <div class="equipos">
+          <div class="equipo azul"><b>Equipo azul</b><div class="caras" id="azul"></div></div>
+          <div class="equipo rojo"><b>Equipo rojo</b><div class="caras" id="rojo"></div></div>
+        </div>
+        <div class="botones">
+          <button class="btn" id="volver" type="button">Volver a los valores reales</button>
+          <button class="btn" id="revelar" type="button">¿Cuánto duró de verdad?</button>
+        </div>
+        <div class="revelado" id="revelado"></div>
+      </div>
+      <div class="aviso" id="aviso"></div>
+      <fieldset><legend>La partida</legend>
+        <div class="slot" id="s-srv_p"></div><div class="slot" id="s-elo_partida"></div>
+      </fieldset>
+      <fieldset><legend>Cuánto se separaron los equipos al minuto 10</legend>
+        <div class="deslizadores">
+          <div class="slot" id="s-dif_gold_m10"></div><div class="slot" id="s-dif_xp_m10"></div>
+          <div class="slot" id="s-dif_cs_m10"></div><div class="slot" id="s-dif_level_m10"></div>
+          <div class="slot" id="s-dif_kills_m10"></div><div class="slot" id="s-dif_towers_m10"></div>
+          <div class="slot" id="s-dif_elite_monsters_m10"></div>
+        </div>
+      </fieldset>
+      <fieldset><legend>Cuánto juntaron entre los dos al minuto 10</legend>
+        <div class="deslizadores">
+          <div class="slot" id="s-suma_gold_m10"></div><div class="slot" id="s-suma_xp_m10"></div>
+          <div class="slot" id="s-suma_cs_m10"></div><div class="slot" id="s-suma_level_m10"></div>
+          <div class="slot" id="s-suma_kills_m10"></div><div class="slot" id="s-suma_towers_m10"></div>
+          <div class="slot" id="s-suma_elite_monsters_m10"></div>
+        </div>
+      </fieldset>
+      <p class="nota">Las diferencias son en valor absoluto: el modelo no sabe qué equipo va adelante, sólo por cuánto.
+      El nivel es el nivel medio de cada equipo.</p>
+    </div>
+    <div class="fijo"><div class="grafico" id="g-probar"></div>
+      <p class="mirar">Las barras son la probabilidad de cada banda; el borde <b>dorado</b> marca la ventana de 12
+      minutos que se le mostraría al jugador.</p></div>
+  </div>
+</section>
+
+<footer>
+  <p><b style="color:#C8AA6E">FF-15</b> · Grupo 5K09-02 · Proyecto Integrador de Ciencia de Datos · UTN FRM · 2026.
+  Datos: API de Riot Games y Data Dragon, partidas clasificatorias de la Season 16 ($CSV_DF y $CSV_MIN). La página se
+  genera con <code>app/build_app.py</code>; los gráficos están hechos con Altair.</p>
+  <p>FF-15 no está respaldado por Riot Games y no refleja las opiniones de Riot Games ni de nadie oficialmente
+  involucrado en producir o administrar League of Legends. League of Legends y Riot Games son marcas comerciales o
+  marcas registradas de Riot Games, Inc.</p>
+</footer>
+</main>
+
+<script>
+const SPECS = $SPECS;
+const EJEMPLOS = $EJEMPLOS;
+const DDRAGON = $DDRAGON;
+const BANDAS = $BANDAS_JSON;
+const DESL = $NUM_DESL;
+const METRICAS = {gold: "oro", xp: "experiencia", cs: "súbditos", level: "nivel", kills: "asesinatos", towers: "torres", elite_monsters: "monstruos épicos"};
+const CORTES = [0, 15, 21, 27, 33, 39, 45];
+const OPC = {actions: false, renderer: "canvas", tooltip: {theme: "dark"},
+  formatLocale: {decimal: ",", thousands: ".", grouping: [3], currency: ["$$", ""], percent: " %"}};
+const vistas = {};
+
+function pc(x) { return (Math.round(x * 1000) / 10).toString().replace(".", ",") + " %"; }
+
+function textoVentana(i) {
+  if (i === 0) return "antes del minuto " + CORTES[2];
+  if (i === BANDAS.length - 2) return "después del minuto " + CORTES[i];
+  return "entre los minutos " + CORTES[i] + " y " + CORTES[i + 2];
+}
+
+function ventana(p) {
+  let mejor = 0, suma = -1;
+  for (let i = 0; i < p.length - 1; i++) { if (p[i] + p[i + 1] > suma) { suma = p[i] + p[i + 1]; mejor = i; } }
+  return {i: mejor, p: suma};
+}
+
+function pintarEquipos(e) {
+  ["azul", "rojo"].forEach(function (lado) {
+    const caja = document.getElementById(lado);
+    caja.innerHTML = "";
+    e[lado].forEach(function (c) {
+      if (DDRAGON) {
+        const img = document.createElement("img");
+        img.src = "https://ddragon.leagueoflegends.com/cdn/" + DDRAGON + "/img/champion/" + c + ".png";
+        img.alt = c; img.title = c; img.loading = "lazy";
+        img.onerror = function () { const s = document.createElement("span"); s.className = "sin"; s.textContent = c; img.replaceWith(s); };
+        caja.appendChild(img);
+      } else {
+        const s = document.createElement("span"); s.className = "sin"; s.textContent = c; caja.appendChild(s);
+      }
+    });
+  });
+}
+
+function revisar() {
+  const v = vistas["g-probar"];
+  const avisos = [];
+  Object.keys(METRICAS).forEach(function (m) {
+    if (v.signal("dif_" + m + "_m10") > v.signal("suma_" + m + "_m10") + 1e-9) {
+      avisos.push("la diferencia de " + METRICAS[m] + " es mayor que el total de la partida");
+    }
+  });
+  const caja = document.getElementById("aviso");
+  if (avisos.length) {
+    caja.textContent = "Ojo: " + avisos.join("; ") + ". Eso no puede pasar en una partida real, y el modelo nunca lo vio: la probabilidad que muestra no es confiable.";
+    caja.className = "aviso si";
+  } else { caja.className = "aviso"; }
+}
+
+function cargar(n) {
+  const e = EJEMPLOS[n], v = vistas["g-probar"];
+  v.signal("partida", e.id);
+  v.signal("srv_p", e.servidor);
+  DESL.forEach(function (c) { v.signal(c, e.valores[c]); });
+  v.runAsync().then(revisar);
+  pintarEquipos(e);
+  document.getElementById("revelado").className = "revelado";
+}
+
+function iniciarProbar() {
+  const sel = document.getElementById("partida"), v = vistas["g-probar"];
+  EJEMPLOS.forEach(function (e, n) {
+    const o = document.createElement("option");
+    o.value = n; o.textContent = "Partida " + (n + 1) + " · " + e.servidor + " · " + e.grupo;
+    sel.appendChild(o);
+  });
+  sel.addEventListener("change", function () { cargar(+sel.value); });
+  document.getElementById("volver").addEventListener("click", function () { cargar(+sel.value); });
+  document.getElementById("revelar").addEventListener("click", function () {
+    const e = EJEMPLOS[+sel.value], w = ventana(e.proba), b = BANDAS.indexOf(e.banda);
+    const acierta = b >= w.i && b <= w.i + 1;
+    const caja = document.getElementById("revelado");
+    caja.innerHTML = "Duró <b>" + e.duracion.toString().replace(".", ",") + " minutos</b> (banda " + e.banda + "). " +
+      "Con sus valores reales, el modelo decía " + pc(w.p) + " de que terminara " + textoVentana(w.i) + ": " +
+      (acierta ? "<b>acertó</b>." : "<b>no acertó</b>.") + " <span style='color:#A09B8C'>(" + e.match_id + ")</span>";
+    caja.className = "revelado si";
+  });
+  DESL.forEach(function (c) { v.addSignalListener(c, revisar); });
+  cargar(0);
+}
+
+Promise.all(Object.keys(SPECS).map(function (id) {
+  return vegaEmbed("#" + id, SPECS[id], OPC).then(function (r) { vistas[id] = r.view; });
+})).then(iniciarProbar).catch(function (err) { console.error("No se pudo dibujar la app:", err); });
+
+// El reloj de la navegación marca la sección que se está leyendo
+const enlaces = document.querySelectorAll("nav a");
+const observador = new IntersectionObserver(function (entradas) {
+  entradas.forEach(function (en) {
+    if (en.isIntersecting) {
+      enlaces.forEach(function (a) { a.classList.toggle("activo", a.getAttribute("href") === "#" + en.target.id); });
+    }
+  });
+}, {rootMargin: "-40% 0px -55% 0px"});
+document.querySelectorAll("section").forEach(function (s) { observador.observe(s); });
+</script>
+</body>
+</html>

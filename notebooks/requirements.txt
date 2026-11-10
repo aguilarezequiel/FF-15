@@ -16,6 +16,10 @@ matplotlib==3.11.2
 scipy==1.18.1
 scikit-learn==1.9.1
 
+# La app de la Entrega 4 (app/build_app.py) se construye en este mismo venv.
+# altair 5.x no importa con Python 3.14 (TypedDict(closed=...)): hace falta la 6.
+altair==6.3.0
+
 jupyterlab==4.6.3
 ipykernel==7.3.0
 nbconvert==7.17.1
