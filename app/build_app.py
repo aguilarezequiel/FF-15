@@ -6,8 +6,9 @@ Construye la aplicación de la Entrega 4: app/index.html, una sola página con t
 
 Hace, en orden, lo mismo que notebooks/entrega-4/correcciones_entrega3.ipynb para el ancho de
 6 minutos: las mismas clases, la misma partición, los mismos cinco pedazos y SEMILLA = 42. Entrena
-la regresión logística sin pesos (el modelo final que eligió el grupo), mide lo que muestra la app
-y escribe los gráficos de Altair y la fórmula del modelo adentro de la página.
+la regresión logística sin pesos (el modelo final que eligió el grupo) y, como la Sección 9 del
+notebook, la misma logística antes de jugar y al minuto 5, para comparar los tres momentos. Mide lo
+que muestra la app y escribe los gráficos de Altair y la fórmula del modelo adentro de la página.
 
 Con los CSV congelados, antes de escribir nada compara sus números con los que quedaron guardados
 en el notebook: si no coinciden, corta. Lo que muestra la app tiene que ser lo que da el notebook.
@@ -135,11 +136,16 @@ class EstadoAlMinuto(BaseEstimator, TransformerMixin):
         return np.array([f"suma_{m}{s}" for m in METRICAS_MINUTO] + [f"dif_{m}{s}" for m in METRICAS_MINUTO])
 
 
-def armar(modelo):
-    """El pipeline de la E3 con el minuto 10: derivar, imputar y escalar, codificar, y el modelo al final."""
-    derivar = FeatureUnion([("partida", ColumnasDePartida()), ("diferencias", DiferenciasEntreEquipos()),
-                            ("minuto", EstadoAlMinuto(10))],
-                           verbose_feature_names_out=False).set_output(transform="pandas")
+def armar(modelo, minuto=10):
+    """El pipeline de la E3: derivar, imputar y escalar, codificar, y el modelo al final.
+
+    minuto=10 es el del modelo final. Con minuto=5 usa el estado al minuto 5, y con minuto=None sólo lo
+    que se sabe antes de jugar (Sección 9 del notebook).
+    """
+    partes = [("partida", ColumnasDePartida()), ("diferencias", DiferenciasEntreEquipos())]
+    if minuto is not None:
+        partes.append(("minuto", EstadoAlMinuto(minuto)))
+    derivar = FeatureUnion(partes, verbose_feature_names_out=False).set_output(transform="pandas")
     preparar = ColumnTransformer([
         ("numericas", Pipeline([("imputar", SimpleImputer(strategy="median")), ("escalar", StandardScaler())]),
          make_column_selector(dtype_include="number")),
@@ -161,7 +167,14 @@ GRILLA_C = [0.001, 0.01, 0.1, 1, 10]
 # Lo que quedó guardado en el notebook (Secciones 2, 3 y 5) para el ancho de 6 minutos.
 # Con los CSV congelados, la app tiene que dar exactamente esto.
 DEL_NOTEBOOK = {"C": 10, "F1 test": 0.159, "F1 piso test": 0.076, "accuracy test": 0.369,
-                "±1 banda test": 0.843, "dice ventana": 0.666, "pasa ventana": 0.663}
+                "±1 banda test": 0.843, "dice ventana": 0.666, "pasa ventana": 0.663,
+                # Sección 9: la misma logística antes de jugar y al minuto 5
+                "C antes de jugar": 10, "F1 test antes de jugar": 0.111,
+                "C minuto 5": 10, "F1 test minuto 5": 0.133}
+
+# Los tres momentos en los que se predice (Sección 9 del notebook): las mismas partidas, otras columnas
+MOMENTOS = {"antes de jugar": None, "minuto 5": 5, "minuto 10": 10}
+CORTO = {"antes de jugar": "antes", "minuto 5": "m5", "minuto 10": "m10"}
 
 
 def banda_de(segundos):
@@ -242,7 +255,12 @@ ORO = "#C8AA6E"        # lo que dice el modelo
 HEXTECH = "#0AC8B9"    # lo que se sabe al minuto 10
 PIZARRA = "#6E7F99"    # lo que se sabe antes de jugar
 PISO_COLOR = "#8C8C8C"  # el piso
-COLORES_BANDA = ["#9CC3FF", "#4F7CF7", "#8A5CF5", "#D94FB0", "#F2716B", "#F5A453", "#F7DC7B"]
+MINUTO5 = "#3CA3A9"    # lo que se sabe al minuto 5: entre el gris azulado y el turquesa
+COLOR_MOMENTO = {"antes de jugar": PIZARRA, "minuto 5": MINUTO5, "minuto 10": HEXTECH}
+ESCALA_MOMENTO = alt.Scale(domain=list(MOMENTOS), range=list(COLOR_MOMENTO.values()))
+# Las bandas son ordinales: un degradé de un solo azul, de claro (la más corta) a oscuro (la más larga).
+# Pasos parejos en OKLCH (L de 0,97 a 0,54, tono 262); el más oscuro tiene contraste >= 3:1 con el panel
+COLORES_BANDA = ["#EAF6FF", "#C9DEFF", "#A9C7FD", "#89AFF6", "#6A98ED", "#4B7FE4", "#2A66DB"]
 ESCALA_BANDA = alt.Scale(domain=BANDAS, range=COLORES_BANDA)
 FUENTE = "Inter, Segoe UI, Helvetica, Arial, sans-serif"
 
@@ -280,11 +298,14 @@ def cargar(desde_pipeline):
     if desde_pipeline:
         salida = RAIZ / "include" / "output"
         ruta_df, ruta_min = buscar("lol_2*.csv", salida), buscar("lol_min10_*.csv", salida)
+        ruta_min5 = buscar("lol_min5_*.csv", salida)
     else:
         ruta_df = buscar("lol_2*.csv", RAIZ / "notebooks" / "entrega-2" / "datos")
         ruta_min = buscar("lol_min10_*.csv", RAIZ / "notebooks" / "entrega-3" / "datos")
-    log.info("Datos: %s y %s", ruta_df.name, ruta_min.name)
-    return pd.read_csv(ruta_df), pd.read_csv(ruta_min), ruta_df.name, ruta_min.name
+        ruta_min5 = buscar("lol_min5_*.csv", RAIZ / "notebooks" / "entrega-3" / "datos")
+    log.info("Datos: %s, %s y %s", ruta_df.name, ruta_min.name, ruta_min5.name)
+    return (pd.read_csv(ruta_df), pd.read_csv(ruta_min), pd.read_csv(ruta_min5), ruta_df.name, ruta_min.name,
+            ruta_min5.name)
 
 
 def version_ddragon():
@@ -304,7 +325,7 @@ def main():
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(message)s")
 
-    df, min10, nombre_df, nombre_min = cargar(args.desde_pipeline)
+    df, min10, min5, nombre_df, nombre_min, nombre_min5 = cargar(args.desde_pipeline)
 
     # La partición de la E3 (notebook, Sección 0)
     grupo = pd.cut(df[de_jugador("player_elo")].mean(axis=1), [-np.inf, 2000, 2900, np.inf], right=False,
@@ -320,6 +341,10 @@ def main():
     minuto_tipico = (y10.groupby(yb).median() / 60).reindex(range(K)).to_numpy()
     log.info("Partidas: %d en total, %d llegan al minuto 10 (%d train, %d test)", len(df), len(d10), len(X10),
              len(X10_te))
+    # Sección 9: el estado al minuto 5, sobre las mismas partidas (todas las que llegan al 10 llegan al 5)
+    d_mom = d10.join(min5.drop(columns="game_duration_s").set_index("match_id"), on="match_id", how="left")
+    assert d_mom[[f"dif_{m}_m5" for m in METRICAS_MINUTO]].notna().all().all()
+    Xm, Xm_te = d_mom.loc[tr].drop(columns="game_duration_s"), d_mom.loc[te].drop(columns="game_duration_s")
 
     # ── Elegir el modelo (notebook, Sección 2), sólo el ancho de 6 minutos ──
     scorers = {"F1 macro": "f1_macro", "accuracy": "accuracy", "±1 banda": make_scorer(a_una_banda)}
@@ -330,6 +355,10 @@ def main():
     final = busquedas["sin pesos"].best_estimator_
     C_final = busquedas["sin pesos"].best_params_["modelo__C"]
     piso = armar(DummyClassifier(strategy="prior")).fit(X10, yb)
+    # Los otros dos momentos, cada uno con su C (el del minuto 10 es el final)
+    busq_mom = {n: GridSearchCV(armar(LogisticRegression(max_iter=3000), minuto=m), {"modelo__C": GRILLA_C}, cv=cv,
+                                scoring=scorers, refit="F1 macro", n_jobs=-1).fit(Xm, yb)
+                for n, m in MOMENTOS.items() if m != 10} | {"minuto 10": busquedas["sin pesos"]}
 
     # ── El test, una sola vez (Sección 3) ──
     P_te, P_piso = final.predict_proba(X10_te), piso.predict_proba(X10_te)
@@ -358,9 +387,25 @@ def main():
     resolucion = {t: (dice_te[np.asarray(tercio == t)].min(), dice_te[np.asarray(tercio == t)].max(),
                       pasa_te[np.asarray(tercio == t)].mean()) for t in tercio.categories}
 
+    # Los tres momentos en el test (Sección 9): la ventana, las métricas y la matriz de cada uno
+    P_mom = {n: b.best_estimator_.predict_proba(Xm_te) for n, b in busq_mom.items()}
+    assert np.allclose(P_mom["minuto 10"], P_te)
+    m_mom, cm_mom = {}, {}
+    for n, P in P_mom.items():
+        b = busq_mom[n]
+        ini, dice = ventana_de(P)
+        m_mom[n] = resumen(P.argmax(axis=1)) | {
+            "dice": dice.mean(), "pasa": ((real_te >= ini) & (real_te <= ini + VENTANA - 1)).mean(),
+            "contesta": len(np.unique(P.argmax(axis=1))), "C": b.best_params_["modelo__C"],
+            "F1 cv": b.cv_results_["mean_test_F1 macro"][b.best_index_],
+            "F1 cv desvío": b.cv_results_["std_test_F1 macro"][b.best_index_]}
+        cm_mom[n] = confusion_matrix(yb_te, P.argmax(axis=1), labels=range(K))
+
     chequeo = {"C": C_final, "F1 test": round(m_final["F1"], 3), "F1 piso test": round(m_piso["F1"], 3),
                "accuracy test": round(m_final["accuracy"], 3), "±1 banda test": round(m_final["±1"], 3),
                "dice ventana": round(dice_te.mean(), 3), "pasa ventana": round(pasa_te.mean(), 3)}
+    for n in ["antes de jugar", "minuto 5"]:
+        chequeo |= {f"C {n}": m_mom[n]["C"], f"F1 test {n}": round(m_mom[n]["F1"], 3)}
     log.info("Chequeo contra el notebook: %s", chequeo)
     if not args.desde_pipeline and chequeo != DEL_NOTEBOOK:
         raise SystemExit(f"La app no coincide con el notebook.\n  app:      {chequeo}\n  notebook: {DEL_NOTEBOOK}")
@@ -383,8 +428,9 @@ def main():
     # ── Las predicciones para explorar: cada partida, con un modelo que no la vio ──
     # Las de entrenamiento salen de la validación cruzada (los mismos cinco pedazos, C del final);
     # las del test, del modelo final.
-    P_tr = cross_val_predict(armar(LogisticRegression(max_iter=3000, C=C_final)), X10, yb, cv=cv,
-                             method="predict_proba", n_jobs=-1)
+    P_tr_mom = {n: cross_val_predict(armar(LogisticRegression(max_iter=3000, C=m_mom[n]["C"]), minuto=m), Xm, yb,
+                                     cv=cv, method="predict_proba", n_jobs=-1)
+                for n, m in MOMENTOS.items()}
 
     # ─────────────────────────────────────────────────────────────────────
     # Los números de la página
@@ -394,6 +440,7 @@ def main():
     en_15 = int(((df["game_duration_s"] >= 900) & (df["game_duration_s"] < 960)).sum())
     en_14 = int(((df["game_duration_s"] >= 840) & (df["game_duration_s"] < 900)).sum())
     parte_21_33 = minutos_df.between(21, 33, inclusive="left").mean()
+    n_lt15 = int((df["game_duration_s"] < 900).sum())
     plataformas = df["match_id"].str.split("_").str[0]
 
     derivadas = armar(LogisticRegression())["derivar"].fit_transform(d10.drop(columns="game_duration_s"))
@@ -425,12 +472,20 @@ def main():
         tooltip=[alt.Tooltip("minutos:Q", bin=bin1, title="minuto"), alt.Tooltip("banda:N", title="banda"),
                  alt.Tooltip("count():Q", title="partidas", format=",")])
     regla = alt.Chart(pd.DataFrame({"x": [15]})).mark_rule(color=CREMA, strokeDash=[4, 4]).encode(x="x:Q")
-    nota = alt.Chart(pd.DataFrame({"x": [15], "y": [en_15], "t": [f"min 15: se habilita el «ff» · {num(en_15)} partidas"]})) \
-        .mark_text(align="right", dx=-8, dy=4, color=CREMA, fontSize=12.5, fontWeight=600).encode(x="x:Q", y="y:Q", text="t:N")
-    specs["g-datos"] = (barras + regla + nota).properties(
+    nota = alt.Chart(pd.DataFrame({"x": [15], "t": ["min 15: el «ff»"]})) \
+        .mark_text(align="left", baseline="top", dx=6, color=CREMA, fontSize=12.5, fontWeight=600) \
+        .encode(x="x:Q", y=alt.value(8), text="t:N")
+    # Antes del 15: las partidas que pueden terminar antes porque alguien se fue y la rendición se habilitó antes
+    zona15 = alt.Chart(pd.DataFrame({"a": [5], "b": [15]}))
+    franja15 = zona15.mark_rect(color=CREMA, opacity=0.06).encode(x="a:Q", x2="b:Q")
+    nota15 = alt.Chart(pd.DataFrame({"x": [5.4], "t": [f"antes del 15:\n{num(n_lt15)} partidas ({pct(n_lt15 / len(df))})\n"
+                                                         "si alguien se va,\nla rendición se\nhabilita antes"]})) \
+        .mark_text(align="left", baseline="top", lineBreak="\n", color=CREMA, fontSize=11.5, lineHeight=15) \
+        .encode(x="x:Q", y=alt.value(8), text="t:N")
+    specs["g-datos"] = (franja15 + barras + regla + nota + nota15).properties(
         width=820, height=300,
         title=alt.Title(f"Cuánto duraron las {num(len(df))} partidas",
-                        subtitle=["Cada barra es un minuto de duración; el color, la banda de 6 minutos en la que cae.",
+                        subtitle=["Cada barra es un minuto de duración; el color, la banda de 6 minutos en la que cae (más oscuro, más larga).",
                                   "Del minuto 14 al 15 terminan " + num(en_14) + " partidas; del 15 al 16, " + num(en_15) + "."])).to_dict()
 
     # Lo que encontramos: la correlación de cada columna derivada con la duración
@@ -455,43 +510,170 @@ def main():
                         subtitle=[f"Sobre las {num(len(d10))} partidas que llegan al minuto 10. El signo está en el tooltip:",
                                   "todas las fuertes son negativas (más diferencia, partida más corta)."])).to_dict()
 
-    # El modelo: la calibración de la ventana de 12 minutos en el test
-    cortes = np.linspace(0, 1, 11)
-    cal = pd.DataFrame({"dice": dice_te, "pasa": pasa_te}).groupby(pd.cut(dice_te, cortes), observed=True) \
-        .agg(dice=("dice", "mean"), pasa=("pasa", "mean"), partidas=("pasa", "size")).reset_index(drop=True)
-    cal = cal[cal["partidas"] >= 20].assign(quien="el modelo")
-    cal_piso = pd.DataFrame({"dice": [dice_piso.mean()], "pasa": [pasa_piso.mean()], "partidas": [len(dice_piso)],
-                             "quien": ["el piso (dice siempre lo mismo)"]})
-    cal_todo = pd.concat([cal, cal_piso])
-    cal_todo["dice_txt"], cal_todo["pasa_txt"] = cal_todo["dice"].map(pct), cal_todo["pasa"].map(pct)
-    esc_cal = alt.Scale(domain=[0.3, 0.9], zero=False, clamp=True)
-    diag = alt.Chart(pd.DataFrame({"x": [0.3, 0.9], "y": [0.3, 0.9]})).mark_line(color=GRIS, strokeDash=[5, 5]) \
-        .encode(x=alt.X("x:Q", scale=esc_cal), y=alt.Y("y:Q", scale=esc_cal))
-    diag_txt = alt.Chart(pd.DataFrame({"x": [0.86], "y": [0.86], "t": ["calibración perfecta"]})) \
-        .mark_text(color=GRIS, angle=315, dy=-10, fontSize=11.5).encode(
-            x=alt.X("x:Q", scale=esc_cal), y=alt.Y("y:Q", scale=esc_cal), text="t:N")
-    escala_quien = alt.Scale(domain=["el modelo", "el piso (dice siempre lo mismo)"], range=[ORO, PISO_COLOR])
-    base_cal = alt.Chart(cal_todo).encode(
-        x=alt.X("dice:Q", title="probabilidad que el modelo le da a su ventana", scale=esc_cal,
-                axis=alt.Axis(format="%")),
-        y=alt.Y("pasa:Q", title="frecuencia con que la partida termina ahí", scale=esc_cal,
-                axis=alt.Axis(format="%")),
-        color=alt.Color("quien:N", scale=escala_quien, legend=alt.Legend(title=None, orient="top", labelLimit=320)),
-        tooltip=[alt.Tooltip("quien:N", title=" "), alt.Tooltip("dice_txt:N", title="dice"),
-                 alt.Tooltip("pasa_txt:N", title="pasa"), alt.Tooltip("partidas:Q", title="partidas", format=",")])
-    linea_cal = base_cal.transform_filter("datum.quien == 'el modelo'").mark_line(strokeWidth=2.5)
-    puntos_cal = base_cal.mark_point(filled=True, opacity=1).encode(
-        size=alt.Size("partidas:Q", scale=alt.Scale(range=[40, 600]), legend=None))
-    specs["g-modelo"] = (diag + diag_txt + linea_cal + puntos_cal).properties(
-        width=460, height=400,
-        title=alt.Title("Cuando dice «p %», pasa más o menos el p % de las veces",
-                        subtitle=[f"Las {num(len(te))} partidas del test, agrupadas por la probabilidad que el modelo le dio",
-                                  "a su ventana de 12 minutos (tramos de 10 puntos con 20 partidas o más)."])).to_dict()
+    # ── Antes, a los 5 y a los 10: el mismo modelo, según cuándo se predice (Sección 9 del notebook) ──
+    ORDEN_MOM = list(MOMENTOS)
+    PISO_TXT = "piso (siempre la más común)"
 
-    # ── Explorá: cada partida, con lo que dijo un modelo que no la vio ──
-    P_todo = np.vstack([P_tr, P_te])
+    # El F1 macro del test, una barra por momento, con el piso como regla
+    d_f1 = pd.DataFrame({"momento": ORDEN_MOM, "F1": [m_mom[n]["F1"] for n in ORDEN_MOM]})
+    d_f1["F1_txt"] = d_f1["F1"].map(lambda v: num(v, 3))
+    barras_f1 = alt.Chart(d_f1).mark_bar(cornerRadiusTopLeft=4, cornerRadiusTopRight=4, width=70).encode(
+        x=alt.X("momento:N", sort=ORDEN_MOM, title=None, axis=alt.Axis(labelAngle=0, labelFontSize=13)),
+        y=alt.Y("F1:Q", title="F1 macro en el test (de 0 a 1)", scale=alt.Scale(domain=[0, 1])),
+        color=alt.Color("momento:N", scale=ESCALA_MOMENTO, legend=None),
+        tooltip=[alt.Tooltip("momento:N", title="cuándo predice"), alt.Tooltip("F1_txt:N", title="F1 macro")])
+    txt_f1 = barras_f1.mark_text(dy=-10, fontSize=14, fontWeight=600, color=CREMA).encode(
+        text="F1_txt:N", color=alt.value(CREMA))
+    piso_f1 = alt.Chart(pd.DataFrame({"y": [m_piso["F1"]], "t": [f"piso: {num(m_piso['F1'], 3)}"]}))
+    regla_f1 = piso_f1.mark_rule(color=PISO_COLOR, strokeDash=[5, 4], strokeWidth=2).encode(y="y:Q")
+    regla_f1_txt = piso_f1.mark_text(align="center", dy=-7, color=GRIS, fontSize=12).encode(
+        y="y:Q", x=alt.value(187), text="t:N")
+    specs["g-f1"] = (barras_f1 + txt_f1 + regla_f1 + regla_f1_txt).properties(
+        width=560, height=280,
+        title=alt.Title("El F1 macro sube con cada minuto de partida, pero queda bajo",
+                        subtitle=[f"La misma logística, entrenada con lo que se sabe en cada momento. Las mismas {num(len(te))} partidas del test.",
+                                  "El F1 macro va de 0 a 1: el promedio, sin pesos, del F1 de cada una de las 7 bandas."])).to_dict()
+
+    # Las otras métricas, con el piso al lado
+    filas_met = []
+    nombres_met = {"accuracy": "banda exacta (accuracy)", "±1": "a una banda o menos (±6 min)",
+                   "pasa": "la ventana de 12 min acierta"}
+    for quien, mm in [(PISO_TXT, m_piso | {"pasa": pasa_piso.mean()})] + [(n, m_mom[n]) for n in ORDEN_MOM]:
+        for k, nombre in nombres_met.items():
+            filas_met.append({"quien": quien, "metrica": nombre, "valor": mm[k], "txt": pct(mm[k], 1)})
+    d_met = pd.DataFrame(filas_met)
+    orden_quien = [PISO_TXT, *ORDEN_MOM]
+    esc_quien = alt.Scale(domain=orden_quien, range=[PISO_COLOR, *COLOR_MOMENTO.values()])
+    base_met = alt.Chart().encode(
+        x=alt.X("quien:N", sort=orden_quien, title=None, axis=alt.Axis(labels=False, ticks=False)),
+        y=alt.Y("valor:Q", title="partidas del test", axis=alt.Axis(format="%"), scale=alt.Scale(domain=[0, 1])),
+        color=alt.Color("quien:N", scale=esc_quien, sort=orden_quien,
+                        legend=alt.Legend(title=None, orient="top", direction="horizontal", labelLimit=260)),
+        tooltip=[alt.Tooltip("quien:N", title="modelo"), alt.Tooltip("metrica:N", title="métrica"),
+                 alt.Tooltip("txt:N", title="valor")])
+    capa_met = alt.layer(base_met.mark_bar(cornerRadiusTopLeft=3, cornerRadiusTopRight=3, width=34),
+                         base_met.mark_text(dy=-8, fontSize=11.5, color=CREMA).encode(
+                             text="txt:N", color=alt.value(CREMA)), data=d_met)
+    specs["g-metricas"] = capa_met.properties(width=230, height=250).facet(
+        column=alt.Column("metrica:N", sort=list(nombres_met.values()), title=None,
+                          header=alt.Header(labelFontSize=13, labelFontWeight=600)),
+        spacing=24).properties(
+        title=alt.Title("Las otras métricas casi no se mueven: todos rondan al piso",
+                        subtitle="Banda exacta, a una banda de distancia y la ventana de 12 minutos que vería el jugador.")).to_dict()
+
+    # Qué contesta cada modelo, contra dónde terminaron de verdad
+    real_cuenta = np.bincount(real_te, minlength=K)
+    filas_c = []
+    for n in ORDEN_MOM:
+        dijo = np.bincount(P_mom[n].argmax(axis=1), minlength=K)
+        filas_c += [{"momento": n, "banda": BANDAS[k], "contesta": int(dijo[k]), "real": int(real_cuenta[k])}
+                    for k in range(K)]
+    d_c = pd.DataFrame(filas_c)
+    base_c = alt.Chart().encode(x=alt.X("banda:N", sort=BANDAS, title=None, axis=alt.Axis(labelAngle=0, labelFontSize=11)))
+    barras_c = base_c.mark_bar(cornerRadiusTopLeft=3, cornerRadiusTopRight=3, width=22).encode(
+        y=alt.Y("contesta:Q", title="partidas del test"),
+        color=alt.Color("banda:N", scale=ESCALA_BANDA, sort=BANDAS, legend=None),
+        tooltip=[alt.Tooltip("momento:N", title="modelo"), alt.Tooltip("banda:N"),
+                 alt.Tooltip("contesta:Q", title="veces que la contesta", format=","),
+                 alt.Tooltip("real:Q", title="partidas que terminan ahí", format=",")])
+    marca_real = base_c.mark_tick(color=CREMA, thickness=3, size=30).encode(
+        y="real:Q", tooltip=[alt.Tooltip("banda:N"), alt.Tooltip("real:Q", title="partidas que terminan ahí", format=",")])
+    specs["g-contesta"] = alt.layer(barras_c, marca_real, data=d_c).properties(width=250, height=230).facet(
+        column=alt.Column("momento:N", sort=ORDEN_MOM, title=None,
+                          header=alt.Header(labelFontSize=13, labelFontWeight=600)), spacing=22).properties(
+        title=alt.Title("Los tres contestan casi siempre el centro",
+                        subtitle=["Las barras: cuántas veces contesta cada banda cada modelo. La raya clara: cuántas partidas",
+                                  "terminan de verdad en esa banda. Si el modelo acertara, la barra llegaría a la raya."])).to_dict()
+
+    # La matriz de confusión, normalizada por fila, una por momento
+    filas_m = []
+    for n in ORDEN_MOM:
+        cmn_n = cm_mom[n] / cm_mom[n].sum(axis=1, keepdims=True)
+        filas_m += [{"momento": n, "real": BANDAS[i], "dijo": BANDAS[j], "p": float(cmn_n[i, j]),
+                     "n": int(cm_mom[n][i, j]), "total": int(cm_mom[n][i].sum())} for i in range(K) for j in range(K)]
+    d_m = pd.DataFrame(filas_m)
+    d_m["txt"] = d_m["p"].map(lambda v: f"{round(100 * v)}" if v >= 0.005 else "")
+    base_m = alt.Chart().encode(
+        x=alt.X("dijo:N", sort=BANDAS, title="banda que dijo el modelo", axis=alt.Axis(labelAngle=-45, labelFontSize=11)),
+        y=alt.Y("real:N", sort=BANDAS, title="banda real", axis=alt.Axis(labelFontSize=11)))
+    celdas = base_m.mark_rect(stroke=PANEL, strokeWidth=2).encode(
+        color=alt.Color("p:Q", scale=alt.Scale(domain=[0, 1], range=["#13213A", ORO]),
+                        legend=alt.Legend(title="% de la fila", format="%", orient="right", gradientLength=160)),
+        tooltip=[alt.Tooltip("momento:N", title="modelo"), alt.Tooltip("real:N", title="banda real"),
+                 alt.Tooltip("dijo:N", title="dijo"), alt.Tooltip("p:Q", title="% de la fila", format=".1%"),
+                 alt.Tooltip("n:Q", title="partidas", format=","), alt.Tooltip("total:Q", title="de", format=",")])
+    num_m = base_m.mark_text(fontSize=10.5).encode(
+        text="txt:N", color=alt.condition("datum.p > 0.5", alt.value(PANEL), alt.value(CREMA)))
+    specs["g-matriz"] = alt.layer(celdas, num_m, data=d_m).properties(width=alt.Step(30), height=alt.Step(30)).facet(
+        column=alt.Column("momento:N", sort=ORDEN_MOM, title=None,
+                          header=alt.Header(labelFontSize=13, labelFontWeight=600)), spacing=18).properties(
+        title=alt.Title("De cada banda real, a dónde la manda cada modelo",
+                        subtitle=["Cada fila suma 100 %; el número es el porcentaje. Antes de jugar, casi todo va a 27-33;",
+                                  "al minuto 10, las partidas cortas empiezan a ir a 15-21 y 21-27."])).to_dict()
+
+    # Lo predicho contra lo real: cada banda predicha pasada a su minuto típico, con la recta y = x
+    rng = np.random.default_rng(SEMILLA)
+    sacudida = rng.uniform(-1.2, 1.2, len(te))  # separa los puntos que caen en la misma banda; no es parte del modelo
+    real_min = (y10_te / 60).to_numpy()
+    paneles = []
+    for n in ORDEN_MOM:
+        pr_n = minuto_tipico[P_mom[n].argmax(axis=1)]
+        d_p = pd.DataFrame({"real": real_min.round(2), "predicho": (pr_n + sacudida).round(2), "tipico": pr_n.round(1),
+                            "banda": np.array(BANDAS)[P_mom[n].argmax(axis=1)], "momento": n})
+        diag_p = alt.Chart(pd.DataFrame({"x": [10, 60], "y": [10, 60]})).mark_line(
+            color=GRIS, strokeDash=[5, 5]).encode(x="x:Q", y="y:Q")
+        puntos_p = alt.Chart(d_p).mark_circle(size=10, opacity=0.35, color=COLOR_MOMENTO[n]).encode(
+            x=alt.X("real:Q", title="duración real (min)", scale=alt.Scale(domain=[10, 60], clamp=True)),
+            y=alt.Y("predicho:Q", title="lo que predice (min)" if n == ORDEN_MOM[0] else None,
+                    scale=alt.Scale(domain=[10, 60], clamp=True)),
+            tooltip=[alt.Tooltip("real:Q", title="duró (min)", format=".1f"), alt.Tooltip("banda:N", title="dijo"),
+                     alt.Tooltip("tipico:Q", title="minuto típico de esa banda", format=".1f")])
+        paneles.append((diag_p + puntos_p).properties(width=250, height=250, title=alt.Title(n, fontSize=13.5)))
+    specs["g-predicho"] = alt.hconcat(*paneles, spacing=20).properties(
+        title=alt.Title("Si acertara, los puntos caerían sobre la diagonal: quedan en franjas planas",
+                        subtitle=["Cada punto es una partida del test: en x, lo que duró; en y, el minuto típico (la mediana) de la banda",
+                                  "que dijo el modelo, con una sacudida de ±1,2 min para que no se tapen. La diagonal es y = x."])).to_dict()
+
+    # El modelo: la calibración de la ventana de 12 minutos en el test, un panel por momento
+    cortes = np.linspace(0, 1, 11)
+    esc_cal = alt.Scale(domain=[0.3, 0.9], zero=False, clamp=True)
+    escala_quien = alt.Scale(domain=["el modelo", "el piso (dice siempre lo mismo)"], range=[ORO, PISO_COLOR])
+    paneles_cal = []
+    for n in ORDEN_MOM:
+        ini_n, dice_n = ventana_de(P_mom[n])
+        pasa_n = (real_te >= ini_n) & (real_te <= ini_n + VENTANA - 1)
+        cal = pd.DataFrame({"dice": dice_n, "pasa": pasa_n}).groupby(pd.cut(dice_n, cortes), observed=True) \
+            .agg(dice=("dice", "mean"), pasa=("pasa", "mean"), partidas=("pasa", "size")).reset_index(drop=True)
+        cal = cal[cal["partidas"] >= 20].assign(quien="el modelo")
+        cal_piso = pd.DataFrame({"dice": [dice_piso.mean()], "pasa": [pasa_piso.mean()], "partidas": [len(dice_piso)],
+                                 "quien": ["el piso (dice siempre lo mismo)"]})
+        cal_todo = pd.concat([cal, cal_piso])
+        cal_todo["dice_txt"], cal_todo["pasa_txt"] = cal_todo["dice"].map(pct), cal_todo["pasa"].map(pct)
+        diag = alt.Chart(pd.DataFrame({"x": [0.3, 0.9], "y": [0.3, 0.9]})).mark_line(color=GRIS, strokeDash=[5, 5]) \
+            .encode(x=alt.X("x:Q", scale=esc_cal), y=alt.Y("y:Q", scale=esc_cal))
+        base_cal = alt.Chart(cal_todo).encode(
+            x=alt.X("dice:Q", title="probabilidad que le da a su ventana", scale=esc_cal,
+                    axis=alt.Axis(format="%", values=[0.3, 0.5, 0.7, 0.9])),
+            y=alt.Y("pasa:Q", title="frecuencia con que termina ahí" if n == ORDEN_MOM[0] else None, scale=esc_cal,
+                    axis=alt.Axis(format="%")),
+            color=alt.Color("quien:N", scale=escala_quien, legend=alt.Legend(title=None, orient="top", labelLimit=320)),
+            tooltip=[alt.Tooltip("quien:N", title=" "), alt.Tooltip("dice_txt:N", title="dice"),
+                     alt.Tooltip("pasa_txt:N", title="pasa"), alt.Tooltip("partidas:Q", title="partidas", format=",")])
+        linea_cal = base_cal.transform_filter("datum.quien == 'el modelo'").mark_line(strokeWidth=2.5)
+        puntos_cal = base_cal.mark_point(filled=True, opacity=1).encode(
+            size=alt.Size("partidas:Q", scale=alt.Scale(range=[30, 400]), legend=None))
+        resumen_cal = alt.Chart(pd.DataFrame({"t": [f"dice {pct(dice_n.mean(), 1)} · pasa {pct(pasa_n.mean(), 1)}"]})) \
+            .mark_text(align="left", color=CREMA, fontSize=12).encode(x=alt.value(4), y=alt.value(10), text="t:N")
+        paneles_cal.append((diag + linea_cal + puntos_cal + resumen_cal).properties(
+            width=250, height=250, title=alt.Title(n, fontSize=13.5)))
+    specs["g-modelo"] = alt.hconcat(*paneles_cal, spacing=20).properties(
+        title=alt.Title("Cuando dice «p %», pasa más o menos el p % de las veces, en los tres momentos",
+                        subtitle=[f"Las {num(len(te))} partidas del test, agrupadas por la probabilidad que el modelo le dio a su ventana",
+                                  "de 12 minutos (tramos de 10 puntos con 20 partidas o más). La diagonal es la calibración perfecta."])).to_dict()
+
+    # ── Explorá: cada partida, con lo que dijo un modelo que no la vio, para los tres momentos ──
+    # Las de entrenamiento salen de la validación cruzada; las del test, del modelo de cada momento
     idx = list(tr) + list(te)
-    ini_todo, dice_todo = ventana_de(P_todo)
     real_todo = np.concatenate([yb.to_numpy(), real_te])
     ex = pd.DataFrame({
         "match_id": d10.loc[idx, "match_id"].to_numpy(),
@@ -499,18 +681,45 @@ def main():
         "grupo": grupo.loc[idx].astype(str).to_numpy(),
         "elo": derivadas.loc[idx, "elo_partida"].round().astype(int).to_numpy(),
         "duracion": (d10.loc[idx, "game_duration_s"] / 60).round(1).to_numpy(),
-        "banda_real": np.array(BANDAS)[real_todo],
-        "dif_oro": d10.loc[idx, "dif_gold_m10"].astype(int).to_numpy(),
-        "dif_kills": d10.loc[idx, "dif_kills_m10"].astype(int).to_numpy(),
-        "ventana": [texto_ventana(i, largo=False) for i in ini_todo],
-        "vi": ini_todo,
-        "p_ventana": dice_todo.round(3),
-        "acierta": ((real_todo >= ini_todo) & (real_todo <= ini_todo + 1)).astype(int),
-        "conjunto": ["validación cruzada"] * len(tr) + ["test"] * len(te)})
-    for k in range(K):
-        ex[f"p{k}"] = P_todo[:, k].round(3)
-    ex["acierta_txt"] = np.where(ex["acierta"] == 1, "sí", "no")
-    ejemplo_click = ex.loc[ex["conjunto"] == "test"].sort_values("p_ventana").iloc[len(te) // 2]["match_id"]
+        "banda_real": np.array(BANDAS)[real_todo], "bi": real_todo,
+        "cj": [0] * len(tr) + [1] * len(te)})  # 1 = test
+    for m in METRICAS_MINUTO:
+        v = d10.loc[idx, f"dif_{m}_m10"]
+        ex[f"dif_{m}"] = v.round(2).to_numpy() if m == "level" else v.round().astype(int).to_numpy()
+    # Para que la página no pese de más, las 7 probabilidades de cada modelo van juntas, en milésimos:
+    # «12,30,...». La ventana, su probabilidad y si acertó se calculan adentro del gráfico
+    for n in ORDEN_MOM:
+        c = CORTO[n]
+        P_todo = np.vstack([P_tr_mom[n], P_mom[n]])
+        ex[f"vi_{c}"] = ventana_de(P_todo)[0]
+        ex[f"pp_{c}"] = [",".join(map(str, fila)) for fila in np.rint(P_todo * 1000).astype(int)]
+    dice_m10 = ventana_de(np.vstack([P_tr_mom["minuto 10"], P_mom["minuto 10"]]))[1]
+    arriba70 = {}
+    for n in ORDEN_MOM:
+        P_mil = np.rint(np.vstack([P_tr_mom[n], P_mom[n]]) * 1000) / 1000
+        arriba70[n] = int((ventana_de(P_mil)[1] >= 0.70 - 1e-9).sum())
+    ejemplo_click = ex.loc[ex["cj"] == 1].assign(d=dice_m10[ex["cj"].to_numpy() == 1]).sort_values("d")         .iloc[len(te) // 2]["match_id"]
+    textos_ventana = json.dumps([texto_ventana(i, largo=False) for i in range(K - 1)], ensure_ascii=False)
+
+    # El eje x lo elige el usuario: las 7 diferencias al minuto 10 y el elo medio
+    EJES = {f"dif_{m}": f"Diferencia de {NOMBRES[m]} al minuto 10" for m in METRICAS_MINUTO} | {"elo": "Elo medio de la partida"}
+    titulo_eje = " : ".join(f"eje == '{k}' ? '{v.lower() if k != 'elo' else v}'" for k, v in EJES.items()) + " : ''"
+    p_eje = alt.param(name="eje", value="dif_gold", bind=alt.binding_select(
+        options=list(EJES), labels=list(EJES.values()), name="Eje x ", element="#c-eje"))
+    p_mod = alt.param(name="modelo", value="m10", bind=alt.binding_select(
+        options=[CORTO[n] for n in ORDEN_MOM], labels=["Antes de jugar", "Al minuto 5", "Al minuto 10"],
+        name="Lo que dijo el modelo ", element="#c-modelo"))
+    # Las columnas del modelo elegido, con nombres fijos para el resto de los gráficos
+    paso1 = dict(x="datum[eje]", vi="datum['vi_' + modelo]", pp="split(datum['pp_' + modelo], ',')",
+                 conjunto="datum.cj == 1 ? 'test' : 'validación cruzada'")
+    paso2 = dict(p_ventana="(toNumber(datum.pp[datum.vi]) + toNumber(datum.pp[datum.vi + 1])) / 1000",
+                 ventana=f"{textos_ventana}[datum.vi]",
+                 acierta="datum.bi >= datum.vi && datum.bi <= datum.vi + 1 ? 1 : 0")
+    paso3 = dict(acierta_txt="datum.acierta == 1 ? 'sí' : 'no'")
+
+    def del_modelo(chart):
+        """Las columnas del modelo elegido, con nombres fijos para el resto de los gráficos."""
+        return chart.transform_calculate(**paso1).transform_calculate(**paso2).transform_calculate(**paso3)
 
     srv = sorted(ex["servidor"].unique())
     p_srv = alt.param(name="srv", value=None, bind=alt.binding_select(options=[None, *srv], labels=["Todos", *srv],
@@ -527,33 +736,39 @@ def main():
     tips = [alt.Tooltip("match_id:N", title="partida"), alt.Tooltip("servidor:N"), alt.Tooltip("grupo:N", title="elo"),
             alt.Tooltip("duracion:Q", title="duró (min)", format=".1f"), alt.Tooltip("banda_real:N", title="banda real"),
             alt.Tooltip("ventana:N", title="el modelo dijo"), alt.Tooltip("p_ventana:Q", title="con probabilidad", format=".0%"),
-            alt.Tooltip("acierta_txt:N", title="¿acertó?"), alt.Tooltip("dif_oro:Q", title="dif. de oro al min 10", format=","),
+            alt.Tooltip("acierta_txt:N", title="¿acertó?"), alt.Tooltip("x:Q", title="valor en el eje x", format=",~f"),
+            alt.Tooltip("dif_gold:Q", title="dif. de oro al min 10", format=","),
             alt.Tooltip("dif_kills:Q", title="dif. de asesinatos al min 10"), alt.Tooltip("conjunto:N", title="predicha en")]
-    nube = alt.Chart(ex).mark_circle(size=14).encode(
-        x=alt.X("dif_oro:Q", title="diferencia de oro entre los equipos al minuto 10", axis=alt.Axis(format=",d")),
+    nube = del_modelo(alt.Chart(ex)).mark_circle(size=14).encode(
+        x=alt.X("x:Q", title=" ", axis=alt.Axis(format=",~f", titlePadding=14), scale=alt.Scale(zero=False)),
         y=alt.Y("duracion:Q", title="duración real (minutos)", scale=alt.Scale(domain=[5, 67])),
         color=alt.Color("banda_real:N", scale=ESCALA_BANDA, sort=BANDAS,
                         legend=alt.Legend(title="banda real (clic para resaltar)", orient="top", columns=7, symbolOpacity=1)),
-        opacity=alt.condition(sel_banda, alt.value(0.55), alt.value(0.04)),
-        tooltip=tips).add_params(p_srv, p_elo, p_conf, sel_banda, sel_click).transform_filter(filtro).properties(
+        opacity=alt.condition(sel_banda, alt.value(0.6), alt.value(0.04)),
+        tooltip=tips).add_params(p_eje, p_mod, p_srv, p_elo, p_conf, sel_banda, sel_click).transform_filter(filtro).properties(
         width=470, height=420, title=alt.Title("Las partidas que llegan al minuto 10",
                                                subtitle="Pasá el mouse para ver qué dijo el modelo; hacé clic para abrir una."))
-    elegido = alt.Chart(ex).mark_circle(size=140, fill=None, stroke=ORO, strokeWidth=2.5).encode(
-        x="dif_oro:Q", y="duracion:Q").transform_filter(sel_click)
-    cuenta = alt.Chart(ex).transform_filter(filtro).mark_bar(cornerRadiusEnd=3, height=16).encode(
+    # El título del eje x cambia con el selector: va como texto, debajo del eje
+    eje_txt = alt.Chart(pd.DataFrame({"a": [0]})).transform_calculate(t=titulo_eje).mark_text(
+        color=GRIS, fontSize=12.5, baseline="bottom").encode(x=alt.value(235), y=alt.value(420 + 46), text="t:N")
+    elegido = alt.Chart(ex).transform_calculate(x="datum[eje]").mark_circle(
+        size=140, fill=None, stroke=ORO, strokeWidth=2.5).encode(x="x:Q", y="duracion:Q").transform_filter(sel_click)
+    cuenta = del_modelo(alt.Chart(ex)).transform_filter(filtro).mark_bar(
+        cornerRadiusEnd=3, height=16).encode(
         y=alt.Y("banda_real:N", sort=BANDAS, title=None, scale=alt.Scale(domain=BANDAS)),
         x=alt.X("count():Q", title="partidas"),
         color=alt.Color("banda_real:N", scale=ESCALA_BANDA, legend=None),
         tooltip=[alt.Tooltip("banda_real:N", title="banda real"), alt.Tooltip("count():Q", title="partidas", format=",")]) \
         .properties(width=250, height=alt.Step(20), title=alt.Title("Dónde terminaron", subtitle="las partidas que quedan con los filtros"))
-    acierto = alt.Chart(ex).transform_filter(filtro).transform_aggregate(
+    acierto = del_modelo(alt.Chart(ex)).transform_filter(filtro).transform_aggregate(
         n="count()", a="mean(acierta)").transform_calculate(
-        t="format(datum.n, ',') + ' partidas · el modelo acertó la ventana en el ' + format(datum.a, '.0%')").mark_text(
+        t="format(datum.n, ',') + ' partidas · acertó la ventana en el ' + format(datum.a, '.0%')").mark_text(
         align="left", color=ORO, fontSize=13, fontWeight=600).encode(x=alt.value(0), y=alt.value(8), text="t:N") \
         .properties(width=250, height=18)
-    detalle = alt.Chart(ex).transform_filter(sel_click).transform_fold(
-        [f"p{k}" for k in range(K)], as_=["clave", "p"]).transform_calculate(
-        k="toNumber(replace(datum.clave, 'p', ''))", banda=f"{json.dumps(BANDAS)}[toNumber(replace(datum.clave, 'p', ''))]",
+    detalle = del_modelo(alt.Chart(ex).transform_filter(sel_click)).transform_calculate(
+        **{f"q{k}": f"toNumber(datum.pp[{k}]) / 1000" for k in range(K)}).transform_fold(
+        [f"q{k}" for k in range(K)], as_=["clave", "p"]).transform_calculate(
+        k="toNumber(replace(datum.clave, 'q', ''))", banda=f"{json.dumps(BANDAS)}[toNumber(replace(datum.clave, 'q', ''))]",
         en_ventana="datum.k >= datum.vi && datum.k <= datum.vi + 1",
         titulo="datum.match_id + ' · duró ' + format(datum.duracion, '.1f') + ' min'")
     det_barras = detalle.mark_bar(cornerRadiusTopLeft=3, cornerRadiusTopRight=3, width=24).encode(
@@ -571,7 +786,7 @@ def main():
         x=alt.value(0), y=alt.value(-14), text="titulo:N")
     det = (det_barras + det_borde + det_txt + det_titulo).properties(
         width=250, height=170, title=alt.Title("La partida elegida", subtitle="probabilidad de cada banda; en dorado, la ventana"))
-    specs["g-explora"] = alt.hconcat(nube + elegido, alt.vconcat(acierto, cuenta, det, spacing=18), spacing=28) \
+    specs["g-explora"] = alt.hconcat(nube + elegido + eje_txt, alt.vconcat(acierto, cuenta, det, spacing=18), spacing=28) \
         .resolve_scale(color="shared").to_dict()
 
     # ── Probá el modelo: la fórmula de la logística, adentro del gráfico ──
@@ -712,6 +927,21 @@ def main():
     t_res = tabla(["Partidas del test, por lo que dice", "Dice entre", "Acierta"],
                   [[t, f"{pct(lo, 0)} y {pct(hi, 0)}", pct(a)] for t, (lo, hi, a) in resolucion.items()])
 
+    def c_txt(c):
+        return num(c, 3).rstrip("0").rstrip(",")
+
+    t_mom = tabla(["", "El piso", *[n.capitalize() for n in ORDEN_MOM]], [
+        ["C elegido (validación cruzada)", "—", *[c_txt(m_mom[n]["C"]) for n in ORDEN_MOM]],
+        ["F1 macro, validación cruzada", "—", *[f"{num(m_mom[n]['F1 cv'], 3)} ± {num(m_mom[n]['F1 cv desvío'], 3)}"
+                                               for n in ORDEN_MOM]],
+        ["<b>F1 macro, test</b>", num(m_piso["F1"], 3), *[f"<b>{num(m_mom[n]['F1'], 3)}</b>" for n in ORDEN_MOM]],
+        ["Accuracy (banda exacta)", pct(m_piso["accuracy"]), *[pct(m_mom[n]["accuracy"]) for n in ORDEN_MOM]],
+        ["A una banda o menos", pct(m_piso["±1"]), *[pct(m_mom[n]["±1"]) for n in ORDEN_MOM]],
+        ["Error medio, en minutos", num(m_piso["error medio"], 2), *[num(m_mom[n]["error medio"], 2) for n in ORDEN_MOM]],
+        ["La ventana de 12 min: dice / pasa", f"{pct(dice_piso.mean())} / {pct(pasa_piso.mean())}",
+         *[f"{pct(m_mom[n]['dice'])} / {pct(m_mom[n]['pasa'])}" for n in ORDEN_MOM]],
+        ["Bandas que llega a contestar", "1 de 7", *[f"{m_mom[n]['contesta']} de 7" for n in ORDEN_MOM]]])
+
     filtros = tabla(["Paso", "Partidas", "Qué se hizo"], [
         ["Bajadas al bronce", num(len(df) + 1651),
          "Cada partida clasificatoria (cola 420) de los jugadores de la escalera de seis servidores, tal como la devuelve Riot."],
@@ -734,7 +964,16 @@ def main():
         TITULO="FF-15 · ¿Cuánto dura tu partida?",
         N_PARTIDAS=num(len(df)), N_MIN10=num(len(d10)), N_TEST=num(len(te)), N_TRAIN=num(len(tr)),
         N_SERVIDORES=str(plataformas.nunique()), TXT_SRV=txt_srv,
-        CSV_DF=html.escape(nombre_df), CSV_MIN=html.escape(nombre_min),
+        CSV_DF=html.escape(nombre_df), CSV_MIN=html.escape(nombre_min), CSV_MIN5=html.escape(nombre_min5),
+        N_LT15=num(n_lt15), PCT_LT15=pct(n_lt15 / len(df)),
+        F1_ANTES=num(m_mom["antes de jugar"]["F1"], 3), F1_M5=num(m_mom["minuto 5"]["F1"], 3),
+        ACC_ANTES=pct(m_mom["antes de jugar"]["accuracy"]), ACC_M5=pct(m_mom["minuto 5"]["accuracy"]),
+        MAS1_PISO=pct(m_piso["±1"]), MAS1_ANTES=pct(m_mom["antes de jugar"]["±1"]), MAS1=pct(m_final["±1"]),
+        PASA_ANTES=pct(m_mom["antes de jugar"]["pasa"]), PASA_PISO=pct(pasa_piso.mean()),
+        CONTESTA_ANTES=str(m_mom["antes de jugar"]["contesta"]),
+        N70_ANTES=num(arriba70["antes de jugar"]), N70_M10=num(arriba70["minuto 10"]),
+        CM_ANTES_CENTRO=pct(cm_mom["antes de jugar"][:, 3].sum() / cm_mom["antes de jugar"].sum(), 0),
+        CM_M10_CENTRO=pct(cm_mom["minuto 10"][:, 3].sum() / cm_mom["minuto 10"].sum(), 0),
         R2_ELO=pct(r_elo_e2 ** 2), R_ELO=num(r_elo_e2, 3),
         F1=num(m_final["F1"], 3), F1_PISO=num(m_piso["F1"], 3),
         DICE=pct(dice_te.mean()), PASA=pct(pasa_te.mean()), DICE0=pct(dice_te.mean(), 0), PASA0=pct(pasa_te.mean(), 0),
@@ -749,7 +988,7 @@ def main():
         RES_BAJO=pct(resolucion["el tercio en que dice menos"][2]), RES_ALTO=pct(resolucion["el tercio en que dice más"][2]),
         CONTESTA=str(int((cm.sum(axis=0) > 0).sum())),
         T_FILTROS=filtros, T_COMP=t_comp, T_GRILLA=t_grilla, T_TEST=t_test, T_BANDAS=t_bandas, T_CM=t_cm,
-        T_COEF=t_coef, T_IMP=t_imp, T_RES=t_res,
+        T_COEF=t_coef, T_IMP=t_imp, T_RES=t_res, T_MOM=t_mom,
         SPECS=json.dumps(specs, ensure_ascii=False, separators=(",", ":")),
         EJEMPLOS=json.dumps(ejemplos, ensure_ascii=False),
         DDRAGON=json.dumps(version), BANDAS_JSON=json.dumps(BANDAS, ensure_ascii=False),

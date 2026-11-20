@@ -142,14 +142,15 @@ footer p{max-width:none}
       <li><a href="#proyecto"><span>00:00</span>El proyecto</a></li>
       <li><a href="#datos"><span>05:00</span>Los datos</a></li>
       <li><a href="#hallazgo"><span>10:00</span>Lo que encontramos</a></li>
-      <li><a href="#modelo"><span>15:00</span>El modelo</a></li>
+      <li><a href="#momentos"><span>15:00</span>Antes, a los 5 y a los 10</a></li>
+      <li><a href="#modelo"><span>20:00</span>El modelo del minuto 10</a></li>
     </ol>
   </div>
   <div class="copa">
     <h3>Tu turno</h3>
     <ol>
-      <li><a href="#explora"><span>20:00</span>Explorá las partidas</a></li>
-      <li><a href="#probar"><span>25:00</span>Probá el modelo</a></li>
+      <li><a href="#explora"><span>25:00</span>Explorá las partidas</a></li>
+      <li><a href="#probar"><span>30:00</span>Probá el modelo</a></li>
     </ol>
     <p class="nota-nav">La historia se lee en orden. Acá las preguntas las hacés vos.</p>
   </div>
@@ -163,13 +164,14 @@ footer p{max-width:none}
   <h1>¿Cuánto va a durar tu partida?</h1>
   <p class="pregunta">¿Es posible predecir la duración de una partida de League of Legends a partir de las
   características de los jugadores, de los campeones de los equipos y de las condiciones iniciales de la partida?</p>
-  <div class="oracion">A los 10 minutos de juego, el modelo dice en qué ventana de 12 minutos va a terminar la partida,
-  y su probabilidad se cumple: en promedio dice $DICE0 y acierta el $PASA0. Antes de jugar, en cambio, casi nada
-  anticipa cuánto va a durar.</div>
+  <div class="oracion">Predecir cuánto va a durar una partida es difícil. Antes de jugar, el modelo casi no le gana
+  a contestar siempre la banda más común. Cada minuto de partida le suma un poco, y aun al minuto 10 acierta la banda
+  exacta en el $ACC de las partidas, casi como el piso ($ACC_PISO). Lo que sí logra al minuto 10 es una probabilidad
+  creíble: para su ventana de 12 minutos dice $DICE0, y la partida termina ahí el $PASA0 de las veces.</div>
   <div class="nums">
     <div class="num"><span>$R2_ELO</span><p>de la duración explica la columna de antes de jugar más asociada, el elo medio de la partida (Pearson $R_ELO)</p></div>
-    <div class="num"><span>$F1</span><p>F1 macro del modelo en el test, contra $F1_PISO del piso que contesta siempre la banda más común</p></div>
-    <div class="num"><span>$DICE0 → $PASA0</span><p>lo que dice el modelo para su ventana de 12 minutos, y las veces que la partida termina ahí, en las $N_TEST partidas del test</p></div>
+    <div class="num"><span>$F1_ANTES → $F1</span><p>F1 macro en el test: antes de jugar y al minuto 10 (pasando por $F1_M5 al minuto 5), sobre una escala de 0 a 1. El piso da $F1_PISO</p></div>
+    <div class="num"><span>$ACC</span><p>de las partidas del test en la banda exacta al minuto 10, contra $ACC_PISO del piso que contesta siempre la banda más común</p></div>
   </div>
   <p class="nota">Medido sobre $N_PARTIDAS partidas clasificatorias Solo/Duo de la Season 16, de $N_SERVIDORES servidores
   ($TXT_SRV). El modelo mira las $N_MIN10 que llegan al minuto 10.</p>
@@ -183,11 +185,13 @@ footer p{max-width:none}
   <h2>La mayoría de las partidas termina entre los minutos 21 y 33, y en el 15 hay un salto: la rendición</h2>
   <p class="lead">El $PARTE_21_33 de las $N_PARTIDAS partidas termina entre los minutos 21 y 33. Del minuto 14 al 15
   terminan $EN_14; del 15 al 16, $EN_15: a los quince minutos se habilita la votación de rendición, y las partidas que
-  ya estaban decididas se cierran ahí.</p>
+  ya estaban decididas se cierran ahí. Las $N_LT15 que terminan antes del minuto 15 ($PCT_LT15) son partidas que pueden
+  terminar antes porque una persona se va de la partida, y entonces la rendición se habilita antes.</p>
   <div class="grafico" id="g-datos"></div>
   <p class="mirar">El color es la <b>banda de 6 minutos</b> que el modelo tiene que adivinar, y es el mismo en toda la
-  página. Las bandas del centro juntan casi todo y las de las puntas son chicas: por eso, más abajo, la métrica es el
-  F1 macro y no la accuracy.</p>
+  página: las bandas tienen orden, así que van en un degradé de azul, más claro cuanto más corta la partida y más oscuro
+  cuanto más larga. Las bandas del centro juntan casi todo y las de las puntas son chicas: por eso, más abajo, la
+  métrica es el F1 macro y no la accuracy.</p>
   <details>
     <summary>Cómo lo sabemos</summary>
     <h4>De dónde salen</h4>
@@ -255,10 +259,59 @@ footer p{max-width:none}
   </details>
 </section>
 
-<!-- ═══════════════════════════ TALLO 3 · EL MODELO ═══════════════════════════ -->
+<!-- ═══════════════════════════ TALLO 3 · ANTES, A LOS 5 Y A LOS 10 ═══════════════════════════ -->
+<section id="momentos">
+  <p class="etapa"><b>15:00</b>Antes, a los 5 y a los 10</p>
+  <h2>Cuanto más avanza la partida, mejor predice el modelo, pero muy poco: la duración es difícil de anticipar</h2>
+  <p class="lead">El mismo modelo, una regresión logística, entrenado tres veces: con lo que se sabe antes de jugar,
+  con el estado de la partida al minuto 5 y con el estado al minuto 10. Las partidas son las mismas y el test es el
+  mismo; sólo cambia qué columnas ve. El F1 macro sube de $F1_ANTES a $F1_M5 y a $F1, siempre por encima del piso
+  ($F1_PISO), pero en una escala que llega a 1.</p>
+  <div class="grafico" id="g-f1"></div>
+  <p class="mirar">Cada barra tiene el color del momento, y es el mismo en toda la página: <b style="color:#8f9fb8">gris
+  azulado</b> antes de jugar, <b style="color:#3CA3A9">verde azulado</b> al minuto 5, <b style="color:#0AC8B9">turquesa</b>
+  al minuto 10. La línea gris punteada es el piso.</p>
+  <div class="grafico" id="g-metricas"></div>
+  <p class="mirar">En la banda exacta, los tres quedan donde el piso: $ACC_ANTES antes de jugar, $ACC_M5 al minuto 5 y
+  $ACC al 10, contra $ACC_PISO. A una banda de distancia pasan de $MAS1_PISO (piso) a $MAS1. Lo que más se mueve es la
+  ventana de 12 minutos: de $PASA_PISO con el piso a $PASA al minuto 10.</p>
+  <div class="grafico" id="g-contesta"></div>
+  <p class="mirar">El porqué: los tres modelos contestan casi siempre <b>27-33</b>, la banda más común. Antes de jugar
+  contesta sólo $CONTESTA_ANTES bandas distintas; al minuto 10, $CONTESTA. Las bandas de las puntas casi nunca aparecen.</p>
+  <div class="grafico" id="g-matriz"></div>
+  <p class="mirar">Antes de jugar, el $CM_ANTES_CENTRO de las partidas del test va a parar a 27-33, terminen cuando
+  terminen. Al minuto 10 baja al $CM_M10_CENTRO: las partidas cortas empiezan a separarse, porque un equipo que ya se
+  adelantó cierra antes. Las largas siguen sin verse venir.</p>
+  <div class="grafico" id="g-predicho"></div>
+  <p class="mirar">Si el modelo acertara siempre, los puntos caerían sobre la diagonal. En cambio quedan en franjas
+  horizontales cerca del minuto 30: una partida de 20 minutos y una de 45 reciben casi la misma respuesta. La franja
+  más baja, la de las partidas cortas, se va llenando a medida que avanza la partida.</p>
+  <div class="honesto"><b>Lo que dicen los tres juntos.</b> Antes de jugar, el modelo apenas sabe más que el piso. El
+  estado de la partida ayuda, y ayuda más cuanto más tarde se mira, pero con lo que se sabe al minuto 10 todavía no se
+  separa bien una partida de 20 minutos de una de 40. Por eso el modelo final predice al minuto 10, y lo que ofrece no
+  es una banda exacta sino una probabilidad.</div>
+  <details>
+    <summary>Cómo lo sabemos</summary>
+    <h4>Los tres modelos, lado a lado</h4>
+    $T_MOM
+    <h4>Cómo se compararon</h4>
+    <p>Los tres usan las $N_MIN10 partidas que llegan al minuto 10, con la partición de la Entrega 3 ($N_TRAIN de
+    entrenamiento, $N_TEST de test), así la comparación es justa: lo único que cambia son las columnas. Antes de jugar,
+    las derivadas de las 137 condiciones iniciales; al minuto 5, esas más el estado al minuto 5 (<code>$CSV_MIN5</code>);
+    al minuto 10, esas más el estado al minuto 10. Cada uno elige su C con la misma grilla, la misma validación cruzada
+    de 5 pedazos y el F1 macro. Con la regla de la cátedra, cada paso gana por más que su desvío. Está en la Sección 9
+    del notebook de las correcciones.</p>
+    <h4>Cómo se construyó «predicho contra real»</h4>
+    <p>Un clasificador dice una banda, no un minuto. Para ubicarla en el eje, cada banda se reemplaza por su minuto
+    típico: la mediana de la duración de las partidas de entrenamiento de esa banda. La sacudida vertical de ±1,2 minutos
+    es sólo para que los puntos no se tapen.</p>
+  </details>
+</section>
+
+<!-- ═══════════════════════════ TALLO 4 · EL MODELO ═══════════════════════════ -->
 <section id="modelo">
-  <p class="etapa"><b>15:00</b>El modelo</p>
-  <h2>A los 10 minutos, el modelo dice en qué ventana de 12 minutos termina la partida, y sus probabilidades se cumplen</h2>
+  <p class="etapa"><b>20:00</b>El modelo del minuto 10</p>
+  <h2>No acierta la banda, pero sus probabilidades se cumplen: cuando dice «p %», pasa el p % de las veces</h2>
   <p class="lead">Es una regresión logística: le da una probabilidad a cada banda de 6 minutos, y al jugador se le
   muestran las dos bandas seguidas más probables. En el test, a esa ventana le da en promedio $DICE, y la partida termina
   ahí el $PASA de las veces. Además, no dice siempre lo mismo: en el tercio de partidas en que más se anima, acierta el
@@ -266,7 +319,8 @@ footer p{max-width:none}
   <div class="grafico" id="g-modelo"></div>
   <p class="mirar">Cuanto más pegados a la diagonal, más creíble es la probabilidad. La línea <b>dorada</b> es el
   modelo, y el dorado es siempre lo que dice el modelo. El punto gris es el piso: también está calibrado, pero le dice
-  $DICE_PISO a todas las partidas por igual.</p>
+  $DICE_PISO a todas las partidas por igual. Los tres momentos están calibrados; con más partida jugada, la línea se
+  estira hacia la derecha: el modelo se anima a decir más, y acierta más.</p>
   <div class="honesto"><b>Lo que no logra, sin adornos.</b> Como respuesta de una sola banda, casi no le gana al piso:
   acierta la banda exacta en el $ACC de las partidas, contra $ACC_PISO del piso, y queda a menos de 3 minutos de lo
   real en el $LE3, contra $LE3_PISO. Con lo que se sabe al minuto 10 no se separa bien una partida de 20 minutos de
@@ -319,21 +373,24 @@ footer p{max-width:none}
 
 <!-- ═══════════════════════════ COPA · EXPLORÁ ═══════════════════════════ -->
 <section id="explora">
-  <p class="etapa copa"><b>20:00</b>Tu turno · Explorá</p>
+  <p class="etapa copa"><b>25:00</b>Tu turno · Explorá</p>
   <h2>Las $N_MIN10 partidas, y lo que dijo el modelo de cada una</h2>
-  <p class="lead">Cada punto es una partida: a la izquierda, las que estaban parejas al minuto 10; a la derecha, las que
-  ya tenían un equipo adelante. Filtrá por servidor, por elo o por cuánta confianza tenía el modelo, y hacé clic en una
-  partida para ver sus probabilidades.</p>
-  <div class="controles"><div id="c-srv"></div><div id="c-elo"></div><div id="c-conf"></div></div>
+  <p class="lead">Cada punto es una partida. Elegí qué va en el eje x (cuánto se separaron los equipos al minuto 10 en
+  oro, experiencia, súbditos, nivel, asesinatos, torres o monstruos épicos, o el elo medio) y de qué momento es el
+  modelo: antes de jugar, al minuto 5 o al minuto 10. Filtrá por servidor, por elo o por cuánta confianza tenía el
+  modelo, y hacé clic en una partida para ver sus probabilidades.</p>
+  <div class="controles"><div id="c-eje"></div><div id="c-modelo"></div><div id="c-srv"></div><div id="c-elo"></div><div id="c-conf"></div></div>
   <div class="grafico" id="g-explora"></div>
-  <p class="mirar">Probá subir la <b>confianza mínima</b>: quedan menos partidas, y el acierto de la ventana sube. Cada
-  partida la predice un modelo que no la vio: las $N_TRAIN del entrenamiento, con la validación cruzada; las $N_TEST
-  del test, con el modelo final. La leyenda también es un filtro.</p>
+  <p class="mirar">Probá subir la <b>confianza mínima</b>: quedan menos partidas, y el acierto de la ventana sube. Con
+  la probabilidad mínima en 70 %, quedan $N70_ANTES partidas con el modelo de antes de jugar y $N70_M10 con el del
+  minuto 10: antes de jugar, el modelo se anima menos. Cada partida la predice un modelo
+  que no la vio: las $N_TRAIN del entrenamiento, con la validación cruzada; las $N_TEST del test, con el modelo del
+  momento elegido. La leyenda también es un filtro.</p>
 </section>
 
 <!-- ═══════════════════════════ COPA · PROBÁ ═══════════════════════════ -->
 <section id="probar">
-  <p class="etapa copa"><b>25:00</b>Tu turno · Probá el modelo</p>
+  <p class="etapa copa"><b>30:00</b>Tu turno · Probá el modelo</p>
   <h2>Elegí una partida real, cambiá cómo iba al minuto 10 y mirá qué dice el modelo</h2>
   <p class="lead">Las probabilidades se calculan adentro del gráfico con los coeficientes de la logística entrenada:
   nada se reentrena. Cada deslizador va del mínimo al máximo que vio el entrenamiento, así que no se puede cargar un

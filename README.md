@@ -244,7 +244,8 @@ CSV congelado y los CSV del minuto que viajan en `notebooks/entrega-3/datos/`.
 Una página web que cuenta el proyecto y deja usar el modelo: **[`app/index.html`](app/index.html)**,
 publicada con GitHub Pages en **https://aguilarezequiel.github.io/FF-15/**. Usa el modelo final de las correcciones de la Entrega 3: la regresión
 logística sin pesos con bandas de 6 minutos (`C=10`), que al minuto 10 dice en qué ventana de 12
-minutos termina la partida.
+minutos termina la partida. Para mostrar que la duración es difícil de predecir, la compara con la misma
+logística entrenada antes de jugar y al minuto 5 (Sección 9 del notebook de las correcciones).
 
 Se regenera entera con un solo comando, en el mismo venv de los notebooks:
 
@@ -253,7 +254,7 @@ Se regenera entera con un solo comando, en el mismo venv de los notebooks:
 .venv\Scripts\python app/build_app.py --desde-pipeline  # con lo último que dejó el DAG en include/output/
 ```
 
-El script entrena el modelo con la misma partición, los mismos cinco pedazos y `SEMILLA = 42` que
+El script entrena los modelos con la misma partición, los mismos cinco pedazos y `SEMILLA = 42` que
 `notebooks/entrega-4/correcciones_entrega3.ipynb`. Con los CSV congelados, **compara sus números con los
 que quedaron guardados en el notebook y corta si no coinciden**. Después arma los gráficos con Altair,
 escribe adentro de la página los coeficientes de la logística (para «Probá el modelo», que calcula la
