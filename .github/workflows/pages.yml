@@ -24,17 +24,24 @@ concurrency:
   group: pages
   cancel-in-progress: true
 
+# Dos jobs, como la plantilla oficial de GitHub: uno sube app/ y el otro la publica. Con todo en un
+# solo job, deploy-pages buscaba el artefacto apenas subido y no lo encontraba (20/11).
 jobs:
-  publicar:
+  subir:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.despliegue.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v5
         with:
           path: app
+
+  publicar:
+    needs: subir
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
       - id: despliegue
         uses: actions/deploy-pages@v5
